@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="manifest" href="./manifest.json"/>
+        <script src="js/babel.min.js"></script>
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="js/config.js"></script>
+        <script src="js/vis.min.js"></script>
+        <script type="text/babel" src="js/app.js"></script>
+        <link rel="stylesheet" href="css/w3.css" media="all"/>
+        <link rel="stylesheet" href="css/w3-theme-dark-grey.css" media="all"/>
+        <link rel="stylesheet" href="css/vis-network.min.css" media="all"/>
+        <link rel="stylesheet" href="css/style.css" media="all"/>
+        <title>RoomConf Editor</title>
+    </head>
+    <body class="w3-theme-l4">
+        <div id="root" class="content-container w3-card-2">
+            <header class="w3-container w3-large w3-theme-d4">
+                <h1><b>RoomConf</b> Editor</h1>
+                <div id="systemMessages"><p></p></div>
+            </header>
+            <div id="graphui-content" class="w3-container w3-light-grey">
+                <div id="metiscbr-graphui"></div>
+                <div id="overlay" class="hide">
+                  <div id="selectType" class="hide">
+                      <h2>Select Type</h2>
+                      <div id="types">
+                          <div class="type hide room-type">LIVING</div>
+                          <div class="type hide room-type">SLEEPING</div>
+                          <div class="type hide room-type">WORKING</div>
+                          <div class="type hide room-type">TOILET</div>
+                          <div class="type hide room-type">BATH</div>
+                          <div class="type hide room-type">CORRIDOR</div>
+                          <div class="type hide room-type">STORAGE</div>
+                          <div class="type hide room-type">KITCHEN</div>
+                          <div class="type hide room-type">CHILDREN</div>
+                          <div class="type hide room-type">BUILDINGSERVICES</div>
+                          <div class="type hide room-type">ROOM</div>
+                          <div class="type hide edge-type">DOOR</div>
+                          <div class="type hide edge-type">PASSAGE</div>
+                          <div class="type hide edge-type">WALL</div>
+                          <div class="type hide edge-type">ENTRANCE</div>
+                          <div class="type hide edge-type">SLAB</div>
+                          <div class="type hide edge-type">STAIRS</div>
+                          <div class="type hide edge-type">WINDOW</div>
+                          <div class="type hide edge-type">EDGE</div>
+                      </div>
+                      <div id="additional" class="hide room-type">
+                        <div id="area">Area <input id="areaInput" type="number" /> qm</div>
+                        <div id="windows">Windows <input id="windowsInput" type="checkbox" /></div>
+                      </div>
+                      <div id="save">
+                        <input style="display: block;" type="button" value="Save" id="saveType"/>
+                      </div>
+                  </div>
+                </div>
+                <div id="sendAgraphml">
+                    <textarea hidden id="queryText"></textarea>
+                    <form method="post">
+                        <div>
+                            <input type="checkbox" class="filterCheckbox" id="find-roomcount" name="fp-filter" value="Room_Count">
+                            <input type="text" class="weightValue">
+                            <label for="find-roomcount">FP1 Room Count</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="filterCheckbox" id="find-relationcount" name="fp-filter" value="Relation_Count">
+                            <input type="text" class="weightValue">
+                            <label for="find-relationcount">FP2 Relation Count</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="filterCheckbox" id="find-roomgraph" name="fp-filter" value="Room_Graph">
+                            <input type="text" class="weightValue">
+                            <label for="find-roomgraph">FP3 Room Graph</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="filterCheckbox" id="find-roomtypes" name="fp-filter" value="Room_Types">
+                            <input type="text" class="weightValue">
+                            <label for="find-roomtypes">FP4 Room Types</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="filterCheckbox" id="find-adjacency" name="fp-filter" value="Adjacency">
+                            <input type="text" class="weightValue">
+                            <label for="find-adjacency">FP5 Adjacency</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="filterCheckbox" id="find-accessibility" name="fp-filter" value="Accessibility">
+                            <input type="text" class="weightValue">
+                            <label for="find-accessibility">FP6 Accessibility</label>
+                        </div>
+                        <div class="disabled">
+                            <input disabled type="checkbox" class="filterCheckbox" id="find-fullroomgraph" name="fp-filter" value="Full_Room_Graph">
+                            <input disabled type="text" class="weightValue">
+                            <label for="find-fullroomgraph">FP7 Full Room Graph</label>
+                        </div>
+                        <div class="disabled">
+                            <input disabled type="checkbox" class="filterCheckbox" id="find-naturallight" name="fp-filter" value="Natural_Light">
+                            <input disabled type="text" class="weightValue">
+                            <label for="find-naturallight">FP8 Natural Light</label>
+                        </div>
+                        <input style="display: block;" type="button" value="Send query" id="send2"/>
+                    </form>
+                </div>
+                <div id="suggestion">
+                  <input style="display: block;" type="button" value="Get suggestion" id="getSuggestion"/>
+                </div>
+                <div id="output">
+                  <p></p>
+                  <table id="result"></table>
+                </div>
+            </div>
+        </div>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js').then(function(registration) {
+                        console.log('SW registered in scope: ', registration.scope);
+                    }).catch(function(error) {
+                        console.log('SW could not be registered.', error);
+                    });
+                });
+            }
+        </script>
+    </body>
+</html>

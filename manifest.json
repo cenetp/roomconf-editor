@@ -1,0 +1,8 @@
+{
+  "name": "MetisCBR-GraphUI",
+  "short_name": "mmsys1",
+  "display": "standalone",
+  "orientation": "landscape",
+  "scope": "/metiscbr/graphui/",
+  "start_url": "/metiscbr/graphui/index.html"
+}
