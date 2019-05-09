@@ -56,6 +56,7 @@ div#suggestion {
   width: 950px;
   height: 600px;
   top: 15px;
+  z-index: 5;
 }
 
 div#save {
@@ -63,7 +64,6 @@ div#save {
   bottom: 0;
   right: 0;
   width: 25%;
-  border-top: 1px solid #555;
   height: 14%;
 }
 
@@ -107,7 +107,7 @@ input#send2 {
 #selectType {
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
-  z-index: 2;
+  z-index: 6;
   top: 25%;
   left: 33%;
   width: 34%;
@@ -133,6 +133,7 @@ input#send2 {
   width: 100%;
   height: 72%;
   bottom: 14%;
+  border-bottom: 1px solid #555;
 }
 
 .type {
@@ -179,7 +180,6 @@ div#additional {
   position: absolute;
   bottom: 0;
   height: 14%;
-  border-top: 1px solid #555;
   width: 75%;
 }
 

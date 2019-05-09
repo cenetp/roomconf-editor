@@ -84,7 +84,8 @@ let options = {
   locales: locales,
   interaction: {
     //dragView: false,
-    zoomView: false
+    zoomView: false,
+    tooltipDelay: 0
   }
 }
 
