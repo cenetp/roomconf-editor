@@ -214,6 +214,9 @@ let userView = {
       renderResponse('div', '#suggestion', msg);
     } else if(msg.startsWith('<adaptation>')) {
       renderResponse('div', '#adaptation', msg);
+    } else if (msg.startsWith('<span class="connection')) {
+      // display the connection message
+      document.querySelector('#connMessages p').innerHTML = msg;
     } else {
       // display the system message
       document.querySelector('#systemMessages p').innerHTML = msg;
@@ -235,17 +238,16 @@ let req = {
       req.socket = new MozWebSocket(host);
     } else {
       userView.print('<span class="connection red">'
-      + 'Sorry your browser doesn\'t support websocket connections. '
-      + '<br/>Session will be closed.</span>');
+      + 'Your browser doesn\'t support websocket connections.</span>');
       return;
     }
     req.socket.onopen = function() {
       userView.print('<span class="connection green">'
-      + 'Connected via websocket to: ' + server + '/request </span>');
+      + '&#9679;</span> Connected via websocket to <b>' + server + '</b>');
     }
     req.socket.onclose = function() {
       userView.print('<span class="connection red">'
-      + 'Websocket connection closed.</span>');
+      + '&#9679;</span> Not connected.');
     }
     req.socket.onmessage = function(msg) {
       userView.print(msg.data);

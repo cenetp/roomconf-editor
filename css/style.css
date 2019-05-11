@@ -17,6 +17,11 @@ body, h1, h2, h3, input, .vis-label {
   font-family: 'Inconsolata', Helvetica, 'Liberation Sans', Arial, sans-serif !important;
 }
 
+h1 {
+  margin-bottom: 15px;
+  margin-top: 3px;
+}
+
 #metiscbr-graphui {
   width: 950px;
   height: 600px;
@@ -177,6 +182,14 @@ input.weightValue {
 
 header {
   position: relative;
+}
+
+div#connMessages {
+  position: absolute;
+  top: 33px;
+  left: 17px;
+  font-size: 14px;
+  color: #afafaf;
 }
 
 div#systemMessages {
