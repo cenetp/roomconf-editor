@@ -141,7 +141,7 @@ let roomColors = {
   'BUILDINGSERVICES': '#b5f1d1',
   'EXTERIOR': '#b5f1d1',
   'PARKING': '#b5f1d1',
-  'ROOM': '#ececec'
+  'ROOM': '#96c2fc'
 }
 
 let nodeId = '';
@@ -157,7 +157,7 @@ document.querySelector('#saveType').onclick = function() {
       color: roomColors[type],
       area: a,
       windowsExist: w,
-      title: 'Area: ' + a + ' qm<br>Windows exist: ' + w
+      title: 'Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' qm')) + '<br>Windows exist: ' + w
     });
     showTypes('hide', 'room-type');
   } else if (document.querySelectorAll('.edge-type')[0].classList.contains('show')) {
@@ -204,7 +204,7 @@ let renderResponse = function(el, parentEl, msg) {
 let userView = {
   print: function(msg) {
     console.log(msg);
-    if (msg.startsWith('<tr>') || msg.startsWith('<?xml')) {
+    if (msg.startsWith('<result>') || msg.startsWith('<?xml')) {
       renderResponse('tbody', '#result', msg);
     } else if (msg.startsWith('<suggestion>')) {
       renderResponse('div', '#suggestion', msg);
