@@ -59,6 +59,15 @@ div#suggestion {
   z-index: 5;
 }
 
+#closeTypes {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  font-size: 28px;
+  cursor: pointer;
+  padding-right: 10px;
+}
+
 div#save {
   position: absolute;
   bottom: 0;

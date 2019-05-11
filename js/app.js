@@ -99,12 +99,15 @@ network.setOptions({
 // display the concept attributes dialog
 let overlay = document.querySelector('#overlay');
 let selectType = document.querySelector('#selectType');
+const showOverlay = function(cls1, cls2) {
+  overlay.classList.remove(cls1);
+  overlay.classList.add(cls2);
+  selectType.classList.remove(cls1);
+  selectType.classList.add(cls2);
+}
 let showTypes = function(order, type, concept) {
   if (order === 'show') {
-    overlay.classList.remove('hide');
-    overlay.classList.add('show');
-    selectType.classList.remove('hide');
-    selectType.classList.add('show');
+    showOverlay('hide', 'show');
     document.querySelectorAll('.' + type).forEach(function(el) {
       el.classList.remove('hide');
       el.classList.add('show');
@@ -117,15 +120,16 @@ let showTypes = function(order, type, concept) {
       document.querySelector('#windowsInput').checked = concept['windowsExist'];
     }
   } else if (order === 'hide') {
-    overlay.classList.remove('show');
-    overlay.classList.add('hide');
-    selectType.classList.remove('show');
-    selectType.classList.add('hide');
+    showOverlay('show', 'hide');
     document.querySelectorAll('.' + type).forEach(function(el) {
       el.classList.remove('show');
       el.classList.add('hide');
     });
   }
+}
+
+document.querySelector('#closeTypes').onclick = function() {
+  showOverlay('show', 'hide');
 }
 
 let roomColors = {
