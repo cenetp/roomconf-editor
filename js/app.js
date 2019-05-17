@@ -105,7 +105,7 @@ const showOverlay = function(cls1, cls2) {
   selectType.classList.remove(cls1);
   selectType.classList.add(cls2);
 }
-let showTypes = function(order, type, concept) {
+const showTypes = function(order, type, concept) {
   if (order === 'show') {
     showOverlay('hide', 'show');
     document.querySelectorAll('.' + type).forEach(function(el) {
@@ -199,7 +199,7 @@ if (typeof String.prototype.startsWith != 'function') {
   }
 }
 
-let renderResponse = function(el, parentEl, msg) {
+const renderResponse = function(el, parentEl, msg) {
   let element = document.createElement(el);
   element.innerHTML = msg;
   document.querySelector(parentEl).appendChild(element);
@@ -267,7 +267,7 @@ let head = '<?xml version="1.0" encoding="UTF-8"?><searchrequest><agraphml><grap
 let foot = '</graph></graphml></agraphml>';
 let end = '</searchrequest>';
 
-let getNodesAndEdges = function() {
+const getNodesAndEdges = function() {
   let queryElements = '';
   nodes.get().forEach(function(node) {
     let roomType = node['label'];
@@ -291,7 +291,7 @@ let getNodesAndEdges = function() {
   return queryElements;
 }
 
-var sendQuery = function() {
+const sendQuery = function() {
   if (getNodesAndEdges() != '') {
     let msg2 = head + getNodesAndEdges() + foot;
     let sum = 0;
@@ -340,17 +340,17 @@ var sendQuery = function() {
 
 }
 
-var getSuggestion = function() {
+const getSuggestion = function() {
   let roomCount = nodes.get().length;
   let edgeCount = edges.get().length;
   let actionCount = 10;
   let lastFpCount = 2;
-  let msg = '<chainMeta>' + roomCount + ',' + edgeCount + ','
-    + actionCount + ',' + lastFpCount + '</chainMeta>';
+  let msg = '<chainMeta>a0T;a0S;a1K;f0P;f0T;a0P;a0T,' + roomCount + ',' + edgeCount + ','
+    + actionCount + ',' + lastFpCount + ',0T_0S_1K_0P_0T</chainMeta>';
   req.socket.send(msg);
 }
 
-var initApp = function() {
+const initApp = function() {
   // read the config
   if (!config.retrieval) {
     document.querySelector('#sendAgraphml').classList.add('hide');
@@ -374,7 +374,7 @@ var initApp = function() {
   }
 }
 
-function ready(fn) {
+const ready = function(fn) {
   if (document.readyState != 'loading') {
     fn();
   } else {
