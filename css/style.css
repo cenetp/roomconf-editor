@@ -412,3 +412,29 @@ input[disabled] + label:hover {
   color: #a7a7a7;
   cursor: default;
 }
+
+#download {
+  position: absolute;
+  right: 240px;
+  top: 19px;
+}
+
+#downloadAgraphml {
+  background: #e0e0e0;
+  height: 26px;
+  border: none;
+  cursor: pointer;
+}
+
+#showAgraphml {
+  position: absolute;
+  right: 0;
+  top: 32px;
+  border: 2px solid #ccc;
+  background: #f7f7f7;
+  width: 700px;
+  height: 500px;
+  overflow-y: scroll;
+  resize: none;
+  font-family: monospace;
+}

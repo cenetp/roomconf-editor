@@ -50,9 +50,6 @@ let options = {
           let froms = edges.get().filter(function(e) { return e.to === edgeData.from })
           .map(function(e) { return e.from })
           .map(function(from) { return from === edgeData.to });
-          console.log(tos);
-          console.log(froms);
-          console.log(edges.get());
           if (tos.includes(true) || froms.includes(true)) {
             userView.print('<span class="warning">Rooms are already connected.</span>');
           } else {
@@ -207,7 +204,6 @@ const renderResponse = function(el, parentEl, msg) {
 
 let userView = {
   print: function(msg) {
-    console.log(msg);
     if (msg.startsWith('<result>') || msg.startsWith('<?xml')) {
       renderResponse('tbody', '#result', msg);
     } else if (msg.startsWith('<suggestion>')) {
@@ -291,7 +287,7 @@ const getNodesAndEdges = function() {
   return queryElements;
 }
 
-const sendQuery = function() {
+const sendQuery = function(ev) {
   if (getNodesAndEdges() != '') {
     let msg2 = head + getNodesAndEdges() + foot;
     let sum = 0;
@@ -315,12 +311,14 @@ const sendQuery = function() {
         }
       }
     }
-    if (count < 2) {
+    msg2 = msg2 + end;
+    if (ev === 'download') {
+      document.querySelector('#showAgraphml').value =
+      msg2.substring(msg2.indexOf('<graphml'), msg2.lastIndexOf('</graphml') + 10);
+    } else if (count < 2) {
       userView.print('<span class="warning">'
         + 'Please select a minimum of 2 Fingerprints.</span>');
     } else {
-      msg2 = msg2 + end;
-      console.log(msg2);
       req.socket.send(msg2);
       setTimeout(getSuggestion(), 300);
     }
@@ -348,6 +346,18 @@ const getSuggestion = function() {
   let msg = '<chainMeta>a0T;a0S;a1K;f0P;f0T;a0P;a0T,' + roomCount + ',' + edgeCount + ','
     + actionCount + ',' + lastFpCount + ',0T_0S_1K_0P_0T</chainMeta>';
   req.socket.send(msg);
+}
+
+document.querySelector('#downloadAgraphml').onclick = function() {
+  let cl = document.querySelector('#showAgraphml').classList;
+  if (cl.contains('hide')) {
+    cl.remove('hide');
+    cl.add('show');
+    sendQuery('download');
+  } else {
+    cl.remove('show');
+    cl.add('hide');
+  }
 }
 
 const initApp = function() {
