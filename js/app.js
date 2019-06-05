@@ -1,3 +1,15 @@
+'use strict';
+
+let lastFpCount = 0;
+let currentChain = [];
+let currentSelectedNode = '';
+
+if (typeof String.prototype.startsWith != 'function') {
+  String.prototype.startsWith = function(str) {
+    return this.slice(0, str.length) == str;
+  }
+}
+
 // create empty nodes array
 let nodes = new vis.DataSet([
   // {id: 1, label: 'Node 1', title: 'I have a popup!'},
@@ -34,6 +46,16 @@ let options = {
     addNode: function(nodeData, callback) {
       nodeData.label = 'ROOM';
       nodeData.title = 'Double-click to edit';
+      callback(nodeData);
+    },
+    deleteNode: function(nodeData, callback) {
+      if (currentSelectedNode!=='ROOM') {
+        currentChain.push('r0' + currentSelectedNode);
+      } else {
+        if (network.getConnectedEdges(nodeId).length > 0) {
+          currentChain.push('r0' + currentSelectedNode);
+        }
+      }
       callback(nodeData);
     },
     addEdge: function(edgeData, callback) {
@@ -124,7 +146,6 @@ const showTypes = function(order, type, concept) {
     });
   }
 }
-
 document.querySelector('#closeTypes').onclick = function() {
   showOverlay('show', 'hide');
 }
@@ -152,13 +173,20 @@ document.querySelector('#saveType').onclick = function() {
   if (document.querySelectorAll('.room-type')[0].classList.contains('show')) {
     let a = document.querySelector('#areaInput').value;
     let w = document.querySelector('#windowsInput').checked;
+    let currentType = nodes.get(nodeId).label;
+    if (currentType==='ROOM') {
+      currentChain.push('a0' + type);
+    } else {
+      currentChain.push('t0' + currentType); // TODO: + ':(' + type + ')');
+    }
+    currentSelectedNode = type;
     nodes.update({
       id: nodeId,
       label: type,
       color: roomColors[type],
       area: a,
       windowsExist: w,
-      title: 'Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' qm')) + '<br>Windows exist: ' + w
+      title: 'Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' m<sup>2</sup>')) + '<br>Windows exist: ' + w
     });
     showTypes('hide', 'room-type');
   } else if (document.querySelectorAll('.edge-type')[0].classList.contains('show')) {
@@ -189,14 +217,18 @@ network.on("doubleClick", function(params) {
     showTypes('show', 'edge-type', edges.get(edgeId));
   }
 });
+network.on("selectNode", function (params) {
+  nodeId = params.nodes[0];
+  currentSelectedNode = nodes.get(nodeId).label;
+});
+network.on("deselectNode", function (params) {
+  currentSelectedNode = '';
+  nodeId = '';
+});
 
-if (typeof String.prototype.startsWith != 'function') {
-  String.prototype.startsWith = function(str) {
-    return this.slice(0, str.length) == str;
-  }
-}
 
 const renderResponse = function(el, parentEl, msg) {
+  document.querySelector(parentEl).innerHTML = '';
   let element = document.createElement(el);
   element.innerHTML = msg;
   document.querySelector(parentEl).appendChild(element);
@@ -207,7 +239,7 @@ let userView = {
     if (msg.startsWith('<result>') || msg.startsWith('<?xml')) {
       renderResponse('tbody', '#result', msg);
     } else if (msg.startsWith('<suggestion>')) {
-      renderResponse('div', '#suggestion', msg);
+      renderResponse('div', '#suggestions', msg);
     } else if(msg.startsWith('<adaptation>')) {
       renderResponse('div', '#adaptation', msg);
     } else if (msg.startsWith('<span class="connection')) {
@@ -319,6 +351,7 @@ const sendQuery = function(ev) {
       userView.print('<span class="warning">'
         + 'Please select a minimum of 2 Fingerprints.</span>');
     } else {
+      lastFpCount = count;
       req.socket.send(msg2);
       setTimeout(getSuggestion(), 300);
     }
@@ -340,12 +373,28 @@ const sendQuery = function(ev) {
 
 const getSuggestion = function() {
   let roomCount = nodes.get().length;
-  let edgeCount = edges.get().length;
-  let actionCount = 10;
-  let lastFpCount = 2;
-  let msg = '<chainMeta>a0T;a0S;a1K;f0P;f0T;a0P;a0T,' + roomCount + ',' + edgeCount + ','
-    + actionCount + ',' + lastFpCount + ',0T_0S_1K_0P_0T</chainMeta>';
-  req.socket.send(msg);
+  if (roomCount < 2) {
+    userView.print('<suggestion>At least two rooms should be '
+    + 'available to produce a suggestion.</suggestion>');
+  } else {
+    userView.print('<suggestion></suggestion>'); // Clear suggestion field
+    let edgeCount = edges.get().length;
+    let actionCount = currentChain.length;
+    let nodeIds = nodes.get().map(function(n) { return n.id });
+    let roomsAndEdges = [];
+    nodeIds.forEach(function(id) {
+      let e = network.getConnectedEdges(id)
+      .map(function(id) { return edges.get(id).label });
+      roomsAndEdges.push(
+        nodes.get(id).label + '-' + e.join('+')
+      );
+    });
+    let msg = '<chainMeta>' + currentChain.join(';') + ','
+    + roomCount + ',' + edgeCount + ',' + actionCount + ',' + lastFpCount + ','
+    + roomsAndEdges.join('_') + '</chainMeta>';
+    console.log(msg);
+    req.socket.send(msg);
+  }
 }
 
 document.querySelector('#downloadAgraphml').onclick = function() {
