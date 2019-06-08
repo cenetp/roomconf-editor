@@ -151,19 +151,19 @@ document.querySelector('#closeTypes').onclick = function() {
 }
 
 let roomColors = {
+  'ROOM': '#96c2fc',
   'LIVING': '#e9f1b5',
   'SLEEPING': '#cef1b5',
   'WORKING': '#f1e5b5',
-  'CHILDREN': '#aad2e6',
+  'KITCHEN': '#dbb5f1',
+  'CORRIDOR': '#f1b5d5',
   'BATH': '#b5ebf1',
   'TOILET': '#b7b5f1',
-  'KITCHEN': '#dbb5f1',
-  'STORAGE': '#f1c4b5',
-  'CORRIDOR': '#f1b5d5',
-  'BUILDINGSERVICES': '#b5f1d1',
-  'EXTERIOR': '#b5f1d1',
   'PARKING': '#b5f1d1',
-  'ROOM': '#96c2fc'
+  'CHILDREN': '#aad2e6',
+  'EXTERIOR': '#b5f1d1',
+  'STORAGE': '#f1c4b5',
+  'BUILDINGSERVICES': '#b5f1d1'
 }
 
 let nodeId = '';
@@ -386,7 +386,7 @@ const getSuggestion = function() {
       let e = network.getConnectedEdges(id)
       .map(function(id) { return edges.get(id).label });
       roomsAndEdges.push(
-        nodes.get(id).label + '-' + e.join('+')
+        nodes.get(id).label + '-' + e.join('/')
       );
     });
     let msg = '<chainMeta>' + currentChain.join(';') + ','
