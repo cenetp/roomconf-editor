@@ -49,7 +49,20 @@ div#suggestion {
   width: 190px;
   right: 23px;
   border: 1px solid #ccc;
-  top: 263px;
+  top: 240px;
+  color: #222222;
+  padding: 6px;
+  border-radius: 5px;
+}
+
+div#adaptation {
+  position: absolute;
+  min-height: 20px;
+  background: #fff;
+  width: 190px;
+  right: 23px;
+  border: 1px solid #ccc;
+  top: 380px;
   color: #222222;
   padding: 6px;
   border-radius: 5px;
@@ -92,7 +105,7 @@ input#send2 {
   margin-top: 5px;
 }
 
-#saveType, #send2, #getSuggestion {
+#saveType, #send2, #getSuggestion, #getAdaptation {
   border-radius: 5px;
   border: 1px solid #333;
   background: #6d6d6d;
@@ -100,6 +113,10 @@ input#send2 {
   cursor: pointer;
   outline: none;
   transition: all 0.3s ease-out;
+}
+
+#getSuggestion, #getAdaptation {
+  display: block;
 }
 
 #saveType:hover, #send2:hover, #getSuggestion:hover {

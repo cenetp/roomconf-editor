@@ -291,7 +291,8 @@ let req = {
   }
 }
 
-let head = '<?xml version="1.0" encoding="UTF-8"?><searchrequest><agraphml><graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://graphml.graphdrawing.org/xmlns     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><graph id="searchGraph1" edgedefault="undirected"><key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"></key><key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"></key><key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"></key><key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"></key><key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"></key><key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"></key><key id="bimServerPoid" for="graph" attr.name="bimServerPoid" attr.type="long"></key><key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"></key><key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"></key><key id="name" for="node" attr.name="name" attr.type="string"></key><key id="roomType" for="node" attr.name="roomType" attr.type="string"></key><key id="center" for="node" attr.name="center" attr.type="string"></key><key id="corners" for="node" attr.name="corners" attr.type="string"></key><key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key><key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key><key id="area" for="node" attr.name="area" attr.type="float"></key><key id="sourceConnector" for="edge" attr.name="sourceConnector" attr.type="string"></key><key id="targetConnector" for="edge" attr.name="targetConnector" attr.type="string"></key><key id="hinge" for="edge" attr.name="hinge" attr.type="string"></key><key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key><data key="imageUri"></data><data key="imageMD5"></data><data key="validatedManually">false</data><data key="floorLevel">0.0</data><data key="buildingId">0</data><data key="ifcUri"></data><data key="bimServerPoid">0</data><data key="alignmentNorth">0.0</data><data key="geoReference">null</data>';
+let start = '<?xml version="1.0" encoding="UTF-8"?><searchrequest>'
+let head = '<agraphml><graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://graphml.graphdrawing.org/xmlns     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><graph id="searchGraph1" edgedefault="undirected"><key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"></key><key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"></key><key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"></key><key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"></key><key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"></key><key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"></key><key id="bimServerPoid" for="graph" attr.name="bimServerPoid" attr.type="long"></key><key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"></key><key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"></key><key id="name" for="node" attr.name="name" attr.type="string"></key><key id="roomType" for="node" attr.name="roomType" attr.type="string"></key><key id="center" for="node" attr.name="center" attr.type="string"></key><key id="corners" for="node" attr.name="corners" attr.type="string"></key><key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key><key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key><key id="area" for="node" attr.name="area" attr.type="float"></key><key id="sourceConnector" for="edge" attr.name="sourceConnector" attr.type="string"></key><key id="targetConnector" for="edge" attr.name="targetConnector" attr.type="string"></key><key id="hinge" for="edge" attr.name="hinge" attr.type="string"></key><key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key><data key="imageUri"></data><data key="imageMD5"></data><data key="validatedManually">false</data><data key="floorLevel">0.0</data><data key="buildingId">0</data><data key="ifcUri"></data><data key="bimServerPoid">0</data><data key="alignmentNorth">0.0</data><data key="geoReference">null</data>';
 let foot = '</graph></graphml></agraphml>';
 let end = '</searchrequest>';
 
@@ -321,7 +322,7 @@ const getNodesAndEdges = function() {
 
 const sendQuery = function(ev) {
   if (getNodesAndEdges() != '') {
-    let msg2 = head + getNodesAndEdges() + foot;
+    let msg2 = start + head + getNodesAndEdges() + foot;
     let sum = 0;
     let filters = document.querySelectorAll('.filterCheckbox');
     let weights = document.querySelectorAll('.weightValue');
@@ -397,6 +398,17 @@ const getSuggestion = function() {
   }
 }
 
+const getAdaptation = function() {
+  if (getNodesAndEdges() != '') {
+    let adaptationMsg = (head + getNodesAndEdges() + foot)
+    .replace('<agraphml>', '<adaptation>')
+    .replace('</agraphml>', '</adaptation>');
+    req.socket.send(adaptationMsg);
+  } else {
+    userView.print('<span class="warning">Room conf is empty.</span>');
+  }
+}
+
 document.querySelector('#downloadAgraphml').onclick = function() {
   let cl = document.querySelector('#showAgraphml').classList;
   if (cl.contains('hide')) {
@@ -418,15 +430,16 @@ const initApp = function() {
   if (!config.suggestion) {
     document.querySelector('#suggestion').classList.add('hide');
   }
-  // if (!config.adaptation) {
-  //   document.querySelector('#adaptation').classList.add('hide');
-  // }
+  if (!config.adaptation) {
+    document.querySelector('#adaptation').classList.add('hide');
+  }
   // if (!config.save) {
   //   document.querySelector('#saveAgraphml').classList.add('hide');
   // }
   // add click events
   document.querySelector('#send2').onclick = sendQuery;
   document.querySelector('#getSuggestion').onclick = getSuggestion;
+  document.querySelector('#getAdaptation').onclick = getAdaptation;
   // Initialize WebSocket
   if (config.retrieval || config.suggestion || config.adaptation) {
     req.init();
