@@ -105,7 +105,11 @@ input#send2 {
   margin-top: 5px;
 }
 
-#saveType, #send2, #getSuggestion, #getAdaptation {
+#saveType,
+#send2,
+#getSuggestion,
+#getAdaptation,
+#applyAgraphml {
   border-radius: 5px;
   border: 1px solid #333;
   background: #6d6d6d;
@@ -448,10 +452,28 @@ input[disabled] + label:hover {
   right: 0;
   top: 32px;
   border: 2px solid #ccc;
-  background: #f7f7f7;
+  color: #e4e4e4;
+  background: #656565;
   width: 700px;
   height: 500px;
   overflow-y: scroll;
   resize: none;
   font-family: monospace;
+}
+
+#agraphmlControls {
+  position: absolute;
+  top: 532px;
+  right: 0;
+  background: #f1f1f1;
+  padding: 4px;
+  border: 2px solid #ccc;
+  border-top: 0;
+  width: 700px;
+}
+
+div#agraphmlMessage {
+  display: inline-block;
+  float: right;
+  padding-right: 5px;
 }

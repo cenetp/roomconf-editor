@@ -409,16 +409,91 @@ const getAdaptation = function() {
   }
 }
 
+let cl = document.querySelector('#showAgraphml').classList;
+let cl_ag = document.querySelector('#agraphmlControls').classList;
+
 document.querySelector('#downloadAgraphml').onclick = function() {
-  let cl = document.querySelector('#showAgraphml').classList;
   if (cl.contains('hide')) {
     cl.remove('hide');
+    cl_ag.remove('hide');
     cl.add('show');
+    cl_ag.add('show');
     sendQuery('download');
   } else {
     cl.remove('show');
+    cl_ag.remove('show');
     cl.add('hide');
+    cl_ag.add('hide');
   }
+}
+
+const applyAgraphml = function(agraphml) {
+  // first clear existing nodes and edges
+  nodes.clear();
+  edges.clear();
+  // parse AGraphML
+  let doc = jQuery.parseXML(agraphml);
+  let xml = jQuery(doc);
+  let agraphmlNodes = xml.find('node');
+  let agraphmlEdges = xml.find('edge');
+  let newNodes = new vis.DataSet([]);
+  let newEdges = new vis.DataSet([]);
+  agraphmlNodes.each(function() {
+    let roomId = jQuery(this).attr('id');
+    let roomType = '';
+    let data = jQuery(this).find('data');
+    data.each(function() {
+      let key = jQuery(this).attr('key');
+      if (key === 'roomType') {
+        roomType = (jQuery(this).first().text()).toUpperCase();
+      }
+    });
+    if (roomId !== undefined && roomId !== '' && roomType !== undefined && roomType != '') {
+      let newNode = {
+        id: roomId,
+        label: roomType,
+        color: roomColors[roomType]
+      }
+      nodes.update(newNode)
+    }
+  });
+  agraphmlEdges.each(function() {
+    let edgeId = jQuery(this).attr('id');
+    let source = jQuery(this).attr('source');
+    let target = jQuery(this).attr('target');
+    let edgeType = ''
+    let data = jQuery(this).find('data');
+    data.each(function() {
+      let key = jQuery(this).attr('key');
+      if (key === 'edgeType') {
+        edgeType = (jQuery(this).first().text()).toUpperCase();
+      }
+    });
+    let idAvailable = (edgeId !== undefined && edgeId !== '');
+    let sourceAvailable = (source !== undefined && source !== '');
+    let targetAvailable = (target !== undefined && target !== '');
+    let typeAvailable = (edgeType !== undefined && edgeType !== '');
+    if (idAvailable && sourceAvailable && targetAvailable && typeAvailable) {
+      let newEdge = {
+        id: edgeId,
+        from: source,
+        to: target,
+        label: edgeType
+      }
+      edges.update(newEdge);
+    }
+  });
+  // update vis network data
+  network.setData({nodes: nodes, edges: edges});
+}
+
+document.querySelector('#applyAgraphml').onclick = function() {
+  let agraphmlText = document.querySelector('#showAgraphml').value;
+  applyAgraphml(agraphmlText);
+  cl.remove('show');
+  cl_ag.remove('show');
+  cl.add('hide');
+  cl_ag.add('hide');
 }
 
 const initApp = function() {
@@ -433,9 +508,6 @@ const initApp = function() {
   if (!config.adaptation) {
     document.querySelector('#adaptation').classList.add('hide');
   }
-  // if (!config.save) {
-  //   document.querySelector('#saveAgraphml').classList.add('hide');
-  // }
   // add click events
   document.querySelector('#send2').onclick = sendQuery;
   document.querySelector('#getSuggestion').onclick = getSuggestion;
