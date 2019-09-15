@@ -84,19 +84,23 @@ let options = {
   },
   nodes: {
     shape: 'dot',
-    size: 25,
+    size: 27,
     font: {
-      size: 15,
-      face: 'Inconsolata, sans-serif'
+      size: 18,
+      strokeWidth: 0,
+      face: 'Inconsolata, monospace'
     },
     borderWidth: 2
   },
   edges: {
-    width: 2,
+    width: 3,
     smooth: false,
     font: {
-      size: 15,
-      face: 'Inconsolata, sans-serif'
+      size: 18,
+      align: 'middle',
+      background: '#ffffff',
+      strokeWidth: 0,
+      face: 'Inconsolata, monospace'
     }
   },
   locale: 'en',
@@ -236,18 +240,16 @@ const renderResponse = function(el, parentEl, msg) {
 
 let userView = {
   print: function(msg) {
-    if (msg.startsWith('<result>') || msg.startsWith('<?xml')) {
-      renderResponse('tbody', '#result', msg);
-    } else if (msg.startsWith('<suggestion>')) {
-      renderResponse('div', '#suggestions', msg);
+    if (msg.startsWith('<suggestion>')) {
+      showSuggestion(msg);
     } else if(msg.startsWith('<adaptation>')) {
-      renderResponse('div', '#adaptation', msg);
+      drawAdaptation(msg);
     } else if (msg.startsWith('<span class="connection')) {
-      // display the connection message
+      // display connection message
       document.querySelector('#connMessages p').innerHTML = msg;
     } else {
-      // display the system message
-      document.querySelector('#systemMessages p').innerHTML = msg;
+      // display retrieval results or error message
+      showRetrievalResults(msg);
     }
   }
 }
@@ -272,18 +274,21 @@ let req = {
     req.socket.onopen = function() {
       userView.print('<span class="connection green">'
       + '&#9679;</span> Connected via websocket to <b>' + server + '</b>');
+      jQuery('#send2, #getAdaptation, #getSuggestion').prop('disabled', false)
+      .removeClass('disabled');
     }
     req.socket.onclose = function() {
       userView.print('<span class="connection red">'
       + '&#9679;</span> Not connected.');
+      jQuery('#send2, #getAdaptation, #getSuggestion').prop('disabled', true)
+      .addClass('disabled');
     }
     req.socket.onmessage = function(msg) {
       userView.print(msg.data);
     }
   },
   init: function() {
-    if (window.location.protocol === 'http:'
-    || window.location.protocol === 'file:') {
+    if (window.location.protocol === 'http:' || window.location.protocol === 'file:') {
       req.connect('ws://' + server + '/request');
     } else {
       req.connect('wss://' + server + '/request');
@@ -321,6 +326,8 @@ const getNodesAndEdges = function() {
 }
 
 const sendQuery = function(ev) {
+  // Clear retrieval messasges field first
+  renderResponse('form', '#retrievalMessages', '');
   if (getNodesAndEdges() != '') {
     let msg2 = start + head + getNodesAndEdges() + foot;
     let sum = 0;
@@ -349,15 +356,19 @@ const sendQuery = function(ev) {
       document.querySelector('#showAgraphml').value =
       msg2.substring(msg2.indexOf('<graphml'), msg2.lastIndexOf('</graphml') + 10);
     } else if (count < 2) {
-      userView.print('<span class="warning">'
-        + 'Please select a minimum of 2 Fingerprints.</span>');
+      userView.print('<error>Please select a minimum of 2 Fingerprints.</error>');
     } else {
       lastFpCount = count;
+      jQuery('#send2').prop("disabled", true).addClass('disabled');
+      document.querySelector('#sendAgraphml .loading').classList.remove('ready');
+      document.querySelector('#sendAgraphml .loading').classList.remove('error');
+      document.querySelector('#sendAgraphml .loading').classList.add('active');
       req.socket.send(msg2);
-      setTimeout(getSuggestion(), 300);
     }
   } else {
-    userView.print('<span class="warning">Query is empty.</span>');
+    if (ev !== 'download') {
+      userView.print('<error>Query is empty.</error>');
+    }
   }
 
   //         console.log(sum);
@@ -375,8 +386,8 @@ const sendQuery = function(ev) {
 const getSuggestion = function() {
   let roomCount = nodes.get().length;
   if (roomCount < 2) {
-    userView.print('<suggestion>At least two rooms should be '
-    + 'available to produce a suggestion.</suggestion>');
+    userView.print('<suggestion><error>At least two rooms should be '
+    + 'available to produce a suggestion.</error></suggestion>');
   } else {
     userView.print('<suggestion></suggestion>'); // Clear suggestion field
     let edgeCount = edges.get().length;
@@ -393,19 +404,26 @@ const getSuggestion = function() {
     let msg = '<chainMeta>' + currentChain.join(';') + ','
     + roomCount + ',' + edgeCount + ',' + actionCount + ',' + lastFpCount + ','
     + roomsAndEdges.join('_') + '</chainMeta>';
-    console.log(msg);
+    document.querySelector('#suggestion .loading').classList.remove('ready');
+    document.querySelector('#suggestion .loading').classList.remove('error');
+    document.querySelector('#suggestion .loading').classList.add('active');
+    jQuery('#getSuggestion').prop("disabled", true).addClass('disabled');
     req.socket.send(msg);
   }
 }
 
 const getAdaptation = function() {
+  userView.print('<adaptation></adaptation>'); // Clear suggestion field
   if (getNodesAndEdges() != '') {
     let adaptationMsg = (head + getNodesAndEdges() + foot)
     .replace('<agraphml>', '<adaptation>')
     .replace('</agraphml>', '</adaptation>');
+    document.querySelector('#adaptation .loading').classList.remove('error');
+    document.querySelector('#adaptation .loading').classList.add('active');
+    jQuery('#getAdaptation').prop("disabled", true).addClass('disabled');
     req.socket.send(adaptationMsg);
   } else {
-    userView.print('<span class="warning">Room conf is empty.</span>');
+    userView.print('<adaptation><error>Room configuration is empty.</error></adaptation>');
   }
 }
 
@@ -496,6 +514,83 @@ document.querySelector('#applyAgraphml').onclick = function() {
   cl_ag.add('hide');
 }
 
+const showRetrievalResults = function(msg) {
+  let loading = document.querySelector('#sendAgraphml .loading');
+  loading.classList.remove('active');
+  if (msg.indexOf('error') > -1) {
+    loading.classList.add('error');
+    renderResponse('form', '#retrievalMessages', msg);
+    jQuery('#send2').prop("disabled", false).removeClass('disabled');
+  } else if (msg.startsWith('<result>') || msg.startsWith('<?xml')) {
+    document.querySelector('#output').classList.remove('hide');
+    document.querySelector('#output').classList.add('show');
+    loading.classList.add('ready');
+    let resultCount = (msg.match(/<\/tr>/g)).length;
+    document.querySelector('#resultCount').innerHTML = resultCount;
+    jQuery('#result').css('width', (resultCount * 250) + 'px');
+    renderResponse('tbody', '#result', msg);
+    jQuery('tr').append('<td class="showExplanation">Explain</td>');
+  }
+}
+
+let closeOutput = document.querySelector('#closeOutput');
+closeOutput.onclick = function() {
+  document.querySelector('#output').classList.remove('show');
+  document.querySelector('#output').classList.add('hide');
+  jQuery('#send2').prop("disabled", false).removeClass('disabled');
+  let loading = document.querySelector('#sendAgraphml .loading');
+  loading.classList.remove('ready');
+}
+
+const showSuggestion = function(msg) {
+  let loading = document.querySelector('#suggestion .loading');
+  loading.classList.remove('active');
+  renderResponse('div', '#suggestions', msg);
+  if (msg.indexOf('error') > -1) {
+    loading.classList.add('error');
+  } else {
+    loading.classList.add('ready');
+  }
+  jQuery('#getSuggestion').prop("disabled", false).removeClass('disabled');
+}
+
+let currentConfigAndAdaptations = [];
+let closeAdaptation = document.querySelector('#closeAdaptation');
+
+const drawAdaptation = function(msg) {
+  let loading = document.querySelector('#adaptation .loading');
+  loading.classList.remove('active');
+  let agraphml = msg.substring(12, msg.lastIndexOf('</adaptation>'));
+  if (agraphml.startsWith('<graphml')) {
+    loading.classList.add('ready');
+    let currentConfig = (head + getNodesAndEdges() + foot);
+    let adaptations = agraphml.split(';');
+    adaptations.unshift(currentConfig);
+    currentConfigAndAdaptations = adaptations;
+    for (let i = 0; i < adaptations.length; i++) {
+      let adaptation = i == 0 ? 'Original' : ('Adaptation ' + i);
+      jQuery('#adaptations').append(
+        '<input type="radio" name="adaptations" value="'
+        + i + '" id="adaptation_' + i + '"><label for="adaptation_'
+        + i + '">' + adaptation  + '</label><br>'
+      );
+    }
+    closeAdaptation.classList.remove('hide');
+    closeAdaptation.classList.add('show');
+  } else {
+    loading.classList.add('error');
+    renderResponse('div', '#adaptations', msg);
+  }
+}
+
+closeAdaptation.onclick = function() {
+  document.querySelector('#adaptation .loading').classList.remove('ready');
+  closeAdaptation.classList.remove('show');
+  closeAdaptation.classList.add('hide');
+  jQuery('#adaptations').children().remove();
+  jQuery('#getAdaptation').prop("disabled", false).removeClass('disabled');
+}
+
 const initApp = function() {
   // read the config
   if (!config.retrieval) {
@@ -538,4 +633,24 @@ jQuery(function($) {
       .slideToggle(200);
   });
   $('.vis-close').remove();
+  $('body').on('change', '#adaptations input', function() {
+    let adaptationIndex = parseInt($(this).val());
+    let selectedAdaptation = currentConfigAndAdaptations[adaptationIndex];
+    applyAgraphml(selectedAdaptation);
+  });
+  $('body').on('click', '.showExplanation', function() {
+    let tr = $(this).parent();
+    let tdFirst = tr.children('td').first();
+    tdFirst.show();
+    if (!tdFirst.hasClass('explanation')) {
+      tdFirst.addClass('explanation');
+      tr.append('<div class="closeExplanation">&times;</div>');
+    } else {
+      tr.children('.closeExplanation').show();
+    }
+  });
+  $('body').on('click', '.closeExplanation', function() {
+    $(this).siblings('.explanation').hide();
+    $(this).hide();
+  });
 });

@@ -12,68 +12,66 @@
   font-style: normal
 }
 
+html, body {
+  height: 100%;
+}
 
 body, h1, h2, h3, input, .vis-label {
-  font-family: 'Inconsolata', Helvetica, 'Liberation Sans', Arial, sans-serif !important;
+  font-family: 'Inconsolata', sans-serif !important;
 }
 
-h1 {
-  margin-bottom: 15px;
-  margin-top: 3px;
-}
-
-#metiscbr-graphui {
-  width: 950px;
-  height: 600px;
-  border: 1px solid lightgray;
-  background: #fff;
-  display: inline-block;
-  float: left;
-  margin-right: 25px;
-}
-
-#root {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-#graphui-content {
-  padding: 15px;
+header {
   position: relative;
 }
 
-div#suggestion {
-  position: absolute;
-  min-height: 20px;
-  background: #fff;
-  width: 190px;
-  right: 23px;
-  border: 1px solid #ccc;
-  top: 240px;
-  color: #222222;
-  padding: 6px;
-  border-radius: 5px;
+#metiscbr-graphui {
+  border-bottom: 1px solid lightgray;
+  height: 100%;
 }
 
-div#adaptation {
-  position: absolute;
-  min-height: 20px;
+#root {
+  max-width: 1890px;
+  margin: 0 auto;
+  height: 100%;
+  overflow-y: hidden;
+}
+
+#graphui-content {
+  position: relative;
+  height: inherit;
+}
+
+#sidebar {
+  height: 100%;
+  padding: 14px 20px;
+  border-left: 1px solid #ccc;
+}
+
+#suggestion {
   background: #fff;
-  width: 190px;
-  right: 23px;
   border: 1px solid #ccc;
-  top: 380px;
   color: #222222;
   padding: 6px;
   border-radius: 5px;
+  margin-bottom: 10px;
+  max-width: max-content;
+}
+
+#adaptation {
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #222222;
+  padding: 6px;
+  border-radius: 5px;
+  max-width: max-content;
 }
 
 #overlay {
   position: absolute;
-  background: rgba(0, 0, 0, 0.6);
-  width: 950px;
-  height: 600px;
-  top: 15px;
+  width: 79%;
+  height: 93%;
+  margin: 0;
+  margin-top: 1%;
   z-index: 5;
 }
 
@@ -86,7 +84,7 @@ div#adaptation {
   padding-right: 10px;
 }
 
-div#save {
+#save {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -94,14 +92,14 @@ div#save {
   height: 14%;
 }
 
-input#saveType {
+#saveType {
   margin-top: 8%;
   height: 27px;
   padding: 0;
   width: 92%;
 }
 
-input#send2 {
+#send2 {
   margin-top: 5px;
 }
 
@@ -109,7 +107,8 @@ input#send2 {
 #send2,
 #getSuggestion,
 #getAdaptation,
-#applyAgraphml {
+#applyAgraphml,
+#downloadAgraphml {
   border-radius: 5px;
   border: 1px solid #333;
   background: #6d6d6d;
@@ -117,17 +116,20 @@ input#send2 {
   cursor: pointer;
   outline: none;
   transition: all 0.3s ease-out;
+  font-size: 16px;
 }
 
-#getSuggestion, #getAdaptation {
-  display: block;
-}
-
-#saveType:hover, #send2:hover, #getSuggestion:hover {
+#saveType:hover,
+#send2:hover,
+#getSuggestion:hover,
+#getAdaptation:hover {
   background: #3c3c3c;
 }
 
-#saveType:active, #send2:active, #getSuggestion:active {
+#saveType:active,
+#send2:active,
+#getSuggestion:active,
+#getAdaptation:active {
   background: #191919;
 }
 
@@ -140,15 +142,15 @@ input#send2 {
 }
 
 #selectType {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.86);
   position: absolute;
   z-index: 6;
-  top: 25%;
+  top: 34px;
   left: 33%;
   width: 34%;
   border-radius: 6px;
   border: 2px solid #777777;
-  height: 50%;
+  height: 333px;
   color: #fff;
   text-align: center;
   overflow-y: hidden;
@@ -187,56 +189,52 @@ input#send2 {
   background: #3e3e3e;
 }
 
-div#sendAgraphml {
-  float: left;
+#sendAgraphml {
+  background: #fff;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 6px;
+  margin-bottom: 10px;
 }
 
-input.weightValue {
+.weightValue {
   display: none;
   width: 33px;
 }
 
-#output {
-  width: 100%;
-  float: left;
-}
-
-header {
-  position: relative;
-}
-
-div#connMessages {
+#connMessages {
   position: absolute;
-  top: 33px;
-  left: 17px;
+  top: 15px;
+  left: 333px;
   font-size: 14px;
   color: #afafaf;
 }
 
-div#systemMessages {
+#systemMessages {
   position: absolute;
   top: 8px;
   right: 20px;
 }
 
-div#additional {
+#additional {
   position: absolute;
   bottom: 0;
   height: 14%;
   width: 75%;
 }
 
-div#area, div#windows {
+#area,
+#windows {
   width: 50%;
   float: left;
 }
 
-div#windows {
-  margin-top: 9px;
+#windows {
+  margin-top: 12px;
 }
 
-div#area {
-  margin-top: 6px;
+#area {
+  margin-top: 9px;
 }
 
 input[type="number"] {
@@ -278,27 +276,29 @@ input[type="number"] {
 
 .vis-button .vis-label {
   margin: 0 !important;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 23px !important;
   font-weight: 400;
 }
 
 tr {
-  text-align: center;
-  font-size: 12px;
-  padding: 10px 0;
+  width: 250px;
+  height: 250px;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
 }
 
 th, td {
-  padding: 4px 2px;
-  border: 1px solid #e3e3e3;
-  margin: 0;
-  width: 50px;
+  display: none;
 }
 
-table#result {
+#result {
   border-collapse: collapse;
-  margin-top: 12px;
+  display: block;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  margin-top: 27px;
 }
 
 error {
@@ -313,33 +313,85 @@ error {
   color: #ff8686;
 }
 
+#output {
+  position: fixed;
+  bottom: 0;
+  height: 280px;
+  width: 100%;
+  max-width: 1890px;
+  margin: 0 auto;
+}
+
 td:nth-child(1) {
-  text-align: left;
-  width: 500px;
+  position: absolute;
   display: block;
-  padding: 14px;
-  border-right: none;
-  border-left: none;
-  background: #f9f9f9;
+  background: rgba(0, 0, 0, 0.86);
+  font-size: 12px;
+  color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  bottom: 15px;
+  top: 5px;
+  left: 5px;
+  z-index: 2;
+  overflow-y: scroll;
+  right: 5px;
+  border: 1px solid #777;
+  padding: 12px 4px 4px 10px;
+  display: none;
+}
+
+td:nth-child(1) p {
+  margin: 0;
 }
 
 td:nth-child(2) {
-  color: green;
-  font-weight: 700;
-  font-size: 15px;
-  padding: 0 20px;
-  vertical-align: text-top;
-}
-td:nth-child(5) {
-  width: 600px;
+  color: #090;
+  /* font-weight: 700; */
+  padding: 2px 6px;
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  font-size: 16px;
+  display: block;
+  background: #fff;
+  border: 2px solid #0099006b;
+  border-radius: 10px;
 }
 
-td:nth-child(5) > div,
-td:nth-child(5) > img,
-td:nth-child(5) > div svg,
-td:nth-child(5) > div img {
+td:nth-child(3) {
+  display: block;
+  position: absolute;
+  top: 0;
   width: 100%;
-  float: left;
+  height: 100px;
+}
+
+td:nth-child(5) {
+  height: 100%;
+  display: block;
+  padding: 10px;
+  border-right: 1px solid #ccc;
+}
+
+td:nth-child(5) img,
+td:nth-child(5) svg {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+td:nth-child(7) {
+  color: #006cde;
+  padding: 2px 10px;
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  font-size: 16px;
+  display: block;
+  background: #fff;
+  border: 2px solid rgba(0, 75, 187, 0.4);
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 .disabled {
@@ -391,7 +443,7 @@ label:hover {
 button.see-more {
   background: transparent;
   border: 0;
-  color: #112d84;
+  color: #bac9f9;
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
@@ -410,7 +462,7 @@ button.show-stats-button {
 }
 
 span.context {
-  background: #ffffff;
+  background: #3a3a3a;
   display: inline-block;
   padding: 2px 6px;
   font-style: italic;
@@ -435,22 +487,21 @@ input[disabled] + label:hover {
 }
 
 #download {
+  right: 25px;
   position: absolute;
-  right: 240px;
-  top: 19px;
+  top: 23px;
 }
 
 #downloadAgraphml {
-  background: #e0e0e0;
-  height: 26px;
-  border: none;
-  cursor: pointer;
+  height: 28px;
+  width: 46px;
+  font-size: 15px;
 }
 
 #showAgraphml {
   position: absolute;
-  right: 0;
-  top: 32px;
+  right: 26px;
+  top: 53px;
   border: 2px solid #ccc;
   color: #e4e4e4;
   background: #656565;
@@ -459,21 +510,162 @@ input[disabled] + label:hover {
   overflow-y: scroll;
   resize: none;
   font-family: monospace;
+  z-index: 99999 !important;
 }
 
 #agraphmlControls {
   position: absolute;
-  top: 532px;
-  right: 0;
+  top: 553px;
+  right: 26px;
   background: #f1f1f1;
   padding: 4px;
   border: 2px solid #ccc;
   border-top: 0;
   width: 700px;
+  z-index: 9999;
 }
 
-div#agraphmlMessage {
+#agraphmlMessage {
   display: inline-block;
   float: right;
   padding-right: 5px;
+  color: #777;
+  font-size: 17px;
+}
+
+label {
+  font-size: 16px;
+}
+
+.selectFp {
+  height: 42px;
+  border-bottom: 1px dashed #ccc;
+  padding-top: 10px;
+}
+
+.selectFp.last {
+  border-bottom: none;
+}
+
+.fpImage {
+  height: 25px;
+  float: right;
+  margin-right: 10px;
+}
+
+@media (max-width: 1300px) {
+  .fpImage {
+    display: none;
+  }
+}
+
+.loading {
+  display: inline-block;
+  float: right;
+  height: 22px;
+  width: 22px;
+  margin: 3px 6px 0 10px;
+  border-radius: 11px;
+  border: 6px solid #aaa;
+  background: #ccc;
+}
+
+@keyframes circle {
+  0% {border-color: #aaa;}
+  50% {border-color: #090;}
+  100% {border-color: #aaa;}
+}
+
+.loading.active {
+  animation-name: circle;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+.loading.ready {
+  border-color: #090;
+  background: #090;
+}
+
+.loading.error {
+  border-color: #ff8686;
+  background: #ff8686;
+}
+
+input.disabled {
+  background: #ccc !important;
+  border-color: #bbb !important;
+}
+
+#adaptations input[type="radio"] {
+  margin-top: 10px;
+  margin-right: 5px;
+  vertical-align: text-bottom;
+}
+
+#closeAdaptation {
+  background: #ddd;
+  border: none;
+  width: 100%;
+  height: 23px;
+  line-height: 1.0;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+.controls {
+  display: inline-block;
+}
+
+form .controls .loading {
+  margin-top: 7px;
+}
+
+#outputResults {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  height: 280px;
+}
+
+#outputInfo {
+  position: absolute;
+  border-top: 1px solid #ccc;
+  width: 100%;
+  height: 27px;
+}
+
+#closeOutput {
+  position: absolute;
+  right: 0;
+  top: -3px;
+  font-size: 22px;
+  font-weight: 700;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+#outputStats p {
+  margin: 0;
+  padding: 0;
+}
+
+#outputStats {
+  padding: 2px 9px 0;
+}
+
+.closeExplanation {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background: #fff;
+  color: #006cde;
+  width: 15px;
+  height: 15px;
+  font-size: 14px;
+  text-align: center;
+  line-height: 0.87;
+  cursor: pointer;
+  border: 2px solid rgba(0, 75, 187, 0.4);
+  z-index: 3;
+  border-radius: 10px;
 }

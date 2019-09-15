@@ -18,14 +18,21 @@
         <title>RoomConf Editor</title>
     </head>
     <body class="w3-theme-l4">
-        <div id="root" class="content-container w3-card-2">
-            <header class="w3-container w3-large w3-theme-d4">
+        <div id="root" class="w3-card-2 w3-light-grey">
+            <header class="w3-container w3-large w3-theme-d4 w3-teal">
                 <h1><b>RoomConf</b> Editor</h1>
                 <div id="connMessages"><p></p></div>
-                <div id="systemMessages"><p></p></div>
+                <div id="download">
+                  <input type="button" value="</>" title="Show Source" id="downloadAgraphml"/>
+                </div>
+                <textarea id="showAgraphml" class="hide"></textarea>
+                <div id="agraphmlControls" class="hide">
+                  <input type="button" id="applyAgraphml" value="Apply AGraphML">
+                  <div id="agraphmlMessage">Copy, paste, or edit AGraphML</div>
+                </div>
             </header>
-            <div id="graphui-content" class="w3-container w3-light-grey">
-                <div id="metiscbr-graphui"></div>
+            <div id="graphui-content" class="w3-row w3-light-grey">
+                <div id="metiscbr-graphui" class="w3-white w3-col l9 m9"></div>
                 <div id="overlay" class="hide">
                   <div id="selectType" class="hide">
                       <h2>Select Type</h2>
@@ -62,71 +69,92 @@
                       </div>
                   </div>
                 </div>
-                <div id="sendAgraphml">
-                    <textarea hidden id="queryText"></textarea>
-                    <form method="post">
-                        <div>
-                            <input type="checkbox" class="filterCheckbox" id="find-roomcount" name="fp-filter" value="Room_Count">
-                            <input type="text" class="weightValue">
-                            <label for="find-roomcount">FP1 Room Count</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" class="filterCheckbox" id="find-relationcount" name="fp-filter" value="Relation_Count">
-                            <input type="text" class="weightValue">
-                            <label for="find-relationcount">FP2 Relation Count</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" class="filterCheckbox" id="find-roomgraph" name="fp-filter" value="Room_Graph">
-                            <input type="text" class="weightValue">
-                            <label for="find-roomgraph">FP3 Room Graph</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" class="filterCheckbox" id="find-roomtypes" name="fp-filter" value="Room_Types">
-                            <input type="text" class="weightValue">
-                            <label for="find-roomtypes">FP4 Room Types</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" class="filterCheckbox" id="find-adjacency" name="fp-filter" value="Adjacency">
-                            <input type="text" class="weightValue">
-                            <label for="find-adjacency">FP5 Adjacency</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" class="filterCheckbox" id="find-accessibility" name="fp-filter" value="Accessibility">
-                            <input type="text" class="weightValue">
-                            <label for="find-accessibility">FP6 Accessibility</label>
-                        </div>
-                        <div class="disabled">
-                            <input disabled type="checkbox" class="filterCheckbox" id="find-fullroomgraph" name="fp-filter" value="Full_Room_Graph">
-                            <input disabled type="text" class="weightValue">
-                            <label for="find-fullroomgraph">FP7 Full Room Graph</label>
-                        </div>
-                        <div class="disabled">
-                            <input disabled type="checkbox" class="filterCheckbox" id="find-naturallight" name="fp-filter" value="Natural_Light">
-                            <input disabled type="text" class="weightValue">
-                            <label for="find-naturallight">FP8 Natural Light</label>
-                        </div>
-                        <input style="display: block;" type="button" value="Send query" id="send2"/>
-                    </form>
-                </div>
-                <div id="suggestion">
-                  <input type="button" value="Get suggestion" id="getSuggestion"/>
-                  <div id="suggestions"></div>
-                </div>
-                <div id="adaptation">
-                  <input type="button" value="Get adaptation" id="getAdaptation"/>
-                  <div id="adaptations"></div>
-                </div>
-                <div id="download">
-                  <input type="button" value="</>" title="Show Source" id="downloadAgraphml"/>
-                  <textarea id="showAgraphml" class="hide"></textarea>
-                  <div id="agraphmlControls" class="hide">
-                    <input type="button" id="applyAgraphml" value="Apply AGraphML">
-                    <div id="agraphmlMessage">Copy, paste, or edit AGraphML</div>
+
+                <div id="sidebar" class="w3-rest">
+                  <div id="sendAgraphml">
+                      <textarea hidden id="queryText"></textarea>
+                      <form method="post">
+                          <div class="selectFp">
+                              <input type="checkbox" class="filterCheckbox" id="find-roomcount" name="fp-filter" value="Room_Count">
+                              <input type="text" class="weightValue">
+                              <label for="find-roomcount">Room Count</label>
+                              <img src="img/fp1.svg" class="fpImage">
+                          </div>
+                          <div class="selectFp">
+                              <input type="checkbox" class="filterCheckbox" id="find-relationcount" name="fp-filter" value="Relation_Count">
+                              <input type="text" class="weightValue">
+                              <label for="find-relationcount">Relation Count</label>
+                              <img src="img/fp2.svg" class="fpImage">
+                          </div>
+                          <div class="selectFp">
+                              <input type="checkbox" class="filterCheckbox" id="find-roomgraph" name="fp-filter" value="Room_Graph">
+                              <input type="text" class="weightValue">
+                              <label for="find-roomgraph">Room Graph</label>
+                              <img src="img/fp3.svg" class="fpImage">
+                          </div>
+                          <div class="selectFp">
+                              <input type="checkbox" class="filterCheckbox" id="find-roomtypes" name="fp-filter" value="Room_Types">
+                              <input type="text" class="weightValue">
+                              <label for="find-roomtypes">Room Types</label>
+                              <img src="img/fp4.svg" class="fpImage">
+                          </div>
+                          <div class="selectFp">
+                              <input type="checkbox" class="filterCheckbox" id="find-adjacency" name="fp-filter" value="Adjacency">
+                              <input type="text" class="weightValue">
+                              <label for="find-adjacency">Adjacency</label>
+                              <img src="img/fp5.svg" class="fpImage">
+                          </div>
+                          <div class="selectFp last">
+                              <input type="checkbox" class="filterCheckbox" id="find-accessibility" name="fp-filter" value="Accessibility">
+                              <input type="text" class="weightValue">
+                              <label for="find-accessibility">Accessibility</label>
+                              <img src="img/fp6.svg" class="fpImage">
+                          </div>
+                          <!-- <div class="disabled">
+                              <input disabled type="checkbox" class="filterCheckbox" id="find-fullroomgraph" name="fp-filter" value="Full_Room_Graph">
+                              <input disabled type="text" class="weightValue">
+                              <label for="find-fullroomgraph">Full Room Graph</label>
+                              <img src="img/fp7.svg" class="fpImage">
+                          </div>
+                          <div class="disabled">
+                              <input disabled type="checkbox" class="filterCheckbox" id="find-naturallight" name="fp-filter" value="Natural_Light">
+                              <input disabled type="text" class="weightValue">
+                              <label for="find-naturallight">Natural Light</label>
+                              <img src="img/fp8.svg" class="fpImage">
+                          </div> -->
+                          <div class="controls">
+                            <input type="button" value="Find designs" id="send2"/>
+                            <span class="loading"></span>
+                          </div>
+                          <div id="retrievalMessages"></div>
+                      </form>
+                  </div>
+                  <div id="suggestion">
+                    <div class="controls">
+                      <input type="button" value="Get suggestion" id="getSuggestion"/>
+                      <span class="loading"></span>
+                    </div>
+                    <div id="suggestions"></div>
+                  </div>
+                  <div id="adaptation">
+                    <div class="controls">
+                      <input type="button" value="Get adaptation" id="getAdaptation"/>
+                      <span class="loading"></span>
+                    </div>
+                    <div id="adaptations"></div>
+                    <input type="button" value="Done" id="closeAdaptation" class="hide">
                   </div>
                 </div>
-                <div id="output">
-                  <p></p>
-                  <table id="result"></table>
+                <div id="output" class="w3-light-grey hide">
+                  <div id="outputInfo">
+                    <div id="outputStats">
+                      <p><span id="resultCount"></span> similar room configurations found.</p>
+                    </div>
+                    <div id="closeOutput">&times;</div>
+                  </div>
+                  <div id="outputResults">
+                    <table id="result"></table>
+                  </div>
                 </div>
             </div>
         </div>
