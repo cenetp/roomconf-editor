@@ -37,9 +37,6 @@ let locales = {
 }
 
 let options = {
-  interaction: {
-    hover: true
-  },
   manipulation: {
     enabled: true,
     initiallyActive: true,
@@ -107,8 +104,10 @@ let options = {
   locales: locales,
   interaction: {
     //dragView: false,
+    //hover: true,
     zoomView: false,
-    tooltipDelay: 0
+    tooltipDelay: 0,
+    multiselect: true
   }
 }
 
