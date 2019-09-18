@@ -103,9 +103,9 @@ let options = {
   locale: 'en',
   locales: locales,
   interaction: {
-    //dragView: false,
+    dragView: false,
     //hover: true,
-    zoomView: false,
+    zoomView: true,
     tooltipDelay: 0,
     multiselect: true
   }
@@ -302,22 +302,29 @@ let end = '</searchrequest>';
 
 const getNodesAndEdges = function() {
   let queryElements = '';
+  let positions = network.getPositions();
   nodes.get().forEach(function(node) {
+    let nodeId = node['id'];
     let roomType = node['label'];
     let area = (node['area'] === undefined || node['area'] === '') ? 0 : node['area'];
     let windowsExist = node['windowsExist'] === undefined ?
       false : node['windowsExist'];
-    queryElements += '<node id="' + node['id'] + '">'
+    let center = '('  + positions[nodeId].x + ' ' + positions[nodeId].y + ')';
+    queryElements += '<node id="' + nodeId + '">'
       + '<data key="roomType">' + roomType + '</data>'
       + '<data key="area">' + area + '</data>'
       + '<data key="windowExist">' + windowsExist + '</data>'
+      + '<data key="center">' + center + '</data>'
       + '</node>';
   });
   edges.get().forEach(function(edge) {
+    let edgeId = edge['id'];
+    let source = edge['from'];
+    let target = edge['to'];
     let edgeType = edge['label'];
-    queryElements += '<edge id="' + edge['id']
-      + '" source="' + edge['from']
-      + '" target="' + edge['to'] + '">'
+    queryElements += '<edge id="' + edgeId
+      + '" source="' + source
+      + '" target="' + target + '">'
       + '<data key="edgeType">' + edgeType + '</data>'
       + '</edge>';
   });
@@ -458,17 +465,26 @@ const applyAgraphml = function(agraphml) {
   agraphmlNodes.each(function() {
     let roomId = jQuery(this).attr('id');
     let roomType = '';
+    let center = {};
     let data = jQuery(this).find('data');
     data.each(function() {
       let key = jQuery(this).attr('key');
+      let text = jQuery(this).first().text();
       if (key === 'roomType') {
-        roomType = (jQuery(this).first().text()).toUpperCase();
+        roomType = text.toUpperCase();
+      }
+      if (key === 'center') {
+        let xy = text.substring(1, text.indexOf(')')).split(' ');
+        center.x = parseFloat(xy[0]);
+        center.y = parseFloat(xy[1]);
       }
     });
     if (roomId !== undefined && roomId !== '' && roomType !== undefined && roomType != '') {
       let newNode = {
         id: roomId,
         label: roomType,
+        x: center.x,
+        y: center.y,
         color: roomColors[roomType]
       }
       nodes.update(newNode)
