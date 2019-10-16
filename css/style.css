@@ -427,6 +427,13 @@ td:nth-child(7) {
   cursor: pointer;
 }
 
+/* workaround that hides the node tooltips and the close button
+(to fully disable the conf editing) in the retrieval results */
+#output .vis-tooltip,
+#output .vis-close {
+  display: none !important;
+}
+
 .disabled {
   color: #c9c9c9;
 }
@@ -437,10 +444,7 @@ td:nth-child(7) {
 
 .show-justification,
 .show-contexts,
-.show-stats {
-  display: none;
-}
-
+.show-stats,
 .show-stats p {
   display: none;
 }
