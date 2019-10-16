@@ -54,7 +54,6 @@ header {
   padding: 6px;
   border-radius: 5px;
   margin-bottom: 10px;
-  max-width: max-content;
 }
 
 #adaptation {
@@ -63,12 +62,11 @@ header {
   color: #222222;
   padding: 6px;
   border-radius: 5px;
-  max-width: max-content;
 }
 
 #overlay {
   position: absolute;
-  width: 79%;
+  width: 74.99999%;
   height: 93%;
   margin: 0;
   margin-top: 1%;
@@ -84,26 +82,28 @@ header {
   padding-right: 10px;
 }
 
-#save {
+.save {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 25%;
+  width: 40%;
   height: 14%;
 }
 
-#saveType {
-  margin-top: 8%;
+.saveType {
+  margin-top: 3%;
   height: 27px;
   padding: 0;
-  width: 92%;
+  width: 100px;
+  float: right;
+  margin-right: 11%;
 }
 
 #send2 {
   margin-top: 5px;
 }
 
-#saveType,
+.saveType,
 #send2,
 #getSuggestion,
 #getAdaptation,
@@ -119,14 +119,14 @@ header {
   font-size: 16px;
 }
 
-#saveType:hover,
+.saveType:hover,
 #send2:hover,
 #getSuggestion:hover,
 #getAdaptation:hover {
   background: #3c3c3c;
 }
 
-#saveType:active,
+.saveType:active,
 #send2:active,
 #getSuggestion:active,
 #getAdaptation:active {
@@ -141,13 +141,13 @@ header {
   display: block;
 }
 
-#selectType {
+.selectType {
   background: rgba(0, 0, 0, 0.86);
-  position: absolute;
+  position: relative;
   z-index: 6;
   top: 34px;
-  left: 33%;
-  width: 34%;
+  width: 500px;
+  margin: 0 auto;
   border-radius: 6px;
   border: 2px solid #777777;
   height: 333px;
@@ -156,7 +156,7 @@ header {
   overflow-y: hidden;
 }
 
-#selectType h2 {
+.selectType h2 {
   border-bottom: 1px solid #555;
   padding: 0;
   margin: 0;
@@ -164,13 +164,29 @@ header {
   font-size: 28px;
 }
 
-#types {
+.types {
   overflow-y: auto;
   position: absolute;
-  width: 100%;
-  height: 72%;
-  bottom: 14%;
+  width: 60%;
+  height: 86.5%;
   border-bottom: 1px solid #555;
+}
+
+.selectType.edge-overlay {
+  width: 375px;
+}
+
+.edge-overlay .types {
+  width: 100%;
+  height: 72.5%;
+}
+
+.edge-overlay .save {
+  width: 100%;
+}
+
+.edge-overlay .saveType {
+  margin-right: 5%;
 }
 
 .type {
@@ -218,27 +234,36 @@ header {
 
 #additional {
   position: absolute;
-  bottom: 0;
-  height: 14%;
-  width: 75%;
+  right: 0;
+  height: 72%;
+  width: 40%;
 }
 
 #area,
-#windows {
-  width: 50%;
-  float: left;
+#windows,
+#roomLabel {
+  width: 100%;
+  margin-top: 25px;
 }
 
-#windows {
-  margin-top: 12px;
-}
-
-#area {
-  margin-top: 9px;
+#roomLabelText {
+  width: 78%;
+  margin: 0 auto;
+  height: 55px;
+  resize: none;
 }
 
 input[type="number"] {
-  width: 44px;
+  width: 70px;
+}
+
+.vis-network {
+  background: #fff;
+  outline: none;
+}
+
+td .vis-network {
+  border: 1px solid #ccc;
 }
 
 .vis-button {
@@ -272,6 +297,7 @@ input[type="number"] {
 
 .vis-manipulation {
   background: #f3f3f3 !important;
+  padding-top: 2px !important;
 }
 
 .vis-button .vis-label {
@@ -279,6 +305,11 @@ input[type="number"] {
   font-size: 17px;
   line-height: 23px !important;
   font-weight: 400;
+}
+
+.vis-tooltip {
+  font-family: 'Liberation Sans', sans-serif !important;
+  font-size: 12px !important;
 }
 
 tr {
@@ -296,7 +327,6 @@ th, td {
 #result {
   border-collapse: collapse;
   display: block;
-  border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   margin-top: 27px;
 }
@@ -346,7 +376,6 @@ td:nth-child(1) p {
 
 td:nth-child(2) {
   color: #090;
-  /* font-weight: 700; */
   padding: 2px 6px;
   position: absolute;
   bottom: 20px;
@@ -364,6 +393,10 @@ td:nth-child(3) {
   top: 0;
   width: 100%;
   height: 100px;
+}
+
+td:nth-child(3) {
+  display: none;
 }
 
 td:nth-child(5) {
@@ -511,6 +544,7 @@ input[disabled] + label:hover {
   resize: none;
   font-family: monospace;
   z-index: 99999 !important;
+  font-size: 12px;
 }
 
 #agraphmlControls {
@@ -603,7 +637,9 @@ input.disabled {
   vertical-align: text-bottom;
 }
 
-#closeAdaptation {
+#closeAdaptation,
+#accept,
+#deny {
   background: #ddd;
   border: none;
   width: 100%;
@@ -611,6 +647,23 @@ input.disabled {
   line-height: 1.0;
   margin-top: 6px;
   cursor: pointer;
+  outline: none;
+}
+
+#closeAdaptation:hover,
+#accept:hover,
+#deny:hover {
+  text-decoration: underline;
+}
+
+#accept,
+#deny {
+  width: 50%;
+}
+
+#deny {
+  background: #fff;
+  color: red;
 }
 
 .controls {
@@ -630,18 +683,45 @@ form .controls .loading {
 #outputInfo {
   position: absolute;
   border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   width: 100%;
   height: 27px;
 }
 
 #closeOutput {
   position: absolute;
-  right: 0;
-  top: -3px;
-  font-size: 22px;
+  right: 0px;
+  top: -4px;
+  font-size: 23px;
   font-weight: 700;
   padding: 0 10px;
   cursor: pointer;
+}
+
+#navigateOutput {
+  display: inline-block;
+  position: absolute;
+  right: 50px;
+  top: 0px;
+}
+
+.navigate {
+  margin: 0px;
+  cursor: pointer;
+  border: none;
+  border-left: 1px solid #ccc;
+  padding: 0px 14px;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1;
+  height: 26px;
+  display: inline-block;
+  background: transparent;
+  outline: none;
+}
+
+.navigate.right {
+  border-right: 1px solid #ccc;
 }
 
 #outputStats p {
@@ -668,4 +748,13 @@ form .controls .loading {
   border: 2px solid rgba(0, 75, 187, 0.4);
   z-index: 3;
   border-radius: 10px;
+}
+
+from, to, uuidRoom, uuidEdge1, uuidEdge2 {
+  display: none;
+}
+
+room1, room2 {
+  border-radius: 5px;
+  padding: 1px 4px;
 }

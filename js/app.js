@@ -42,6 +42,7 @@ let options = {
     initiallyActive: true,
     addNode: function(nodeData, callback) {
       nodeData.label = 'ROOM';
+      nodeData.roomType = 'ROOM';
       nodeData.title = 'Double-click to edit';
       callback(nodeData);
     },
@@ -60,6 +61,7 @@ let options = {
         userView.print('<span class="warning">Cannot connect the room to itself.</span>');
       } else {
         edgeData.label = 'EDGE';
+        edgeData.edgeType = 'EDGE';
         if (edges.get().length === 0 && nodes.get().length === 2) {
           callback(edgeData);
         } else {
@@ -103,9 +105,8 @@ let options = {
   locale: 'en',
   locales: locales,
   interaction: {
-    dragView: false,
-    //hover: true,
-    zoomView: true,
+    dragView: true,
+    zoomView: false,
     tooltipDelay: 0,
     multiselect: true
   }
@@ -120,12 +121,19 @@ network.setOptions({
 
 // display the concept attributes dialog
 let overlay = document.querySelector('#overlay');
-let selectType = document.querySelector('#selectType');
+let selectType = document.querySelector('.selectType');
 const showOverlay = function(cls1, cls2) {
   overlay.classList.remove(cls1);
   overlay.classList.add(cls2);
   selectType.classList.remove(cls1);
   selectType.classList.add(cls2);
+}
+const hideWithSelected = function(selector) {
+  document.querySelectorAll(selector).forEach(function(el) {
+    el.classList.remove('show');
+    el.classList.add('hide');
+    el.classList.remove('type-selected');
+  });
 }
 const showTypes = function(order, type, concept) {
   if (order === 'show') {
@@ -133,24 +141,33 @@ const showTypes = function(order, type, concept) {
     document.querySelectorAll('.' + type).forEach(function(el) {
       el.classList.remove('hide');
       el.classList.add('show');
-      if (el.innerHTML === concept['label']) {
+      if (el.innerHTML === concept['roomType'] || el.innerHTML === concept['edgeType']) {
         el.classList.add('type-selected');
+      } else {
+        el.classList.remove('type-selected');
       }
     });
     if (type === 'room-type') {
+      selectType.classList.remove('edge-overlay');
       document.querySelector('#areaInput').value = concept['area'];
       document.querySelector('#windowsInput').checked = concept['windowsExist'];
+      let label = concept['label'];
+      document.querySelector('#roomLabelText').value =
+      label.indexOf('"') > -1 ? label.substring(label.indexOf('"')+1, label.length-1) : '';
+    } else {
+      selectType.classList.add('edge-overlay');
     }
   } else if (order === 'hide') {
     showOverlay('show', 'hide');
-    document.querySelectorAll('.' + type).forEach(function(el) {
-      el.classList.remove('show');
-      el.classList.add('hide');
-    });
+    if (type !== undefined) {
+      hideWithSelected('.' + type);
+    } else {
+      hideWithSelected('.room-type, .edge-type');
+    }
   }
 }
 document.querySelector('#closeTypes').onclick = function() {
-  showOverlay('show', 'hide');
+  showTypes('hide');
 }
 
 let roomColors = {
@@ -171,11 +188,12 @@ let roomColors = {
 
 let nodeId = '';
 let edgeId = '';
-document.querySelector('#saveType').onclick = function() {
+document.querySelector('.saveType').onclick = function() {
   let type = document.querySelectorAll('.type-selected')[0].innerHTML;
   if (document.querySelectorAll('.room-type')[0].classList.contains('show')) {
     let a = document.querySelector('#areaInput').value;
     let w = document.querySelector('#windowsInput').checked;
+    let l = document.querySelector('#roomLabelText').value;
     let currentType = nodes.get(nodeId).label;
     if (currentType==='ROOM') {
       currentChain.push('a0' + type);
@@ -185,7 +203,8 @@ document.querySelector('#saveType').onclick = function() {
     currentSelectedNode = type;
     nodes.update({
       id: nodeId,
-      label: type,
+      label: (l === undefined || l === '') ? type : (type + '\n"' + l.trim() + '"'),
+      roomType: type,
       color: roomColors[type],
       area: a,
       windowsExist: w,
@@ -195,7 +214,8 @@ document.querySelector('#saveType').onclick = function() {
   } else if (document.querySelectorAll('.edge-type')[0].classList.contains('show')) {
     edges.update({
       id: edgeId,
-      label: type
+      label: type,
+      edgeType: type
     });
     showTypes('hide', 'edge-type');
   }
@@ -211,7 +231,8 @@ types.forEach(function(t) {
   }
 });
 network.on("doubleClick", function(params) {
-  let n = params.nodes, e = params.edges;
+  let n = params.nodes;
+  let e = params.edges;
   if (n.length === 1) {
     nodeId = n[0];
     showTypes('show', 'room-type', nodes.get(nodeId));
@@ -222,7 +243,7 @@ network.on("doubleClick", function(params) {
 });
 network.on("selectNode", function (params) {
   nodeId = params.nodes[0];
-  currentSelectedNode = nodes.get(nodeId).label;
+  currentSelectedNode = nodes.get(nodeId).roomType;
 });
 network.on("deselectNode", function (params) {
   currentSelectedNode = '';
@@ -305,7 +326,7 @@ const getNodesAndEdges = function() {
   let positions = network.getPositions();
   nodes.get().forEach(function(node) {
     let nodeId = node['id'];
-    let roomType = node['label'];
+    let roomType = node['roomType'];
     let area = (node['area'] === undefined || node['area'] === '') ? 0 : node['area'];
     let windowsExist = node['windowsExist'] === undefined ?
       false : node['windowsExist'];
@@ -321,7 +342,7 @@ const getNodesAndEdges = function() {
     let edgeId = edge['id'];
     let source = edge['from'];
     let target = edge['to'];
-    let edgeType = edge['label'];
+    let edgeType = edge['edgeType'];
     queryElements += '<edge id="' + edgeId
       + '" source="' + source
       + '" target="' + target + '">'
@@ -331,33 +352,35 @@ const getNodesAndEdges = function() {
   return queryElements;
 }
 
+const getGraphML = function() {
+  let msg2 = start + head + getNodesAndEdges() + foot;
+  let filters = document.querySelectorAll('.filterCheckbox');
+  let weights = document.querySelectorAll('.weightValue');
+  for (let i = 0; i < filters.length; i++) {
+    if (filters[i].checked === true) {
+      if (weights[i].value !== '') {
+        let wt = parseFloat(weights[i].value);
+        msg2 = msg2
+        + '<fingerprint name="' + filters[i].value
+        + '" weight="' + weights[i].value + '"></fingerprint>';
+      } else {
+        msg2 = msg2 + '<fingerprint name="' + filters[i].value
+        + '" weight="1"></fingerprint>';
+      }
+    }
+  }
+  return msg2 + end;
+}
+
 const sendQuery = function(ev) {
   // Clear retrieval messasges field first
   renderResponse('form', '#retrievalMessages', '');
+  let filters = jQuery('.filterCheckbox');
+  let count = filters.filter(function(index) {
+    return jQuery(filters[index]).prop('checked');
+  }).length;
   if (getNodesAndEdges() != '') {
-    let msg2 = start + head + getNodesAndEdges() + foot;
-    let sum = 0;
-    let filters = document.querySelectorAll('.filterCheckbox');
-    let weights = document.querySelectorAll('.weightValue');
-    let nul = false;
-    let count = 0;
-    for (let i = 0; i < filters.length; i++) {
-      if (filters[i].checked === true) {
-        count += 1;
-        if (weights[i].value !== '') {
-          let wt = parseFloat(weights[i].value);
-          sum = sum + wt;
-          msg2 = msg2
-          + '<fingerprint name="' + filters[i].value
-          + '" weight="' + weights[i].value + '"></fingerprint>';
-        } else {
-          nul = true;
-          msg2 = msg2 + '<fingerprint name="' + filters[i].value
-          + '" weight="1"></fingerprint>';
-        }
-      }
-    }
-    msg2 = msg2 + end;
+    let msg2 = getGraphML();
     if (ev === 'download') {
       document.querySelector('#showAgraphml').value =
       msg2.substring(msg2.indexOf('<graphml'), msg2.lastIndexOf('</graphml') + 10);
@@ -376,17 +399,6 @@ const sendQuery = function(ev) {
       userView.print('<error>Query is empty.</error>');
     }
   }
-
-  //         console.log(sum);
-  //         console.log(nul);
-  //         if ((nul===false && (sum>=0 || sum===parseFloat(filters.length)))
-  //             || (nul===true && sum===0)) {
-  //             req.socket.send(msg2);
-  //         } else {
-  //             userView.print('<span style="color: #c00">'
-  //+ 'Sum of the weights should be 1.0.</span>');
-  //         }
-
 }
 
 const getSuggestion = function() {
@@ -407,14 +419,17 @@ const getSuggestion = function() {
         nodes.get(id).label + '-' + e.join('/')
       );
     });
-    let msg = '<chainMeta>' + currentChain.join(';') + ','
+    let chainMetaMsg = '<chainMeta>' + currentChain.join(';') + ','
     + roomCount + ',' + edgeCount + ',' + actionCount + ',' + lastFpCount + ','
     + roomsAndEdges.join('_') + '</chainMeta>';
+    let suggestionMsg = (head + getNodesAndEdges() + foot)
+    .replace('<agraphml>', '<suggestion>')
+    .replace('</agraphml>', '</suggestion>');
     document.querySelector('#suggestion .loading').classList.remove('ready');
     document.querySelector('#suggestion .loading').classList.remove('error');
     document.querySelector('#suggestion .loading').classList.add('active');
     jQuery('#getSuggestion').prop("disabled", true).addClass('disabled');
-    req.socket.send(msg);
+    req.socket.send(chainMetaMsg + suggestionMsg);
   }
 }
 
@@ -451,21 +466,22 @@ document.querySelector('#downloadAgraphml').onclick = function() {
   }
 }
 
-const applyAgraphml = function(agraphml) {
+const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkToUpdate) {
   // first clear existing nodes and edges
-  nodes.clear();
-  edges.clear();
+  nodesToUpdate.clear();
+  edgesToUpdate.clear();
   // parse AGraphML
   let doc = jQuery.parseXML(agraphml);
   let xml = jQuery(doc);
   let agraphmlNodes = xml.find('node');
   let agraphmlEdges = xml.find('edge');
-  let newNodes = new vis.DataSet([]);
-  let newEdges = new vis.DataSet([]);
   agraphmlNodes.each(function() {
     let roomId = jQuery(this).attr('id');
     let roomType = '';
     let center = {};
+    let area = '';
+    let windowsExist = '';
+    let replacementText = '';
     let data = jQuery(this).find('data');
     data.each(function() {
       let key = jQuery(this).attr('key');
@@ -474,20 +490,43 @@ const applyAgraphml = function(agraphml) {
         roomType = text.toUpperCase();
       }
       if (key === 'center') {
-        let xy = text.substring(1, text.indexOf(')')).split(' ');
+        let xy = text.substring(text.indexOf('(')+1, text.indexOf(')')).split(' ');
         center.x = parseFloat(xy[0]);
         center.y = parseFloat(xy[1]);
       }
+      if (key === 'area') {
+        area = 'Area: ' + text + ' m<sup>2</sup><br>';
+      }
+      if (key === 'windowExist') {
+        windowsExist = 'Windows exist: ' + text;
+      }
     });
+    let replacement = jQuery(this).find('replacement');
+    replacement.each(function() {
+      let text = jQuery(this).first().text();
+      replacementText = '<b>Replaces: </b><i>' + text + '</i><br>';
+    });
+    if (area === '') {
+      area = 'Area: undefined<br>';
+    }
+    if (windowsExist === '') {
+      windowsExist = 'Windows exist: undefined';
+    }
     if (roomId !== undefined && roomId !== '' && roomType !== undefined && roomType != '') {
       let newNode = {
         id: roomId,
         label: roomType,
+        roomType: roomType,
         x: center.x,
         y: center.y,
-        color: roomColors[roomType]
+        color: roomColors[roomType],
+        title: replacementText + area + windowsExist,
+        borderWidth: replacementText !== '' ? 5 : 2,
+        shapeProperties: {
+          borderDashes: replacementText !== '' ? true : false
+        }
       }
-      nodes.update(newNode)
+      nodesToUpdate.update(newNode)
     }
   });
   agraphmlEdges.each(function() {
@@ -511,22 +550,60 @@ const applyAgraphml = function(agraphml) {
         id: edgeId,
         from: source,
         to: target,
+        edgeType: edgeType,
         label: edgeType
       }
-      edges.update(newEdge);
+      edgesToUpdate.update(newEdge);
     }
   });
   // update vis network data
-  network.setData({nodes: nodes, edges: edges});
+  networkToUpdate.setData({nodes: nodesToUpdate, edges: edgesToUpdate});
 }
 
 document.querySelector('#applyAgraphml').onclick = function() {
   let agraphmlText = document.querySelector('#showAgraphml').value;
-  applyAgraphml(agraphmlText);
+  applyAgraphml(agraphmlText, nodes, edges, network);
   cl.remove('show');
   cl_ag.remove('show');
   cl.add('hide');
   cl_ag.add('hide');
+}
+
+const agraphmlToRoomConf = function() {
+  let results = jQuery('#result tr');
+  results.each(function(result) {
+    let visualResultsContainer = jQuery(results[result]).children().get(4);
+    let resultAgraphmlContainer = jQuery(visualResultsContainer).children().get(0);
+    let resultAgraphmlElement = jQuery(resultAgraphmlContainer);
+    let resultAgraphml = resultAgraphmlElement.html();
+    if (resultAgraphml.startsWith('<graphml')) {
+      let resultId = 'resultAgraphml_' + result;
+      resultAgraphmlElement.prop('id', resultId);
+      let resultNodes = new vis.DataSet([]);
+      let resultEdges = new vis.DataSet([]);
+      let resultData = {
+        nodes: resultNodes,
+        edges: resultEdges
+      }
+      let resultContainer = document.querySelector('#' + resultId);
+      let resultNetwork = new vis.Network(resultContainer, {}, options);
+      resultNetwork.setOptions({
+        height: '180px',
+        physics: {
+          enabled: false
+        },
+        interaction: {
+          hover: false,
+          dragNodes: false,
+          dragView: false,
+          selectable: false
+        }
+      });
+      applyAgraphml(resultAgraphml, resultNodes, resultEdges, resultNetwork);
+      jQuery('#' + resultId + ' .vis-manipulation').hide();
+    }
+    jQuery(visualResultsContainer).show();
+  });
 }
 
 const showRetrievalResults = function(msg) {
@@ -544,6 +621,7 @@ const showRetrievalResults = function(msg) {
     document.querySelector('#resultCount').innerHTML = resultCount;
     jQuery('#result').css('width', (resultCount * 250) + 'px');
     renderResponse('tbody', '#result', msg);
+    agraphmlToRoomConf();
     jQuery('tr').append('<td class="showExplanation">Explain</td>');
   }
 }
@@ -563,10 +641,93 @@ const showSuggestion = function(msg) {
   renderResponse('div', '#suggestions', msg);
   if (msg.indexOf('error') > -1) {
     loading.classList.add('error');
+    jQuery('#getSuggestion').prop("disabled", false).removeClass('disabled');
   } else {
     loading.classList.add('ready');
   }
+  if (msg.indexOf('from') > -1) {
+    let from = jQuery('from').text();
+    let nodeFrom = nodes.get(from);
+    // Re-adding x and y is necessary for node to appear at the same position
+    let xFrom = nodeFrom.x;
+    let yFrom = nodeFrom.y;
+    nodeFrom.x = xFrom;
+    nodeFrom.y = yFrom;
+    nodeFrom.borderWidth = 6;
+    nodeFrom.borderWidthSelected = 6;
+    nodes.update(nodeFrom);
+    jQuery('room1').css('background', nodeFrom.color);
+    let to = jQuery('to').text();
+    if (to !== '') {
+      let nodeTo = nodes.get(to);
+      let xTo = nodeTo.x;
+      let yTo = nodeTo.y;
+      nodeTo.x = xTo;
+      nodeTo.y = yTo;
+      nodeTo.borderWidth = 6;
+      nodeTo.borderWidthSelected = 6;
+      nodes.update(nodeTo);
+      jQuery('room2').css('background', nodeTo.color);
+    }
+    let action = jQuery('action').text();
+    if (action === 'add') {
+      let roomType = jQuery('roomType').text();
+      let uuid = jQuery('uuidRoom').text();
+      let newNode = {
+        id: uuid,
+        label: roomType,
+        color: roomColors[roomType]
+      }
+      nodes.update(newNode);
+      let uuidEdge1 = jQuery('uuidEdge1').text();
+      let newEdge1 = {
+        id: uuidEdge1,
+        label: 'EDGE',
+        from: uuid,
+        to: from
+      }
+      edges.update(newEdge1);
+      if (to !== '') {
+        let uuidEdge2 = jQuery('uuidEdge2').text();
+        let newEdge2 = {
+          id: uuidEdge2,
+          label: 'EDGE',
+          from: uuid,
+          to: to
+        }
+        edges.update(newEdge2);
+      }
+    }
+  }
+}
+
+const resetSuggestion = function() {
+  jQuery('#suggestions').children().remove();
   jQuery('#getSuggestion').prop("disabled", false).removeClass('disabled');
+  jQuery('#suggestion .loading').removeClass('ready');
+}
+
+const addReplacements = function(adaptation) {
+  let doc = jQuery.parseXML(adaptation);
+  let xml = jQuery(doc);
+  let replacements = xml.find('replacement');
+  if (replacements.length > 0) {
+    replacements.each(function(index) {
+      let replacement = replacements[index];
+      let oldRoom = jQuery(replacement).find('old').text();
+      let newRoom = jQuery(replacement).find('new').text();
+      try {
+        let oldNode = nodes.get(oldRoom);
+        let oldLabel = oldNode.label;
+        xml.find('node#' + newRoom).append('<replacement>'
+        + oldLabel.replace('\n', ' ') + '</replacement>');
+      } catch (e) {
+        userView.print('<adaptation>Some adaptations might be displayed '
+        + 'incompletely.</adaptation>');
+      }
+    });
+  }
+  return xml.find('graphml').html();
 }
 
 let currentConfigAndAdaptations = [];
@@ -576,10 +737,14 @@ const drawAdaptation = function(msg) {
   let loading = document.querySelector('#adaptation .loading');
   loading.classList.remove('active');
   let agraphml = msg.substring(12, msg.lastIndexOf('</adaptation>'));
-  if (agraphml.startsWith('<graphml')) {
+  if (agraphml.startsWith('<agraphml')) {
     loading.classList.add('ready');
     let currentConfig = (head + getNodesAndEdges() + foot);
-    let adaptations = agraphml.split(';');
+    let adaptationsAndReplacements = agraphml.split(';');
+    let adaptations = [];
+    adaptationsAndReplacements.forEach(function(adaptationAndReplacement) {
+      adaptations.push(addReplacements(adaptationAndReplacement));
+    });
     adaptations.unshift(currentConfig);
     currentConfigAndAdaptations = adaptations;
     for (let i = 0; i < adaptations.length; i++) {
@@ -600,6 +765,7 @@ const drawAdaptation = function(msg) {
 
 closeAdaptation.onclick = function() {
   document.querySelector('#adaptation .loading').classList.remove('ready');
+  document.querySelector('#adaptation .loading').classList.remove('error');
   closeAdaptation.classList.remove('show');
   closeAdaptation.classList.add('hide');
   jQuery('#adaptations').children().remove();
@@ -639,10 +805,10 @@ const ready = function(fn) {
 ready(initApp);
 
 jQuery(function($) {
-  $('#result').on('click', 'button', function() {
-    $(this).siblings('p').slideToggle(200);
+  $('#result, #suggestion').on('click', 'button', function() {
+    $(this).siblings('p, ol').slideToggle(200);
   });
-  $('#result').on('click', 'button.see-more', function() {
+  $('#result, #suggestion').on('click', 'button.see-more', function() {
     $(this).parent().parent()
       .siblings('.show-justification, .show-contexts, .show-stats')
       .slideToggle(200);
@@ -651,7 +817,15 @@ jQuery(function($) {
   $('body').on('change', '#adaptations input', function() {
     let adaptationIndex = parseInt($(this).val());
     let selectedAdaptation = currentConfigAndAdaptations[adaptationIndex];
-    applyAgraphml(selectedAdaptation);
+    applyAgraphml(selectedAdaptation, nodes, edges, network);
+  });
+  $('body').on('click', '#accept', function() {
+    resetSuggestion();
+  });
+  $('body').on('click', '#deny', function() {
+    let uuid = $('uuidRoom').text();
+    nodes.remove(uuid);
+    resetSuggestion();
   });
   $('body').on('click', '.showExplanation', function() {
     let tr = $(this).parent();
@@ -667,5 +841,13 @@ jQuery(function($) {
   $('body').on('click', '.closeExplanation', function() {
     $(this).siblings('.explanation').hide();
     $(this).hide();
+  });
+  $('.navigate.right').on('click', function() {
+    let scroll = jQuery('#outputResults').scrollLeft();
+    jQuery('#outputResults').scrollLeft(scroll + 50);
+  });
+  $('.navigate.left').on('click', function() {
+    let scroll = jQuery('#outputResults').scrollLeft();
+    jQuery('#outputResults').scrollLeft(scroll - 50);
   });
 });

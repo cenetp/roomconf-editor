@@ -9,7 +9,7 @@
         <script src="js/babel.min.js"></script>
         <script src="js/jquery-3.3.1.min.js"></script>
         <script src="js/config.js"></script>
-        <script src="js/vis.min.js"></script>
+        <script src="js/vis-network.min.js"></script>
         <script type="text/babel" src="js/app.js"></script>
         <link rel="stylesheet" href="css/w3.css" media="all"/>
         <link rel="stylesheet" href="css/w3-theme-dark-grey.css" media="all"/>
@@ -34,10 +34,10 @@
             <div id="graphui-content" class="w3-row w3-light-grey">
                 <div id="metiscbr-graphui" class="w3-white w3-col l9 m9"></div>
                 <div id="overlay" class="hide">
-                  <div id="selectType" class="hide">
+                  <div class="selectType hide">
                       <h2>Select Type</h2>
                       <span id="closeTypes">&times;</span>
-                      <div id="types">
+                      <div class="types">
                           <div class="type hide room-type">LIVING</div>
                           <div class="type hide room-type">SLEEPING</div>
                           <div class="type hide room-type">WORKING</div>
@@ -62,10 +62,11 @@
                       </div>
                       <div id="additional" class="hide room-type">
                         <div id="area">Area <input id="areaInput" type="number" min="1" /> m<sup>2</sup></div>
-                        <div id="windows">Windows <input id="windowsInput" type="checkbox" /></div>
+                        <div id="windows">Windows exist? <input id="windowsInput" type="checkbox" /></div>
+                        <div id="roomLabel">Room label<br><textarea id="roomLabelText"></textarea></div>
                       </div>
-                      <div id="save">
-                        <input style="display: block;" type="button" value="Save" id="saveType"/>
+                      <div class="save">
+                        <input style="display: block;" type="button" value="Save" class="saveType"/>
                       </div>
                   </div>
                 </div>
@@ -149,6 +150,9 @@
                   <div id="outputInfo">
                     <div id="outputStats">
                       <p><span id="resultCount"></span> similar room configurations found.</p>
+                    </div>
+                    <div id="navigateOutput">
+                      <button class="navigate left">&#9664;</button><button class="navigate right">&#9654;</button>
                     </div>
                     <div id="closeOutput">&times;</div>
                   </div>
