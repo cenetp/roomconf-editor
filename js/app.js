@@ -119,6 +119,41 @@ network.setOptions({
   physics: {enabled: false}
 });
 
+const freezeNetwork = function(order) {
+  if (order === 'freeze') {
+    network.setOptions({
+      interaction: {
+        dragNodes: false,
+        selectable: false
+      }
+    });
+  } else {
+    network.setOptions({
+      interaction: {
+        dragNodes: true,
+        selectable: true
+      }
+    });
+  }
+}
+
+let disableManipulation = document.querySelector('#disableManipulation');
+let disableActions = document.querySelector('#disableActions');
+let disableDownload = document.querySelector('#disableDownload');
+const toggleManipulation = function(order) {
+  if (order === 'hide') {
+    disableManipulation.classList.add('show');
+    disableActions.classList.add('show');
+    disableDownload.classList.add('show');
+    freezeNetwork('freeze');
+  } else {
+    disableManipulation.classList.remove('show');
+    disableActions.classList.remove('show');
+    disableDownload.classList.remove('show');
+    freezeNetwork('unfreeze');
+  }
+}
+
 // display the concept attributes dialog
 let overlay = document.querySelector('#overlay');
 let selectType = document.querySelector('.selectType');
@@ -168,6 +203,7 @@ const showTypes = function(order, type, concept) {
 }
 document.querySelector('#closeTypes').onclick = function() {
   showTypes('hide');
+  toggleManipulation('show');
 }
 
 let roomColors = {
@@ -208,9 +244,10 @@ document.querySelector('.saveType').onclick = function() {
       color: roomColors[type],
       area: a,
       windowsExist: w,
-      title: 'Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' m<sup>2</sup>')) + '<br>Windows exist: ' + w
+      title: nodeId + '<br>Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' m<sup>2</sup>')) + '<br>Windows exist: ' + w
     });
     showTypes('hide', 'room-type');
+    toggleManipulation('show');
   } else if (document.querySelectorAll('.edge-type')[0].classList.contains('show')) {
     edges.update({
       id: edgeId,
@@ -218,6 +255,7 @@ document.querySelector('.saveType').onclick = function() {
       edgeType: type
     });
     showTypes('hide', 'edge-type');
+    toggleManipulation('show');
   }
 }
 
@@ -236,9 +274,11 @@ network.on("doubleClick", function(params) {
   if (n.length === 1) {
     nodeId = n[0];
     showTypes('show', 'room-type', nodes.get(nodeId));
+    toggleManipulation('hide');
   } else if (e.length === 1) {
     edgeId = e[0];
     showTypes('show', 'edge-type', edges.get(edgeId));
+    toggleManipulation('hide');
   }
 });
 network.on("selectNode", function (params) {
@@ -249,7 +289,6 @@ network.on("deselectNode", function (params) {
   currentSelectedNode = '';
   nodeId = '';
 });
-
 
 const renderResponse = function(el, parentEl, msg) {
   document.querySelector(parentEl).innerHTML = '';
@@ -356,20 +395,21 @@ const getGraphML = function() {
   let msg2 = start + head + getNodesAndEdges() + foot;
   let filters = document.querySelectorAll('.filterCheckbox');
   let weights = document.querySelectorAll('.weightValue');
+  let fingerprints = '';
   for (let i = 0; i < filters.length; i++) {
     if (filters[i].checked === true) {
       if (weights[i].value !== '') {
         let wt = parseFloat(weights[i].value);
-        msg2 = msg2
-        + '<fingerprint name="' + filters[i].value
+        fingerprints += '<fingerprint name="' + filters[i].value
         + '" weight="' + weights[i].value + '"></fingerprint>';
       } else {
-        msg2 = msg2 + '<fingerprint name="' + filters[i].value
+        fingerprints += '<fingerprint name="' + filters[i].value
         + '" weight="1"></fingerprint>';
       }
     }
   }
-  return msg2 + end;
+  fingerprints += '<fingerprints>' + (fingerprints === '' ? '<fingerprint name="auto"></fingerprint>' : fingerprints) + '</fingerprints>';
+  return msg2 + fingerprints + end;
 }
 
 const sendQuery = function(ev) {
@@ -380,11 +420,11 @@ const sendQuery = function(ev) {
     return jQuery(filters[index]).prop('checked');
   }).length;
   if (getNodesAndEdges() != '') {
-    let msg2 = getGraphML();
     if (ev === 'download') {
+      let graphml = getGraphML();
       document.querySelector('#showAgraphml').value =
-      msg2.substring(msg2.indexOf('<graphml'), msg2.lastIndexOf('</graphml') + 10);
-    } else if (count < 2) {
+      graphml.substring(graphml.indexOf('<graphml'), graphml.lastIndexOf('</graphml') + 10);
+    } else if (count === 1) {
       userView.print('<error>Please select a minimum of 2 Fingerprints.</error>');
     } else {
       lastFpCount = count;
@@ -392,7 +432,7 @@ const sendQuery = function(ev) {
       document.querySelector('#sendAgraphml .loading').classList.remove('ready');
       document.querySelector('#sendAgraphml .loading').classList.remove('error');
       document.querySelector('#sendAgraphml .loading').classList.add('active');
-      req.socket.send(msg2);
+      req.socket.send(getGraphML());
     }
   } else {
     if (ev !== 'download') {
@@ -430,6 +470,7 @@ const getSuggestion = function() {
     document.querySelector('#suggestion .loading').classList.add('active');
     jQuery('#getSuggestion').prop("disabled", true).addClass('disabled');
     req.socket.send(chainMetaMsg + suggestionMsg);
+    toggleManipulation();
   }
 }
 
@@ -520,7 +561,7 @@ const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkTo
         x: center.x,
         y: center.y,
         color: roomColors[roomType],
-        title: replacementText + area + windowsExist,
+        title: roomId +'<br>'+ replacementText + area + windowsExist,
         borderWidth: replacementText !== '' ? 5 : 2,
         shapeProperties: {
           borderDashes: replacementText !== '' ? true : false
@@ -821,11 +862,13 @@ jQuery(function($) {
   });
   $('body').on('click', '#accept', function() {
     resetSuggestion();
+    toggleManipulation();
   });
   $('body').on('click', '#deny', function() {
     let uuid = $('uuidRoom').text();
     nodes.remove(uuid);
     resetSuggestion();
+    toggleManipulation();
   });
   $('body').on('click', '.showExplanation', function() {
     let tr = $(this).parent();

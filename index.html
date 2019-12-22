@@ -23,6 +23,7 @@
                 <h1><b>RoomConf</b> Editor</h1>
                 <div id="connMessages"><p></p></div>
                 <div id="download">
+                  <div id="disableDownload"></div>
                   <input type="button" value="</>" title="Show Source" id="downloadAgraphml"/>
                 </div>
                 <textarea id="showAgraphml" class="hide"></textarea>
@@ -32,6 +33,7 @@
                 </div>
             </header>
             <div id="graphui-content" class="w3-row w3-light-grey">
+                <div id="disableManipulation"></div>
                 <div id="metiscbr-graphui" class="w3-white w3-col l9 m9"></div>
                 <div id="overlay" class="hide">
                   <div class="selectType hide">
@@ -72,6 +74,7 @@
                 </div>
 
                 <div id="sidebar" class="w3-rest">
+                  <div id="disableActions"></div>
                   <div id="sendAgraphml">
                       <textarea hidden id="queryText"></textarea>
                       <form method="post">

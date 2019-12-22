@@ -45,6 +45,7 @@ header {
   height: 100%;
   padding: 14px 20px;
   border-left: 1px solid #ccc;
+  position: relative;
 }
 
 #suggestion {
@@ -134,11 +135,11 @@ header {
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }
 
 .show {
-  display: block;
+  display: block !important;
 }
 
 .selectType {
@@ -298,6 +299,33 @@ td .vis-network {
 .vis-manipulation {
   background: #f3f3f3 !important;
   padding-top: 2px !important;
+}
+
+#disableManipulation {
+  position: absolute;
+  height: 30px;
+  width: 475px;
+  background: #0000009c;
+  z-index: 2;
+  display: none;
+}
+
+#disableActions {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: #0000009c;
+  z-index: 2;
+  display: none;
+}
+
+#disableDownload {
+  position: absolute;
+  height: 30px;
+  width: 60px;
+  background: #0000009c;
+  z-index: 2;
+  display: none;
 }
 
 .vis-button .vis-label {
