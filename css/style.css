@@ -74,7 +74,7 @@ header {
   z-index: 5;
 }
 
-#closeTypes {
+.close-types {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -105,7 +105,7 @@ header {
 }
 
 .saveType,
-#send2,
+#send2, #send3,
 #getSuggestion,
 #getAdaptation,
 #applyAgraphml,
@@ -122,6 +122,7 @@ header {
 
 .saveType:hover,
 #send2:hover,
+#send3:hover,
 #getSuggestion:hover,
 #getAdaptation:hover {
   background: #3c3c3c;
@@ -129,6 +130,7 @@ header {
 
 .saveType:active,
 #send2:active,
+#send3:active,
 #getSuggestion:active,
 #getAdaptation:active {
   background: #191919;
@@ -150,7 +152,7 @@ header {
   width: 500px;
   margin: 0 auto;
   border-radius: 6px;
-  border: 2px solid #777777;
+  border: 2px solid #777;
   height: 333px;
   color: #fff;
   text-align: center;
@@ -212,6 +214,101 @@ header {
   border: 1px solid #ccc;
   padding: 6px;
   margin-bottom: 10px;
+  position: relative;
+}
+
+.retrievalSettingsLabel {
+  font-size: 14px;
+  line-height: 1;
+}
+
+#retrievalSettingsWrapper {
+  padding: 5px 9px 2px;
+  position: absolute;
+  right: 0;
+  top: 25px;
+  background: #ddd;
+  width: 150px;
+}
+
+#showRetrievalSettings {
+  background: #ddd;
+  font-size: 17px;
+  position: absolute;
+  right: 0;
+  border: 1px solid #ccc;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  cursor: pointer;
+}
+
+#retrievalSettings {
+  position: absolute;
+  right: 10px;
+  background: #777;
+  top: 178px;
+}
+
+#zonesViewControls {
+  background: #f1f1f1;
+  padding: 4px;
+  border-top: 2px solid #ccc;
+}
+
+#zonesViewMessage {
+  color: #777;
+  font-size: 15px;
+  padding-left: 10px;
+  display: inline-block;
+  width: 1050px;
+}
+
+#zonesViewButtons {
+  display: inline-block;
+}
+
+#send3 {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+#zonesOverlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#zonesViewSelection {
+  margin-top: 23px;
+}
+
+#setZone {
+  font-weight: 400;
+  margin-right: 7px;
+}
+
+#zonesLegend {
+  position: absolute;
+  z-index: 4;
+  top: 37px;
+  left: 7px;
+  background: rgba(239, 239, 239, 0.5);
+  padding: 2px 7px;
+  border: 1px solid #ccc;
+}
+
+.zoneColor {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+}
+
+#availableZones {
+  border-right: 1px solid #555;
 }
 
 .weightValue {
@@ -231,6 +328,11 @@ header {
   position: absolute;
   top: 8px;
   right: 20px;
+}
+
+#scale {
+  display: inline-block;
+  color: #777;
 }
 
 #additional {
@@ -265,6 +367,7 @@ input[type="number"] {
 
 td .vis-network {
   border: 1px solid #ccc;
+  border-radius: 6px;
 }
 
 .vis-button {
@@ -275,6 +378,7 @@ td .vis-network {
   border-radius: 6px !important;
   padding: 0 20px !important;
   transition: all 0.25s ease-out;
+  outline: none;
 }
 
 .vis-button.vis-edit.vis-edit-mode {
@@ -305,7 +409,7 @@ td .vis-network {
   position: absolute;
   height: 30px;
   width: 475px;
-  background: #0000009c;
+  background: transparent;
   z-index: 2;
   display: none;
 }
@@ -314,7 +418,7 @@ td .vis-network {
   position: absolute;
   height: 100%;
   width: 100%;
-  background: #0000009c;
+  background: transparent;
   z-index: 2;
   display: none;
 }
@@ -323,7 +427,7 @@ td .vis-network {
   position: absolute;
   height: 30px;
   width: 60px;
-  background: #0000009c;
+  background: transparent;
   z-index: 2;
   display: none;
 }
@@ -402,9 +506,25 @@ td:nth-child(1) p {
   margin: 0;
 }
 
+td:nth-child(3) {
+  color: #990093cf;
+  padding: 2px 15px;
+  position: absolute;
+  bottom: 20px;
+  left: 73px;
+  font-size: 16px;
+  display: block;
+  background: #fff;
+  border: 2px solid #99007147;
+  border-radius: 10px;
+}
+
 td:nth-child(2) {
+  display: block;
+  position: absolute;
+  bottom: 20px;
   color: #090;
-  padding: 2px 6px;
+  padding: 2px 15px;
   position: absolute;
   bottom: 20px;
   left: 10px;
@@ -413,18 +533,6 @@ td:nth-child(2) {
   background: #fff;
   border: 2px solid #0099006b;
   border-radius: 10px;
-}
-
-td:nth-child(3) {
-  display: block;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 100px;
-}
-
-td:nth-child(3) {
-  display: none;
 }
 
 td:nth-child(5) {
@@ -460,6 +568,89 @@ td:nth-child(7) {
 #output .vis-tooltip,
 #output .vis-close {
   display: none !important;
+}
+
+.resultAgraphml {
+  display: block;
+  cursor: pointer;
+}
+
+.selectedMapping .vis-network,
+.resultAgraphml:hover .vis-network {
+  border: 2px solid rgba(0, 75, 187, 0.4);
+  opacity: 0.8;
+}
+
+#resultMappings, #zonesView {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 14px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.mappingsView, #zonesViewWrapper {
+  width: 1306px;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 6px;
+  border: 2px solid #777;
+  overflow: hidden;
+}
+
+.mapping-header, #zonesViewHeader {
+  position: absolute;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.86);
+  color: #fff;
+  font-size: 19px;
+  width: 100%;
+  text-align: center;
+  padding: 2px 0;
+}
+
+#mappingCounter {
+  color: #fff;
+  right: 155px;
+  height: 30px;
+  position: absolute;
+  z-index: 4;
+  font-size: 18px;
+}
+
+.mapping {
+  float: left;
+}
+
+.mapping.left {
+  border-right: 2px solid #777;
+}
+
+.mapping .vis-manipulation {
+  display: none !important;
+}
+
+#navigateMappingsWrapper {
+  position: absolute;
+  top: 18px;
+  width: 100%;
+}
+
+#navigateMappingsContainer {
+  position: relative;
+  width: 1304px;
+  margin: 0 auto;
+}
+
+#navigateMappings .navigate {
+  border: none;
+  color: #fff;
+}
+
+#closeMappings {
+  color: #fff;
 }
 
 .disabled {
@@ -508,7 +699,7 @@ label:hover {
 button.see-more {
   background: transparent;
   border: 0;
-  color: #bac9f9;
+  color: rgba(0, 75, 187, 0.8);
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
@@ -619,7 +810,7 @@ label {
   margin-right: 10px;
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1320px) {
   .fpImage {
     display: none;
   }
@@ -720,7 +911,8 @@ form .controls .loading {
   height: 27px;
 }
 
-#closeOutput {
+#closeOutput,
+#closeMappings {
   position: absolute;
   right: 0px;
   top: -4px;
@@ -728,13 +920,16 @@ form .controls .loading {
   font-weight: 700;
   padding: 0 10px;
   cursor: pointer;
+  z-index: 4;
 }
 
-#navigateOutput {
+#navigateOutput,
+#navigateMappings {
   display: inline-block;
   position: absolute;
   right: 50px;
   top: 0px;
+  z-index: 4;
 }
 
 .navigate {
@@ -759,6 +954,7 @@ form .controls .loading {
 #outputStats p {
   margin: 0;
   padding: 0;
+  color: #777;
 }
 
 #outputStats {

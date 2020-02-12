@@ -24,11 +24,17 @@
                 <div id="connMessages"><p></p></div>
                 <div id="download">
                   <div id="disableDownload"></div>
-                  <input type="button" value="</>" title="Show Source" id="downloadAgraphml"/>
+                  <input type="button" value="</>" title="Show source" id="downloadAgraphml"/>
                 </div>
                 <textarea id="showAgraphml" class="hide"></textarea>
                 <div id="agraphmlControls" class="hide">
                   <input type="button" id="applyAgraphml" value="Apply AGraphML">
+                  <div id="scale">
+                    Scale:
+                    <input type="radio" class="scaleFactor" name="scale-factor" value="1" checked>1
+                    <input type="radio" class="scaleFactor" name="scale-factor" value="10">10
+                    <input type="radio" class="scaleFactor" name="scale-factor" value="100">100
+                  </div>
                   <div id="agraphmlMessage">Copy, paste, or edit AGraphML</div>
                 </div>
             </header>
@@ -38,7 +44,7 @@
                 <div id="overlay" class="hide">
                   <div class="selectType hide">
                       <h2>Select Type</h2>
-                      <span id="closeTypes">&times;</span>
+                      <span id="closeTypes" class="close-types">&times;</span>
                       <div class="types">
                           <div class="type hide room-type">LIVING</div>
                           <div class="type hide room-type">SLEEPING</div>
@@ -78,7 +84,7 @@
                   <div id="sendAgraphml">
                       <textarea hidden id="queryText"></textarea>
                       <form method="post">
-                          <div class="selectFp">
+                          <!-- <div class="selectFp">
                               <input type="checkbox" class="filterCheckbox" id="find-roomcount" name="fp-filter" value="Room_Count">
                               <input type="text" class="weightValue">
                               <label for="find-roomcount">Room Count</label>
@@ -89,46 +95,59 @@
                               <input type="text" class="weightValue">
                               <label for="find-relationcount">Relation Count</label>
                               <img src="img/fp2.svg" class="fpImage">
-                          </div>
+                          </div> -->
                           <div class="selectFp">
-                              <input type="checkbox" class="filterCheckbox" id="find-roomgraph" name="fp-filter" value="Room_Graph">
+                              <input type="radio" class="filterCheckbox" id="find-roomgraph" name="fp-filter" value="Room_Graph">
                               <input type="text" class="weightValue">
                               <label for="find-roomgraph">Room Graph</label>
                               <img src="img/fp3.svg" class="fpImage">
                           </div>
-                          <div class="selectFp">
+                          <!-- <div class="selectFp">
                               <input type="checkbox" class="filterCheckbox" id="find-roomtypes" name="fp-filter" value="Room_Types">
                               <input type="text" class="weightValue">
                               <label for="find-roomtypes">Room Types</label>
                               <img src="img/fp4.svg" class="fpImage">
-                          </div>
+                          </div> -->
                           <div class="selectFp">
-                              <input type="checkbox" class="filterCheckbox" id="find-adjacency" name="fp-filter" value="Adjacency">
+                              <input type="radio" class="filterCheckbox" id="find-adjacency" name="fp-filter" value="Adjacency">
                               <input type="text" class="weightValue">
                               <label for="find-adjacency">Adjacency</label>
                               <img src="img/fp5.svg" class="fpImage">
                           </div>
-                          <div class="selectFp last">
-                              <input type="checkbox" class="filterCheckbox" id="find-accessibility" name="fp-filter" value="Accessibility">
+                          <div class="selectFp">
+                              <input type="radio" class="filterCheckbox" id="find-accessibility" name="fp-filter" value="Accessibility">
                               <input type="text" class="weightValue">
                               <label for="find-accessibility">Accessibility</label>
                               <img src="img/fp6.svg" class="fpImage">
                           </div>
-                          <!-- <div class="disabled">
-                              <input disabled type="checkbox" class="filterCheckbox" id="find-fullroomgraph" name="fp-filter" value="Full_Room_Graph">
-                              <input disabled type="text" class="weightValue">
+                          <div class="selectFp last">
+                              <input type="radio" class="filterCheckbox" id="find-fullroomgraph" name="fp-filter" value="Full_Room_Graph">
+                              <input type="text" class="weightValue">
                               <label for="find-fullroomgraph">Full Room Graph</label>
                               <img src="img/fp7.svg" class="fpImage">
                           </div>
-                          <div class="disabled">
+                          <!-- <div class="disabled">
                               <input disabled type="checkbox" class="filterCheckbox" id="find-naturallight" name="fp-filter" value="Natural_Light">
                               <input disabled type="text" class="weightValue">
                               <label for="find-naturallight">Natural Light</label>
                               <img src="img/fp8.svg" class="fpImage">
                           </div> -->
                           <div class="controls">
-                            <input type="button" value="Find designs" id="send2"/>
+                            <input type="button" value="Find designs" id="send2" class="sendQuery"/>
                             <span class="loading"></span>
+                            <div id="retrievalSettings">
+                              <span id="showRetrievalSettings" title="Retrieval settings">&#9881;</span>
+                              <div id="retrievalSettingsWrapper" class="hide">
+                                <div>
+                                  <input type="checkbox" name="inspectZones" id="inspectZones" value="inspectZones">
+                                  <label class="retrievalSettingsLabel" id="inspectZonesLabel" for="inspectZones">Inspect zones</label>
+                                </div>
+                                <div>
+                                  <input type="checkbox" name="analyzeGraph" id="analyzeGraph" value="analyzeGraph">
+                                  <label class="retrievalSettingsLabel" id="analyzeGraphLabel" for="analyzeGraph">Analyze graph</label>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           <div id="retrievalMessages"></div>
                       </form>
@@ -152,7 +171,8 @@
                 <div id="output" class="w3-light-grey hide">
                   <div id="outputInfo">
                     <div id="outputStats">
-                      <p><span id="resultCount"></span> similar room configurations found.</p>
+                      <p>Click on preview to open mapping view.</p>
+                      <!-- <p><span id="resultCount"></span> similar room configurations found.</p> -->
                     </div>
                     <div id="navigateOutput">
                       <button class="navigate left">&#9664;</button><button class="navigate right">&#9654;</button>
@@ -161,6 +181,48 @@
                   </div>
                   <div id="outputResults">
                     <table id="result"></table>
+                  </div>
+                </div>
+                <div id="resultMappings" class="hide">
+                  <div id="navigateMappingsWrapper">
+                    <div id="navigateMappingsContainer">
+                      <div id="mappingCounter">Mapping
+                        <span id="currentMapping"></span> / <span id="totalMappings"></span>
+                      </div>
+                      <div id="navigateMappings">
+                        <button class="navigate left">&#9664;</button>
+                        <button class="navigate right">&#9654;</button>
+                      </div>
+                      <div id="closeMappings">&times;</div>
+                    </div>
+                  </div>
+                </div>
+                <div id="zonesView" class="hide">
+                  <div id="zonesViewWrapper">
+                    <div id="zonesViewHeader">Inspect and Edit Zones</div>
+                    <div id="zonesViewContainer"> </div>
+                    <div id="zonesViewControls">
+                      <span id="zonesViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
+                      <div id="zonesViewButtons">
+                        <input disabled type="button" value="Set zone" id="setZone" class="vis-button"/>
+                        <input type="button" value="Continue" id="send3" class="sendQuery"/>
+                      </div>
+                    </div>
+                    <div id="zonesLegend"></div>
+                    <div id="zonesOverlay" class="hide">
+                      <div id="zonesViewSelection">
+                        <div class="selectType">
+                            <h2>Select New Zone</h2>
+                            <span id="closeZonesOverlay" class="close-types">&times;</span>
+                            <div class="types" id="availableZones"></div>
+                            <div id="additional">
+                              <div id="zoneLabel">Zone label<br><textarea disabled id="zoneLabelText"></textarea></div>
+                            </div>
+                            <div class="save">
+                              <input style="display: block;" type="button" value="Save" class="saveType" id="saveZone"/>
+                            </div>
+                        </div>
+                      </div>
                   </div>
                 </div>
             </div>

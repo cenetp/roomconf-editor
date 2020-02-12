@@ -14,6 +14,8 @@ if (typeof String.prototype.startsWith != 'function') {
 let nodes = new vis.DataSet([
   // {id: 1, label: 'Node 1', title: 'I have a popup!'},
 ]);
+// also create zones nodes array
+let zonesNodes = new vis.DataSet([]);
 
 // create empty edges array
 let edges = new vis.DataSet([
@@ -106,7 +108,7 @@ let options = {
   locales: locales,
   interaction: {
     dragView: true,
-    zoomView: false,
+    zoomView: true,
     tooltipDelay: 0,
     multiselect: true
   }
@@ -164,7 +166,7 @@ const showOverlay = function(cls1, cls2) {
   selectType.classList.add(cls2);
 }
 const hideWithSelected = function(selector) {
-  document.querySelectorAll(selector).forEach(function(el) {
+  document.querySelectorAll(selector).forEach((el) => {
     el.classList.remove('show');
     el.classList.add('hide');
     el.classList.remove('type-selected');
@@ -173,7 +175,7 @@ const hideWithSelected = function(selector) {
 const showTypes = function(order, type, concept) {
   if (order === 'show') {
     showOverlay('hide', 'show');
-    document.querySelectorAll('.' + type).forEach(function(el) {
+    document.querySelectorAll('.' + type).forEach((el) => {
       el.classList.remove('hide');
       el.classList.add('show');
       if (el.innerHTML === concept['roomType'] || el.innerHTML === concept['edgeType']) {
@@ -222,6 +224,11 @@ let roomColors = {
   'BUILDINGSERVICES': '#b5f1d1'
 }
 
+const getRandomColor = function() {
+  let color = Math.floor(Math.random()*16777215).toString(16);
+  return '#' + (color.length === 6 ? color : color+'0');
+}
+
 let nodeId = '';
 let edgeId = '';
 document.querySelector('.saveType').onclick = function() {
@@ -244,7 +251,7 @@ document.querySelector('.saveType').onclick = function() {
       color: roomColors[type],
       area: a,
       windowsExist: w,
-      title: nodeId + '<br>Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' m<sup>2</sup>')) + '<br>Windows exist: ' + w
+      title: 'Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' m<sup>2</sup>')) + '<br>Windows exist: ' + w
     });
     showTypes('hide', 'room-type');
     toggleManipulation('show');
@@ -259,16 +266,7 @@ document.querySelector('.saveType').onclick = function() {
   }
 }
 
-let types = document.querySelectorAll('.type');
-types.forEach(function(t) {
-  t.onclick = function() {
-    types.forEach(function(tp) {
-      tp.classList.remove('type-selected');
-    });
-    t.classList.add('type-selected');
-  }
-});
-network.on("doubleClick", function(params) {
+network.on('doubleClick', function(params) {
   let n = params.nodes;
   let e = params.edges;
   if (n.length === 1) {
@@ -281,11 +279,11 @@ network.on("doubleClick", function(params) {
     toggleManipulation('hide');
   }
 });
-network.on("selectNode", function (params) {
+network.on('selectNode', function(params) {
   nodeId = params.nodes[0];
   currentSelectedNode = nodes.get(nodeId).roomType;
 });
-network.on("deselectNode", function (params) {
+network.on('deselectNode', function(params) {
   currentSelectedNode = '';
   nodeId = '';
 });
@@ -303,6 +301,8 @@ let userView = {
       showSuggestion(msg);
     } else if(msg.startsWith('<adaptation>')) {
       drawAdaptation(msg);
+    } else if(msg.startsWith('<zones>')) {
+      inspectZones(msg);
     } else if (msg.startsWith('<span class="connection')) {
       // display connection message
       document.querySelector('#connMessages p').innerHTML = msg;
@@ -356,43 +356,67 @@ let req = {
 }
 
 let start = '<?xml version="1.0" encoding="UTF-8"?><searchrequest>'
-let head = '<agraphml><graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://graphml.graphdrawing.org/xmlns     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><graph id="searchGraph1" edgedefault="undirected"><key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"></key><key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"></key><key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"></key><key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"></key><key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"></key><key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"></key><key id="bimServerPoid" for="graph" attr.name="bimServerPoid" attr.type="long"></key><key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"></key><key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"></key><key id="name" for="node" attr.name="name" attr.type="string"></key><key id="roomType" for="node" attr.name="roomType" attr.type="string"></key><key id="center" for="node" attr.name="center" attr.type="string"></key><key id="corners" for="node" attr.name="corners" attr.type="string"></key><key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key><key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key><key id="area" for="node" attr.name="area" attr.type="float"></key><key id="sourceConnector" for="edge" attr.name="sourceConnector" attr.type="string"></key><key id="targetConnector" for="edge" attr.name="targetConnector" attr.type="string"></key><key id="hinge" for="edge" attr.name="hinge" attr.type="string"></key><key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key><data key="imageUri"></data><data key="imageMD5"></data><data key="validatedManually">false</data><data key="floorLevel">0.0</data><data key="buildingId">0</data><data key="ifcUri"></data><data key="bimServerPoid">0</data><data key="alignmentNorth">0.0</data><data key="geoReference">null</data>';
+let head = '<agraphml><graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://graphml.graphdrawing.org/xmlns     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><graph id="searchGraph1" edgedefault="undirected"><key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"></key><key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"></key><key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"></key><key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"></key><key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"></key><key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"></key><key id="bimServerPoid" for="graph" attr.name="bimServerPoid" attr.type="long"></key><key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"></key><key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"></key><key id="name" for="node" attr.name="name" attr.type="string"></key><key id="roomType" for="node" attr.name="roomType" attr.type="string"></key><key id="center" for="node" attr.name="center" attr.type="string"></key><key id="corners" for="node" attr.name="corners" attr.type="string"></key><key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key><key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key><key id="area" for="node" attr.name="area" attr.type="float"></key>><key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key><data key="imageUri"></data><data key="imageMD5"></data><data key="validatedManually">false</data><data key="floorLevel">0.0</data><data key="buildingId">0</data><data key="ifcUri"></data><data key="bimServerPoid">0</data><data key="alignmentNorth">0.0</data><data key="geoReference">null</data>';
 let foot = '</graph></graphml></agraphml>';
 let end = '</searchrequest>';
 
 const getNodesAndEdges = function() {
   let queryElements = '';
   let positions = network.getPositions();
-  nodes.get().forEach(function(node) {
+  nodes.get().forEach((node) => {
     let nodeId = node['id'];
+    let group = '';
+    try {
+      group = zonesNodes.get(nodeId).group;
+    } catch (e) {
+      // pass
+    }
+    let zone = group !== '' ? ' zone="' + group + '"' : '';
     let roomType = node['roomType'];
+    let label = node['label'];
+    label = label.indexOf('"') > -1 ? label.substring(label.indexOf('"')+1, label.length-1) : '';
     let area = (node['area'] === undefined || node['area'] === '') ? 0 : node['area'];
     let windowsExist = node['windowsExist'] === undefined ?
-      false : node['windowsExist'];
+    false : node['windowsExist'];
     let center = '('  + positions[nodeId].x + ' ' + positions[nodeId].y + ')';
-    queryElements += '<node id="' + nodeId + '">'
-      + '<data key="roomType">' + roomType + '</data>'
-      + '<data key="area">' + area + '</data>'
-      + '<data key="windowExist">' + windowsExist + '</data>'
-      + '<data key="center">' + center + '</data>'
-      + '</node>';
+    queryElements += '<node id="' + nodeId + '"' + zone + '>'
+    + '<data key="roomType">' + roomType + '</data>'
+    + '<data key="name">' + label + '</data>'
+    + '<data key="area">' + area + '</data>'
+    + '<data key="windowExist">' + windowsExist + '</data>'
+    + '<data key="center">' + center + '</data>'
+    + '</node>';
   });
-  edges.get().forEach(function(edge) {
+  edges.get().forEach((edge) => {
     let edgeId = edge['id'];
     let source = edge['from'];
+    let sourceGroup = '';
+    try {
+      sourceGroup = zonesNodes.get(source).group;
+    } catch (e) {
+      // pass
+    }
+    let sourceZone = sourceGroup !== '' ? ' sourceZone="' + sourceGroup + '"' : '';
     let target = edge['to'];
+    let targetGroup = '';
+    try {
+      targetGroup = zonesNodes.get(target).group;
+    } catch (e) {
+      // pass
+    }
+    let targetZone = targetGroup !== '' ? ' targetZone="' + targetGroup + '"' : '';
     let edgeType = edge['edgeType'];
     queryElements += '<edge id="' + edgeId
-      + '" source="' + source
-      + '" target="' + target + '">'
-      + '<data key="edgeType">' + edgeType + '</data>'
-      + '</edge>';
+    + '" source="' + source + '" target="' + target + '"' + sourceZone + targetZone + '>'
+    + '<data key="edgeType">' + edgeType + '</data>'
+    + '</edge>';
   });
   return queryElements;
 }
 
-const getGraphML = function() {
-  let msg2 = start + head + getNodesAndEdges() + foot;
+const getGraphML = function(ev) {
+  let nodesAndEdges = getNodesAndEdges();
+  let msg2 = start + head + nodesAndEdges + foot;
   let filters = document.querySelectorAll('.filterCheckbox');
   let weights = document.querySelectorAll('.weightValue');
   let fingerprints = '';
@@ -408,11 +432,31 @@ const getGraphML = function() {
       }
     }
   }
-  fingerprints += '<fingerprints>' + (fingerprints === '' ? '<fingerprint name="auto"></fingerprint>' : fingerprints) + '</fingerprints>';
-  return msg2 + fingerprints + end;
+  fingerprints = '<fingerprints search="' + ev + '">' + fingerprints + '</fingerprints>';
+  let inspectZones = '';
+  let analyzeGraph = '';
+  if (ev === 'search-graphmatch') {
+    let inspect = document.querySelector('#inspectZones');
+    if (inspect.checked) {
+      let zonesSet = (nodesAndEdges.indexOf('zone="') > -1 && nodesAndEdges.indexOf('sourceZone="') > -1 && nodesAndEdges.indexOf('targetZone="') > -1);
+      inspectZones += '<inspectZones zonesSet="' + zonesSet + '"></inspectZones>';
+    }
+    let analyze = document.querySelector('#analyzeGraph');
+    if (analyze.checked) {
+      analyzeGraph += '<analyzeGraph analyzeGraph="true"></analyzeGraph>';
+    }
+  }
+  return msg2 + fingerprints + inspectZones + analyzeGraph + end;
 }
 
-const sendQuery = function(ev) {
+const disableSearch = function() {
+  jQuery('#send2').prop("disabled", true).addClass('disabled');
+  document.querySelector('#sendAgraphml .loading').classList.remove('ready');
+  document.querySelector('#sendAgraphml .loading').classList.remove('error');
+  document.querySelector('#sendAgraphml .loading').classList.add('active');
+}
+
+const sendQuery = function(ev, continueSearch) {
   // Clear retrieval messasges field first
   renderResponse('form', '#retrievalMessages', '');
   let filters = jQuery('.filterCheckbox');
@@ -421,18 +465,38 @@ const sendQuery = function(ev) {
   }).length;
   if (getNodesAndEdges() != '') {
     if (ev === 'download') {
-      let graphml = getGraphML();
+      let graphML = getGraphML();
       document.querySelector('#showAgraphml').value =
-      graphml.substring(graphml.indexOf('<graphml'), graphml.lastIndexOf('</graphml') + 10);
-    } else if (count === 1) {
-      userView.print('<error>Please select a minimum of 2 Fingerprints.</error>');
-    } else {
-      lastFpCount = count;
-      jQuery('#send2').prop("disabled", true).addClass('disabled');
-      document.querySelector('#sendAgraphml .loading').classList.remove('ready');
-      document.querySelector('#sendAgraphml .loading').classList.remove('error');
-      document.querySelector('#sendAgraphml .loading').classList.add('active');
-      req.socket.send(getGraphML());
+      graphML.substring(graphML.indexOf('<graphml'), graphML.lastIndexOf('</graphml') + 10);
+    } else if (ev === 'search-cbr') {
+      if (count === 1) {
+        userView.print('<error>Please select a minimum of 2 fingerprints.</error>');
+      } else {
+        lastFpCount = count;
+        disableSearch();
+        req.socket.send(getGraphML(ev));
+      }
+    } else if (ev === 'search-graphmatch') {
+      if (count === 1) {
+        lastFpCount = 1;
+        disableSearch();
+        let graphML = getGraphML(ev);
+        if (graphML.indexOf('zonesSet="true"') > -1) {
+          if (continueSearch) {
+            zonesView.classList.add('hide');
+            req.socket.send(graphML);
+          } else {
+            inspectZones(graphML);
+          }
+        } else {
+          zonesView.classList.add('hide');
+          req.socket.send(graphML);
+        }
+      } else if (count === 0) {
+        userView.print('<error>Please select fingerprints.</error>');
+      } else {
+        userView.print('<error>Fingerprint selection error ocurred.</error>');
+      }
     }
   } else {
     if (ev !== 'download') {
@@ -452,7 +516,7 @@ const getSuggestion = function() {
     let actionCount = currentChain.length;
     let nodeIds = nodes.get().map(function(n) { return n.id });
     let roomsAndEdges = [];
-    nodeIds.forEach(function(id) {
+    nodeIds.forEach((id) => {
       let e = network.getConnectedEdges(id)
       .map(function(id) { return edges.get(id).label });
       roomsAndEdges.push(
@@ -507,10 +571,31 @@ document.querySelector('#downloadAgraphml').onclick = function() {
   }
 }
 
-const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkToUpdate) {
-  // first clear existing nodes and edges
+// Initalize objects for zonesView
+let groups = {};
+const updateZonesLegend = function() {
+  jQuery('.zonesLegendEntry').remove();
+  Object.keys(groups).forEach((groupId) => {
+    let entry = '<div class="zonesLegendEntry">'
+    + '<span class="zoneColor" style="background:' + groups[groupId].color.background + '"></span>'
+    + ' <span>(' + groups[groupId].count + ')</span>'
+    + ' <span>' + groupId + ' <i>' + groups[groupId].name + '<i></span></div>';
+    jQuery('#zonesLegend').append(entry);
+  });
+}
+
+// Apply AGraphML to a network
+const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkToUpdate, mappingColors, factor) {
+  let currentFactor = factor !== undefined ? factor : 1;
+  let mapping = (mappingColors !== undefined && Object.entries(mappingColors).length > 0);
+  let zonesAvailable = false;
+  // first clear existing nodes, edges, and groups
   nodesToUpdate.clear();
   edgesToUpdate.clear();
+  zonesNodes.clear();
+  for (let g in groups) {
+    delete groups[g];
+  }
   // parse AGraphML
   let doc = jQuery.parseXML(agraphml);
   let xml = jQuery(doc);
@@ -518,7 +603,32 @@ const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkTo
   let agraphmlEdges = xml.find('edge');
   agraphmlNodes.each(function() {
     let roomId = jQuery(this).attr('id');
+    let color = '';
+    let zone = jQuery(this).attr('zone');
+    let zoneExists = zone !== undefined;
+    let group = '';
+    if (zoneExists) {
+      let zoneName = jQuery(this).attr('zoneName');
+      if (!zonesAvailable) {
+        zonesAvailable = true;
+      }
+      group = '<br>Zone: ' + zone;
+      if (Object.keys(groups).includes(zone)) {
+        let currentCount = groups[zone].count;
+        groups[zone].count = currentCount+1;
+      } else {
+        groups[zone] = {
+          name: zoneName !== undefined ? ('~ ' + zoneName) : 'custom',
+          color: {
+            background: getRandomColor()
+          },
+          count: 1
+        }
+      }
+      color = groups[zone].color.background;
+    }
     let roomType = '';
+    let label = '';
     let center = {};
     let area = '';
     let windowsExist = '';
@@ -530,10 +640,13 @@ const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkTo
       if (key === 'roomType') {
         roomType = text.toUpperCase();
       }
-      if (key === 'center') {
+      if (key === 'name') {
+        label = text;
+      }
+      if (key === 'center' && text !== undefined && text !== '') {
         let xy = text.substring(text.indexOf('(')+1, text.indexOf(')')).split(' ');
-        center.x = parseFloat(xy[0]);
-        center.y = parseFloat(xy[1]);
+        center.x = parseFloat(xy[0]) * currentFactor;
+        center.y = parseFloat(xy[1]) * currentFactor;
       }
       if (key === 'area') {
         area = 'Area: ' + text + ' m<sup>2</sup><br>';
@@ -554,20 +667,28 @@ const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkTo
       windowsExist = 'Windows exist: undefined';
     }
     if (roomId !== undefined && roomId !== '' && roomType !== undefined && roomType != '') {
+      if (label !== '') {
+        label = roomType + '\n"' + label + '"';
+      } else {
+        label = roomType;
+      }
       let newNode = {
         id: roomId,
-        label: roomType,
+        label: label,
         roomType: roomType,
-        x: center.x,
-        y: center.y,
-        color: roomColors[roomType],
-        title: roomId +'<br>'+ replacementText + area + windowsExist,
+        color: color !== '' ? color : (mapping ? (roomId in mappingColors ? mappingColors[roomId] : '#eeeeee') : roomColors[roomType]),
+        title: replacementText + area + windowsExist + group,
         borderWidth: replacementText !== '' ? 5 : 2,
+        group: zone,
         shapeProperties: {
           borderDashes: replacementText !== '' ? true : false
         }
       }
-      nodesToUpdate.update(newNode)
+      if (center.x !== undefined && center.y !== undefined) {
+        newNode.x = center.x;
+        newNode.y = center.y;
+      }
+      nodesToUpdate.update(newNode);
     }
   });
   agraphmlEdges.each(function() {
@@ -592,40 +713,64 @@ const applyAgraphml = function(agraphml, nodesToUpdate, edgesToUpdate, networkTo
         from: source,
         to: target,
         edgeType: edgeType,
-        label: edgeType
+        label: edgeType,
+        color: mapping ? ((source in mappingColors && target in mappingColors) ? mappingColors[source] : '#dddddd') : roomColors[source]
       }
       edgesToUpdate.update(newEdge);
     }
   });
-  // update vis network data
-  networkToUpdate.setData({nodes: nodesToUpdate, edges: edgesToUpdate});
+  try {
+    // update vis network data
+    networkToUpdate.setData({nodes: nodesToUpdate, edges: edgesToUpdate, groups: groups});
+    // set nodes for zonesView
+    if (zonesAvailable) {
+      zonesNodes = nodesToUpdate;
+      updateZonesLegend();
+    }
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 document.querySelector('#applyAgraphml').onclick = function() {
   let agraphmlText = document.querySelector('#showAgraphml').value;
-  applyAgraphml(agraphmlText, nodes, edges, network);
+  let scaleFactor;
+  let scale = jQuery('.scaleFactor');
+  scale.each(function() {
+    if (jQuery(this).prop('checked')) {
+      scaleFactor = parseInt(jQuery(this).val());
+    }
+  });
+  applyAgraphml(agraphmlText, nodes, edges, network, '', scaleFactor !== undefined ? scaleFactor : 1);
   cl.remove('show');
   cl_ag.remove('show');
   cl.add('hide');
   cl_ag.add('hide');
 }
 
+const queryTypes = {
+  'Graph_Match_Exact': 'Exact Graph Matching',
+  'Graph_Match_Inexact': 'Inexact Graph Matching',
+  'Graph_Match_Structure': 'Structure Matching',
+  'Subgraph_Match_Exact': 'Exact Subgraph Matching',
+  'Subgraph_Match_Inexact': 'Inexact Subgraph Matching'
+}
+
 const agraphmlToRoomConf = function() {
   let results = jQuery('#result tr');
+  // remove available mappings
+  jQuery('.mappingsView').remove();
   results.each(function(result) {
     let visualResultsContainer = jQuery(results[result]).children().get(4);
     let resultAgraphmlContainer = jQuery(visualResultsContainer).children().get(0);
     let resultAgraphmlElement = jQuery(resultAgraphmlContainer);
     let resultAgraphml = resultAgraphmlElement.html();
-    if (resultAgraphml.startsWith('<graphml')) {
+    if (resultAgraphml.startsWith('<graphml') || resultAgraphml.startsWith('[')) {
       let resultId = 'resultAgraphml_' + result;
       resultAgraphmlElement.prop('id', resultId);
+      resultAgraphmlElement.prop('class', 'resultAgraphml');
       let resultNodes = new vis.DataSet([]);
       let resultEdges = new vis.DataSet([]);
-      let resultData = {
-        nodes: resultNodes,
-        edges: resultEdges
-      }
       let resultContainer = document.querySelector('#' + resultId);
       let resultNetwork = new vis.Network(resultContainer, {}, options);
       resultNetwork.setOptions({
@@ -638,13 +783,101 @@ const agraphmlToRoomConf = function() {
           dragNodes: false,
           dragView: false,
           selectable: false
+        },
+        manipulation: {
+          enabled: false
         }
+        // ,
+        // layout: {
+        //   improvedLayout: false
+        // }
       });
-      applyAgraphml(resultAgraphml, resultNodes, resultEdges, resultNetwork);
-      jQuery('#' + resultId + ' .vis-manipulation').hide();
+      // add mappings view
+      if (resultAgraphml.includes('<mappings>')) {
+        jQuery('#resultMappings').append(
+          '<div id="mappingsView_' + result + '" class="mappingsView hide"></div>'
+        );
+        let res = resultAgraphml.split('],[')
+        let query = res[0].substring(1);
+        let graphml = res[1];
+        let nameExists = graphml.includes('<data key="name">');
+        let mappings = res[2].substring(0, res[2].length-1);
+        let json = mappings.substring(10, mappings.lastIndexOf('</mappings'));
+        let allMappings = JSON.parse(json);
+        let availableMappings = [];
+        for (let queryType in queryTypes) {
+          let mapping = allMappings[queryType];
+          if (mapping !== undefined && mapping.length > 0) {
+            for (let index = 0; index < mapping.length; index++) {
+              let mp = mapping[index];
+              let mps = JSON.stringify(mp);
+              if (!availableMappings.includes(mps)) {
+                availableMappings.push(mps);
+                let queryId = 'query_' + queryType + '_' + result + index;
+                let resultId = 'result_' + queryType + '_' + result + index;
+                jQuery('#mappingsView_' + result).append(
+                  '<div id="mappings_' + queryType + '_' + result + index + '" class="mappings hide">'
+                  + '<div class="mapping-header">' + queryTypes[queryType] + ' ' + (index + 1) + '</div>'
+                  + '<agraphml id="' + queryId +'" class="mapping left"></agraphml>'
+                  + '<agraphml id="' + resultId +'" class="mapping"></agraphml>'
+                  + '</div>'
+                );
+                let containers = {
+                  containerQuery: document.querySelector('#' + queryId),
+                  containerResult: document.querySelector('#' + resultId)
+                };
+                createMappingsView(query, graphml, mp, containers, queryType);
+              }
+            }
+          }
+        }
+        applyAgraphml(graphml, resultNodes, resultEdges, resultNetwork, '', nameExists ? 40 : 1);
+        jQuery('#' + resultId + ' .vis-manipulation').hide();
+      } else {
+        applyAgraphml(resultAgraphml, resultNodes, resultEdges, resultNetwork);
+      }
     }
     jQuery(visualResultsContainer).show();
   });
+}
+
+let availableMappingNetworks = {};
+const getNetworkForMapping = function(container) {
+  let mappingNetwork = new vis.Network(container, {}, options);
+  mappingNetwork.setOptions({
+    height: '600px',
+    width: '650px',
+    physics: {
+      enabled: false
+    },
+    manipulation: {
+      enabled: false
+    }
+    // ,
+    // layout: {
+    //   improvedLayout: false
+    // }
+  });
+  availableMappingNetworks[container.id] = {
+    network: mappingNetwork,
+    fit: false
+  }
+  return mappingNetwork;
+}
+
+const createMappingsView = function(query, result, mapping, containers, queryType) {
+  let resultNodeIds = {};
+  let queryNodeIds = {};
+  if (queryType !== 'Graph_Match_Structure') {
+    for (const [resultNodeId, queryNodeId] of Object.entries(mapping)) {
+      let color = getRandomColor();
+      resultNodeIds[resultNodeId] = color;
+      queryNodeIds[queryNodeId] = color;
+    }
+  }
+  let nameExists = result.includes('<data key="name">');
+  applyAgraphml(query, new vis.DataSet([]), new vis.DataSet([]), getNetworkForMapping(containers.containerQuery), queryNodeIds);
+  applyAgraphml(result, new vis.DataSet([]), new vis.DataSet([]), getNetworkForMapping(containers.containerResult), resultNodeIds, nameExists ? 40 : 1);
 }
 
 const showRetrievalResults = function(msg) {
@@ -659,11 +892,11 @@ const showRetrievalResults = function(msg) {
     document.querySelector('#output').classList.add('show');
     loading.classList.add('ready');
     let resultCount = (msg.match(/<\/tr>/g)).length;
-    document.querySelector('#resultCount').innerHTML = resultCount;
+    //document.querySelector('#resultCount').innerHTML = resultCount;
     jQuery('#result').css('width', (resultCount * 250) + 'px');
     renderResponse('tbody', '#result', msg);
     agraphmlToRoomConf();
-    jQuery('tr').append('<td class="showExplanation">Explain</td>');
+    jQuery('tr').append('<td class="showExplanation">Info</td>');
   }
 }
 
@@ -763,8 +996,7 @@ const addReplacements = function(adaptation) {
         xml.find('node#' + newRoom).append('<replacement>'
         + oldLabel.replace('\n', ' ') + '</replacement>');
       } catch (e) {
-        userView.print('<adaptation>Some adaptations might be displayed '
-        + 'incompletely.</adaptation>');
+        userView.print('<adaptation>Some adaptations might be displayed incompletely.</adaptation>');
       }
     });
   }
@@ -783,7 +1015,7 @@ const drawAdaptation = function(msg) {
     let currentConfig = (head + getNodesAndEdges() + foot);
     let adaptationsAndReplacements = agraphml.split(';');
     let adaptations = [];
-    adaptationsAndReplacements.forEach(function(adaptationAndReplacement) {
+    adaptationsAndReplacements.forEach((adaptationAndReplacement) => {
       adaptations.push(addReplacements(adaptationAndReplacement));
     });
     adaptations.unshift(currentConfig);
@@ -813,6 +1045,119 @@ closeAdaptation.onclick = function() {
   jQuery('#getAdaptation').prop("disabled", false).removeClass('disabled');
 }
 
+let zonesViewContainer = document.querySelector('#zonesViewContainer');
+let zonesNetwork = new vis.Network(zonesViewContainer, {}, options);
+zonesNetwork.setOptions({
+  height: '700px',
+  width: '1306px',
+  interaction: {
+    dragView: false,
+    dragNodes: false,
+    zoomView: false
+  },
+  physics: {
+    enabled: false
+  },
+  manipulation: {
+    enabled: false
+  }
+});
+
+let zonesView = document.querySelector('#zonesView');
+const inspectZones = function(graphMLZones) {
+  document.querySelector('#sendAgraphml .loading').classList.remove('active');
+  let graphML = (graphMLZones.indexOf('<zones>') > -1) ?  graphMLZones.substring(graphMLZones.indexOf('<graphml'), graphMLZones.lastIndexOf('</zones')) : graphMLZones;
+  zonesView.classList.remove('hide');
+  applyAgraphml(graphML, new vis.DataSet([]), new vis.DataSet([]), zonesNetwork);
+}
+
+let availableZones = jQuery('#availableZones');
+const appendNewZone = function() {
+  availableZones.append('<div id="newZone" class="type zone">Add new zone</div>');
+}
+
+let zonesOverlay = document.querySelector('#zonesOverlay');
+document.querySelector('#setZone').onclick = function() {
+  let selectedNodes = zonesNetwork.getSelectedNodes();
+  zonesOverlay.classList.remove('hide');
+  availableZones.find('.type.zone').remove();
+  Object.keys(groups).forEach((groupId) => {
+    let allInSameGroup = true;
+    for (let id of selectedNodes) {
+      let groupIdOfNode = zonesNodes.get(id).group;
+      if (groupIdOfNode !== groupId) {
+        allInSameGroup = false;
+        break;
+      }
+    }
+    if (!allInSameGroup) {
+      availableZones.append('<div class="type zone">' + groupId + '</div>');
+    }
+  });
+  if (selectedNodes.length === 1) {
+    let currentGroup = zonesNodes.get(selectedNodes[0]).group;
+    if (groups[currentGroup].count > 1) {
+      appendNewZone();
+    }
+  } else {
+    appendNewZone();
+  }
+}
+
+zonesNetwork.on('selectNode', function(params) {
+  setZone.removeAttribute('disabled');
+});
+zonesNetwork.on('deselectNode', function(params) {
+  if (zonesNetwork.getSelectedNodes().length === 0) {
+    setZone.setAttribute('disabled', 'disabled');
+  }
+});
+
+let saveZone = document.querySelector('#saveZone');
+saveZone.onclick = function() {
+  let selectedNodes = zonesNetwork.getSelectedNodes();
+  let newZone = jQuery('.type.zone.type-selected').get(0).innerHTML;
+  if (newZone === 'Add new zone') {
+    newZone = (jQuery('.type.zone').length + 1).toString();
+    groups[newZone] = {
+      color: {
+        background: getRandomColor()
+      },
+      count: selectedNodes.length
+    }
+  } else {
+    let currentCount = groups[newZone].count;
+    groups[newZone].count = currentCount+selectedNodes.length;
+  }
+  selectedNodes.forEach((id) => {
+    let currentGroup = zonesNodes.get(id).group;
+    let currentCount = groups[currentGroup].count;
+    groups[currentGroup].count = currentCount-1;
+  });
+  Object.keys(groups).forEach((groupId) => {
+    if (groups[groupId].count <= 0) {
+      delete groups[groupId];
+    }
+  });
+  updateZonesLegend();
+  zonesNodes.forEach((node) => {
+    let newNode = node;
+    let title = node.title;
+    let newTitle = title.substring(0, title.lastIndexOf('Zone: ')+6) + newZone;
+    if (selectedNodes.includes(newNode.id)) {
+      newNode.group = newZone;
+      newNode.color = groups[newZone].color.background;
+      newNode.title = newTitle;
+    }
+    zonesNodes.update(newNode);
+  });
+  zonesOverlay.classList.add('hide');
+}
+
+document.querySelector('#closeZonesOverlay').onclick = function() {
+  zonesOverlay.classList.add('hide');
+}
+
 const initApp = function() {
   // read the config
   if (!config.retrieval) {
@@ -825,10 +1170,6 @@ const initApp = function() {
   if (!config.adaptation) {
     document.querySelector('#adaptation').classList.add('hide');
   }
-  // add click events
-  document.querySelector('#send2').onclick = sendQuery;
-  document.querySelector('#getSuggestion').onclick = getSuggestion;
-  document.querySelector('#getAdaptation').onclick = getAdaptation;
   // Initialize WebSocket
   if (config.retrieval || config.suggestion || config.adaptation) {
     req.init();
@@ -846,19 +1187,30 @@ const ready = function(fn) {
 ready(initApp);
 
 jQuery(function($) {
+  $('.sendQuery').on('click', function() {
+    let continueSearch = $(this).prop('id') === 'send3';
+    sendQuery(config.retrievalMode, continueSearch);
+  });
+  $('#getSuggestion').on('click', getSuggestion);
+  $('#getAdaptation').on('click', getAdaptation);
   $('#result, #suggestion').on('click', 'button', function() {
     $(this).siblings('p, ol').slideToggle(200);
   });
   $('#result, #suggestion').on('click', 'button.see-more', function() {
     $(this).parent().parent()
-      .siblings('.show-justification, .show-contexts, .show-stats')
-      .slideToggle(200);
+    .siblings('.show-justification, .show-contexts, .show-stats')
+    .slideToggle(200);
   });
   $('.vis-close').remove();
   $('body').on('change', '#adaptations input', function() {
     let adaptationIndex = parseInt($(this).val());
     let selectedAdaptation = currentConfigAndAdaptations[adaptationIndex];
     applyAgraphml(selectedAdaptation, nodes, edges, network);
+  });
+  $('body').on('click', '.type', function() {
+    let types = $(this).parents('.types').find('.type');
+    types.removeClass('type-selected');
+    $(this).addClass('type-selected');
   });
   $('body').on('click', '#accept', function() {
     resetSuggestion();
@@ -885,12 +1237,67 @@ jQuery(function($) {
     $(this).siblings('.explanation').hide();
     $(this).hide();
   });
-  $('.navigate.right').on('click', function() {
-    let scroll = jQuery('#outputResults').scrollLeft();
-    jQuery('#outputResults').scrollLeft(scroll + 50);
+  $('#navigateOutput .navigate.right').on('click', function() {
+    let scroll = $('#outputResults').scrollLeft();
+    $('#outputResults').scrollLeft(scroll + 50);
   });
-  $('.navigate.left').on('click', function() {
-    let scroll = jQuery('#outputResults').scrollLeft();
-    jQuery('#outputResults').scrollLeft(scroll - 50);
+  $('#navigateOutput .navigate.left').on('click', function() {
+    let scroll = $('#outputResults').scrollLeft();
+    $('#outputResults').scrollLeft(scroll - 50);
+  });
+  const fitNetworks = function(mappingsEl) {
+    mappingsEl.find('.mapping').each(function() {
+      let id = $(this).prop('id');
+      let n = availableMappingNetworks[id];
+      if (!n.fit) {
+        n.network.fit();
+      }
+    });
+  }
+  $('body').on('click', '.resultAgraphml', function() {
+    $(this).addClass('selectedMapping');
+    $('#resultMappings').removeClass('hide');
+    let index = $('.resultAgraphml').index($(this));
+    let mv = $('.mappingsView').eq(index);
+    mv.removeClass('hide').addClass('active');
+    let count = mv.find('.mappings').length;
+    $('#totalMappings').text(count);
+    $('#currentMapping').text('1');
+    let mv0 = mv.find('.mappings').eq(0);
+    mv0.removeClass('hide').addClass('active');
+    fitNetworks(mv0);
+  });
+  const navigateMappings = function(direction) {
+    let mpa = $('.mappingsView.active .mappings');
+    let index = -2;
+    mpa.each(function(i) {
+      if ($(this).hasClass('active')) {
+        index = i;
+      }
+    });
+    let nextOrPrev = (direction === 'next') ? (index + 1) : (index - 1);
+    if (nextOrPrev >= 0 && nextOrPrev < mpa.length) {
+      let current = nextOrPrev + 1;
+      $('#currentMapping').text(current);
+      let mp = mpa.eq(nextOrPrev);
+      mp.removeClass('hide').addClass('active');
+      fitNetworks(mp);
+      mpa.eq(index).removeClass('active').addClass('hide');
+    }
+  }
+  $('#navigateMappings .navigate.right').on('click', function() {
+    navigateMappings('next');
+  });
+  $('#navigateMappings .navigate.left').on('click', function() {
+    navigateMappings('prev');
+  });
+  $('#closeMappings').on('click', function() {
+    let rm = $('#resultMappings');
+    rm.find('.active').removeClass('active').addClass('hide');
+    rm.addClass('hide');
+    $('.resultAgraphml').removeClass('selectedMapping');
+  });
+  $('#showRetrievalSettings').on('click', function() {
+    $('#retrievalSettingsWrapper').toggleClass('hide');
   });
 });
