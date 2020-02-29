@@ -85,7 +85,7 @@ let options = {
   },
   nodes: {
     shape: 'dot',
-    size: 27,
+    size: 30,
     font: {
       size: 18,
       strokeWidth: 0,
@@ -250,8 +250,9 @@ document.querySelector('.saveType').onclick = function() {
       roomType: type,
       color: roomColors[type],
       area: a,
+      size: isNaN(parseInt(a)) ? 30 : (parseInt(a) * 3 >= 81 ? 81 : (parseInt(a) * 3 < 21 ? 21 : parseInt(a) * 3)),
       windowsExist: w,
-      title: 'Area: ' + ((a === undefined || a === '') ? 'undefined' : (a + ' m<sup>2</sup>')) + '<br>Windows exist: ' + w
+      title: 'Area: ' + (isNaN(parseInt(a)) ? 'undefined' : (a + ' m<sup>2</sup>')) + '<br>Windows exist: ' + w
     });
     showTypes('hide', 'room-type');
     toggleManipulation('show');
