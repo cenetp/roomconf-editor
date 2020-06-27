@@ -2,7 +2,7 @@ var cacheName = 'graphui-cache';
 var filesToCache = [
   'index.html',
   'js/babel.min.js',
-  'js/vis.min.js',
+  'js/vis-network.min.js',
   'js/config.js',
   //'js/app.js',
   'css/w3.css',

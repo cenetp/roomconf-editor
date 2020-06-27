@@ -837,6 +837,7 @@ label {
   animation-name: circle;
   animation-duration: 1s;
   animation-iteration-count: infinite;
+  transform: translateZ(0);
 }
 
 .loading.ready {
