@@ -40,6 +40,8 @@ let locales = {
     editEdge: "Edit Edge",
     addDescription: "Click in an empty space to place a new room.",
     edgeDescription: "Click on a room and drag the edge to another room to connect them.",
+    del: "Delete selected",
+    back: "Back",
   },
 };
 
@@ -106,9 +108,9 @@ let options = {
   },
   nodes: {
     shape: "dot",
-    size: 3,
+    size: 7,
     font: {
-      size: 3,
+      size: 4,
       strokeWidth: 0,
       face: "Inconsolata, monospace",
     },
@@ -118,7 +120,7 @@ let options = {
     width: 1,
     smooth: false,
     font: {
-      size: 3,
+      size: 4,
       align: "middle",
       background: "#ffffff",
       strokeWidth: 0,
@@ -270,7 +272,7 @@ document.querySelector(".saveType").onclick = function () {
       roomType: type,
       color: roomColors[type],
       area: a,
-      size: isNaN(parseInt(a)) ? 3 : parseInt(a) * 3 >= 81 ? 81 : parseInt(a) * 3 < 21 ? 21 : parseInt(a) * 3,
+      size: isNaN(parseInt(a)) ? 7 : parseInt(a) * 3 >= 81 ? 81 : parseInt(a) * 3 < 21 ? 21 : parseInt(a) * 3,
       windowsExist: w,
       title: "Area: " + (isNaN(parseInt(a)) ? "undefined" : a + " m<sup>2</sup>") + "<br>Windows exist: " + w,
     });
@@ -381,7 +383,6 @@ const getNodesAndEdges = function () {
   let queryElements = "";
   let positions = network.getPositions();
   nodes.get().forEach((node) => {
-    console.log("DRIN", node);
     let nodeId = node["id"];
     let group = "";
     try {
