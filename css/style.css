@@ -2,22 +2,28 @@
   font-family: Inconsolata;
   src: url(../webfonts/Inconsolata-Regular.ttf);
   font-weight: 400;
-  font-style: normal
+  font-style: normal;
 }
 
 @font-face {
   font-family: Inconsolata;
   src: url(../webfonts/Inconsolata-Bold.ttf);
   font-weight: 700;
-  font-style: normal
+  font-style: normal;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
-body, h1, h2, h3, input, .vis-label {
-  font-family: 'Inconsolata', sans-serif !important;
+body,
+h1,
+h2,
+h3,
+input,
+.vis-label {
+  font-family: "Inconsolata", sans-serif !important;
 }
 
 header {
@@ -105,7 +111,8 @@ header {
 }
 
 .saveType,
-#send2, #send3,
+#send2,
+#send3,
 #getSuggestion,
 #getAdaptation,
 #applyAgraphml,
@@ -403,6 +410,33 @@ td .vis-network {
 .vis-manipulation {
   background: #f3f3f3 !important;
   padding-top: 2px !important;
+  box-sizing: content-box;
+  border-width: 0;
+  border-bottom-width: 0px;
+  border-bottom: 1px;
+  border-bottom-color: currentcolor;
+  border-bottom-style: none;
+  border-style: solid;
+  border-color: #d6d9d8;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 28px;
+}
+
+.vis-manipulation .vis-button {
+  float: left;
+  font-family: verdana;
+  font-size: 12px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  display: inline-block;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  height: 24px;
+  margin-left: 10px;
+  cursor: pointer;
 }
 
 #disableManipulation {
@@ -440,7 +474,7 @@ td .vis-network {
 }
 
 .vis-tooltip {
-  font-family: 'Liberation Sans', sans-serif !important;
+  font-family: "Liberation Sans", sans-serif !important;
   font-size: 12px !important;
 }
 
@@ -452,7 +486,8 @@ tr {
   overflow: hidden;
 }
 
-th, td {
+th,
+td {
   display: none;
 }
 
@@ -471,7 +506,8 @@ error {
   color: #4cce58;
 }
 
-.connection.red, .warning {
+.connection.red,
+.warning {
   color: #ff8686;
 }
 
@@ -581,7 +617,8 @@ td:nth-child(7) {
   opacity: 0.8;
 }
 
-#resultMappings, #zonesView {
+#resultMappings,
+#zonesView {
   position: absolute;
   top: 0;
   left: 0;
@@ -591,7 +628,8 @@ td:nth-child(7) {
   background: rgba(0, 0, 0, 0.3);
 }
 
-.mappingsView, #zonesViewWrapper {
+.mappingsView,
+#zonesViewWrapper {
   width: 1306px;
   margin: 0 auto;
   position: relative;
@@ -600,7 +638,8 @@ td:nth-child(7) {
   overflow: hidden;
 }
 
-.mapping-header, #zonesViewHeader {
+.mapping-header,
+#zonesViewHeader {
   position: absolute;
   z-index: 3;
   background: rgba(0, 0, 0, 0.86);
@@ -828,9 +867,15 @@ label {
 }
 
 @keyframes circle {
-  0% {border-color: #aaa;}
-  50% {border-color: #090;}
-  100% {border-color: #aaa;}
+  0% {
+    border-color: #aaa;
+  }
+  50% {
+    border-color: #090;
+  }
+  100% {
+    border-color: #aaa;
+  }
 }
 
 .loading.active {
@@ -868,7 +913,7 @@ input.disabled {
   border: none;
   width: 100%;
   height: 23px;
-  line-height: 1.0;
+  line-height: 1;
   margin-top: 6px;
   cursor: pointer;
   outline: none;
@@ -979,11 +1024,16 @@ form .controls .loading {
   border-radius: 10px;
 }
 
-from, to, uuidRoom, uuidEdge1, uuidEdge2 {
+from,
+to,
+uuidRoom,
+uuidEdge1,
+uuidEdge2 {
   display: none;
 }
 
-room1, room2 {
+room1,
+room2 {
   border-radius: 5px;
   padding: 1px 4px;
 }
