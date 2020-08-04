@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   entry: "./js/index.ts",
@@ -22,12 +23,13 @@ module.exports = {
     new CopyPlugin({
       patterns: [{ from: "img", to: "img" }],
     }),
+    new MiniCssExtractPlugin(),
   ],
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /\.(ttf|eot|woff|woff2|svg)$/,

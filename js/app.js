@@ -108,19 +108,19 @@ let options = {
   },
   nodes: {
     shape: "dot",
-    size: 7,
+    size: 30,
     font: {
-      size: 4,
+      size: 18,
       strokeWidth: 0,
       face: "Inconsolata, monospace",
     },
     borderWidth: 2,
   },
   edges: {
-    width: 1,
+    width: 3,
     smooth: false,
     font: {
-      size: 4,
+      size: 18,
       align: "middle",
       background: "#ffffff",
       strokeWidth: 0,
@@ -272,7 +272,7 @@ document.querySelector(".saveType").onclick = function () {
       roomType: type,
       color: roomColors[type],
       area: a,
-      size: isNaN(parseInt(a)) ? 7 : parseInt(a) * 3 >= 81 ? 81 : parseInt(a) * 3 < 21 ? 21 : parseInt(a) * 3,
+      size: isNaN(parseInt(a)) ? 30 : parseInt(a) * 3 >= 81 ? 81 : parseInt(a) * 3 < 21 ? 21 : parseInt(a) * 3,
       windowsExist: w,
       title: "Area: " + (isNaN(parseInt(a)) ? "undefined" : a + " m<sup>2</sup>") + "<br>Windows exist: " + w,
     });
