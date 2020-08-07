@@ -5,17 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="manifest" href="./manifest.json"/>
         <link rel="shortcut icon" href="./favicon.ico"/>
-        <!-- <script src="js/babel.min.js"></script>
-        <script src="js/jquery-3.3.1.min.js"></script>
-        <script src="js/config.js"></script>
-        <script src="js/vis-network.min.js"></script> -->
-        <script type="text/babel" src="js/index.js"></script>
-        <!-- <link type="style" rel="stylesheet" href="css/w3.css" media="all"/>
-        <link rel="stylesheet" href="css/w3-theme-dark-grey.css" media="all"/>
-        <link rel="stylesheet" href="css/vis-network.min.css" media="all"/> -->
-        <!-- <link type="text/css" rel="stylesheet" href="/css/style.css" media="all"/> -->
+        <script type="js" src="js/index.js"></script>
         <title>RoomConf Editor</title>
     <link href="main.css" rel="stylesheet"></head>
     <body class="w3-theme-l4">
@@ -228,16 +219,5 @@
                 </div>
             </div>
         </div>
-        <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('sw.js').then(function(registration) {
-                        console.log('SW registered in scope: ', registration.scope);
-                    }).catch(function(error) {
-                        console.log('SW could not be registered.', error);
-                    });
-                });
-            }
-        </script>
     <script src="js/bundle.js"></script></body>
 </html>
