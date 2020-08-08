@@ -1,10 +1,18 @@
 # RoomConf Editor
 
-Produces room configurations in AGraphML format.
+Produces room configurations in the AGraphML format and can be connected to the MetisCBR framework (see http://veisen.de/metiscbr).
+
+See the editor in action: https://metiscbr.hosting.uni-hildesheim.de/metiscbr-alpha/.
 
 # Installation
 
-Put the contents of the repository on a web server and navigate to the index.html file.
+Install `npm` for your OS and run `npm install` in the application's root directory.
+
+# Run
+
+Run `npm run start` to quickstart a development server with the editor.
+
+OR: deploy the contents of the `dist` directory to your web server.
 
 # AGraphML Visualization
 
