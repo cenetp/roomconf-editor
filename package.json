@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/karimould/roomconf-editor.git"
+    "url": "git+https://github.com/cenetp/roomconf-editor.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/karimould/roomconf-editor/issues"
+    "url": "https://github.com/cenetp/roomconf-editor/issues"
   },
-  "homepage": "https://github.com/karimould/roomconf-editor#readme",
+  "homepage": "https://github.com/cenetp/roomconf-editor",
   "devDependencies": {
     "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^4.1.0",
