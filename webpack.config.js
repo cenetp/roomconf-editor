@@ -13,12 +13,12 @@ module.exports = {
     filename: "js/bundle.js",
   },
   devServer: {
-    contentBase: "./dist", //where contents are served from
+    contentBase: "./dist",
   },
   plugins: [
     new HtmlWebpackPlugin({
-      filename: "index.html", // name of html file to be created
-      template: "./index.html", // source from which html file would be created
+      filename: "index.html",
+      template: "./index.html",
     }),
     new CopyPlugin({
       patterns: [{ from: "img", to: "img" }],
@@ -49,6 +49,18 @@ module.exports = {
             options: {
               name: "[name].[ext]",
               outputPath: "img/",
+            },
+          },
+        ],
+      },
+      {
+        test: /\.ico$/i,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "[name].[ext]",
+              outputPath: "favicons/",
             },
           },
         ],
