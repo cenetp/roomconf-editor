@@ -496,10 +496,10 @@ const sendQuery = function (ev, continueSearch) {
       let graphML = getGraphML();
       document.querySelector("#showAgraphml").value = graphML.substring(graphML.indexOf("<graphml"), graphML.lastIndexOf("</graphml") + 10);
     } else if (ev === "search-cbr") {
-      if (count === 1) {
-        userView.print("<error>Please select a minimum of 2 fingerprints.</error>");
-      } else {
-        lastFpCount = count;
+      if (count === 0) {
+        userView.print("<error>Please select fingerprints.</error>");
+      } else if (count === 1) {
+        lastFpCount = 1;
         disableSearch();
         req.socket.send(getGraphML(ev));
       }
@@ -521,8 +521,6 @@ const sendQuery = function (ev, continueSearch) {
         }
       } else if (count === 0) {
         userView.print("<error>Please select fingerprints.</error>");
-      } else {
-        userView.print("<error>Fingerprint selection error ocurred.</error>");
       }
     }
   } else {
@@ -795,7 +793,7 @@ const agraphmlToRoomConf = function () {
     let resultAgraphmlContainer = jQuery(visualResultsContainer).children().get(0);
     let resultAgraphmlElement = jQuery(resultAgraphmlContainer);
     let resultAgraphml = resultAgraphmlElement.html();
-    if (resultAgraphml.startsWith("<graphml") || resultAgraphml.startsWith("[")) {
+    if (resultAgraphml.startsWith("<graph") || resultAgraphml.startsWith("[")) {
       let resultId = "resultAgraphml_" + result;
       resultAgraphmlElement.prop("id", resultId);
       resultAgraphmlElement.prop("class", "resultAgraphml");
@@ -811,16 +809,11 @@ const agraphmlToRoomConf = function () {
         interaction: {
           hover: false,
           dragNodes: false,
-          dragView: false,
           selectable: false,
         },
         manipulation: {
           enabled: false,
         },
-        // ,
-        // layout: {
-        //   improvedLayout: false
-        // }
       });
       // add mappings view
       if (resultAgraphml.includes("<mappings>")) {
@@ -830,44 +823,61 @@ const agraphmlToRoomConf = function () {
         let graphml = res[1];
         let nameExists = graphml.includes('<data key="name">');
         let mappings = res[2].substring(0, res[2].length - 1);
-        let json = mappings.substring(10, mappings.lastIndexOf("</mappings"));
-        let allMappings = JSON.parse(json);
-        let availableMappings = [];
-        for (let queryType in queryTypes) {
-          let mapping = allMappings[queryType];
-          if (mapping !== undefined && mapping.length > 0) {
-            for (let index = 0; index < mapping.length; index++) {
-              let mp = mapping[index];
-              let mps = JSON.stringify(mp);
-              if (!availableMappings.includes(mps)) {
-                availableMappings.push(mps);
-                let queryId = "query_" + queryType + "_" + result + index;
-                let resultId = "result_" + queryType + "_" + result + index;
-                jQuery("#mappingsView_" + result).append(
-                  '<div id="mappings_' +
-                    queryType +
-                    "_" +
-                    result +
-                    index +
-                    '" class="mappings hide">' +
-                    '<div class="mapping-header">' +
-                    queryTypes[queryType] +
-                    " " +
-                    (index + 1) +
-                    "</div>" +
-                    '<agraphml id="' +
-                    queryId +
-                    '" class="mapping left"></agraphml>' +
-                    '<agraphml id="' +
-                    resultId +
-                    '" class="mapping"></agraphml>' +
-                    "</div>"
-                );
-                let containers = {
-                  containerQuery: document.querySelector("#" + queryId),
-                  containerResult: document.querySelector("#" + resultId),
-                };
-                createMappingsView(query, graphml, mp, containers, queryType);
+        if (mappings.includes("no_mappings")) {
+          let queryId = "query_" + result;
+          let resultId = "result_" + result;
+          jQuery("#mappingsView_" + result).append(
+            '<div id="mappings_' + result + '" class="mappings hide">' +
+              '<div class="mapping-header">Result ' + (result + 1) + '</div>' +
+              '<agraphml id="' + queryId + '" class="mapping left"></agraphml>' +
+              '<agraphml id="' + resultId + '" class="mapping"></agraphml>' +
+              "</div>"
+          );
+          let containers = {
+            containerQuery: document.querySelector("#" + queryId),
+            containerResult: document.querySelector("#" + resultId),
+          };
+          createMappingsView(query, graphml, containers);
+        } else {
+          let json = mappings.substring(10, mappings.lastIndexOf("</mappings"));
+          let allMappings = JSON.parse(json);
+          let availableMappings = [];
+          for (let queryType in queryTypes) {
+            let mapping = allMappings[queryType];
+            if (mapping !== undefined && mapping.length > 0) {
+              for (let index = 0; index < mapping.length; index++) {
+                let mp = mapping[index];
+                let mps = JSON.stringify(mp);
+                if (!availableMappings.includes(mps)) {
+                  availableMappings.push(mps);
+                  let queryId = "query_" + queryType + "_" + result + index;
+                  let resultId = "result_" + queryType + "_" + result + index;
+                  jQuery("#mappingsView_" + result).append(
+                    '<div id="mappings_' +
+                      queryType +
+                      "_" +
+                      result +
+                      index +
+                      '" class="mappings hide">' +
+                      '<div class="mapping-header">' +
+                      queryTypes[queryType] +
+                      " " +
+                      (index + 1) +
+                      "</div>" +
+                      '<agraphml id="' +
+                      queryId +
+                      '" class="mapping left"></agraphml>' +
+                      '<agraphml id="' +
+                      resultId +
+                      '" class="mapping"></agraphml>' +
+                      "</div>"
+                  );
+                  let containers = {
+                    containerQuery: document.querySelector("#" + queryId),
+                    containerResult: document.querySelector("#" + resultId),
+                  };
+                  createMappingsView(query, graphml, containers, mp, queryType);
+                }
               }
             }
           }
@@ -894,10 +904,6 @@ const getNetworkForMapping = function (container) {
     manipulation: {
       enabled: false,
     },
-    // ,
-    // layout: {
-    //   improvedLayout: false
-    // }
   });
   availableMappingNetworks[container.id] = {
     network: mappingNetwork,
@@ -906,10 +912,10 @@ const getNetworkForMapping = function (container) {
   return mappingNetwork;
 };
 
-const createMappingsView = function (query, result, mapping, containers, queryType) {
+const createMappingsView = function (query, result, containers, mapping, queryType) {
   let resultNodeIds = {};
   let queryNodeIds = {};
-  if (queryType !== "Graph_Match_Structure") {
+  if (queryType !== undefined && queryType !== "Graph_Match_Structure") {
     for (const [resultNodeId, queryNodeId] of Object.entries(mapping)) {
       let color = getRandomColor();
       resultNodeIds[resultNodeId] = color;
@@ -1223,9 +1229,46 @@ const ready = function (fn) {
 ready(initApp);
 
 jQuery(function ($) {
+  let useCbrCheck = $("#useCbr");
+  let useCbrLabel = $("#useCbrLabel");
+  let inspectZonesCheck = $("#inspectZones");
+  let inspectZonesLabel = $("#inspectZonesLabel");
+  let analyzeGraphCheck = $("#analyzeGraph");
+  let analyzeGraphLabel = $("#analyzeGraphLabel");
+  $(".retrievalSetting").on("change", function () {
+    let settingId = $(this).prop("id");
+    let checked = $(this).prop("checked");
+    if (settingId === "useCbr") {
+      if (checked) {
+        inspectZonesCheck.prop("disabled", "disabled");
+        analyzeGraphCheck.prop("disabled", "disabled");
+        $("#send2").data("search-mode", "search-cbr");
+      } else {
+        inspectZonesCheck.prop("disabled", "");
+        analyzeGraphCheck.prop("disabled", "");
+        $("#send2").data("search-mode", "search-graphmatch");
+      }
+    } else if (settingId === "inspectZones") {
+      if (checked) {
+        useCbrCheck.prop("disabled", "disabled");
+        analyzeGraphCheck.prop("checked", true);
+        analyzeGraphCheck.prop("disabled", "disabled");
+      } else {
+        useCbrCheck.prop("disabled", "");
+        analyzeGraphCheck.prop("disabled", "");
+      }
+    } else {
+      if (checked) {
+        useCbrCheck.prop("disabled", "disabled");
+      } else {
+        useCbrCheck.prop("disabled", "");
+      }
+    }
+  });
   $(".sendQuery").on("click", function () {
     let continueSearch = $(this).prop("id") === "send3";
-    sendQuery(config.retrievalMode, continueSearch);
+    let searchMode = $(this).data("search-mode");
+    sendQuery(searchMode, continueSearch);
   });
   $("#getSuggestion").on("click", getSuggestion);
   $("#getAdaptation").on("click", getAdaptation);

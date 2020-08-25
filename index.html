@@ -125,18 +125,22 @@
                               <img src="img/fp8.svg" class="fpImage">
                           </div> -->
                           <div class="controls">
-                            <input type="button" value="Find designs" id="send2" class="sendQuery"/>
+                            <input type="button" value="Find designs" id="send2" class="sendQuery" data-search-mode="search-graphmatch"/>
                             <span class="loading"></span>
                             <div id="retrievalSettings">
                               <span id="showRetrievalSettings" title="Retrieval settings">&#9881;</span>
                               <div id="retrievalSettingsWrapper" class="hide">
                                 <div>
-                                  <input type="checkbox" name="inspectZones" id="inspectZones" value="inspectZones">
+                                  <input class="retrievalSetting" type="checkbox" name="inspectZones" id="inspectZones" value="inspectZones">
                                   <label class="retrievalSettingsLabel" id="inspectZonesLabel" for="inspectZones">Inspect zones</label>
                                 </div>
                                 <div>
-                                  <input type="checkbox" name="analyzeGraph" id="analyzeGraph" value="analyzeGraph">
+                                  <input class="retrievalSetting" type="checkbox" name="analyzeGraph" id="analyzeGraph" value="analyzeGraph">
                                   <label class="retrievalSettingsLabel" id="analyzeGraphLabel" for="analyzeGraph">Analyze graph</label>
+                                </div>
+                                <div>
+                                  <input class="retrievalSetting" type="checkbox" name="useCbr" id="useCbr" value="useCbr">
+                                  <label class="retrievalSettingsLabel" id="useCbrLabel" for="useCbr">Use CBR search</label>
                                 </div>
                               </div>
                             </div>
@@ -197,7 +201,7 @@
                       <span id="zonesViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
                       <div id="zonesViewButtons">
                         <input disabled type="button" value="Set zone" id="setZone" class="vis-button"/>
-                        <input type="button" value="Continue" id="send3" class="sendQuery"/>
+                        <input type="button" value="Continue" id="send3" class="sendQuery" data-search-mode="search-graphmatch"/>
                       </div>
                     </div>
                     <div id="zonesLegend"></div>

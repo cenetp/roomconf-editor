@@ -340,6 +340,7 @@ header {
 #scale {
   display: inline-block;
   color: #777;
+  padding-left: 10px;
 }
 
 #additional {
@@ -700,8 +701,8 @@ td:nth-child(7) {
   font-weight: bold;
 }
 
+/*.show-contexts,*/
 .show-justification,
-.show-contexts,
 .show-stats,
 .show-stats p {
   display: none;
@@ -779,6 +780,7 @@ input[disabled] + label,
 input[disabled] + label:hover {
   color: #a7a7a7;
   cursor: default;
+  text-decoration: none;
 }
 
 #download {
