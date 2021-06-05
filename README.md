@@ -2,7 +2,7 @@
 
 Produces room configurations in the AGraphML format and can be connected to the MetisCBR framework (see http://veisen.de/metiscbr).
 
-See the editor in action: https://metiscbr.hosting.uni-hildesheim.de/metiscbr-alpha/.
+See the editor in action: http://veisen.de/metiscbr/roomconf.
 
 # Installation
 
