@@ -572,6 +572,22 @@ const getAdaptation = function () {
   }
 };
 
+const getAutocompletion = function () {
+  if (getNodesAndEdges() != "") {
+    let autocompletionMsg = (head + getNodesAndEdges() + foot).replace("<agraphml>", "<autocompletion>").replace("</agraphml>", "</autocompletion>");
+    console.log(autocompletionMsg);
+    req.socket.send(autocompletionMsg);
+  }
+}
+
+const getAutocompletionForBlocks = function () {
+  if (getNodesAndEdges() != "") {
+    let autocompletionMsg = (head + getNodesAndEdges() + foot).replace("<agraphml>", "<autocompletion><blocks>").replace("</agraphml>", "</blocks></autocompletion>");
+    console.log(autocompletionMsg);
+    req.socket.send(autocompletionMsg);
+  }
+}
+
 let cl = document.querySelector("#showAgraphml").classList;
 let cl_ag = document.querySelector("#agraphmlControls").classList;
 
@@ -1213,7 +1229,7 @@ const initApp = function () {
     document.querySelector("#adaptation").classList.add("hide");
   }
   // Initialize WebSocket
-  if (config.retrieval || config.suggestion || config.adaptation) {
+  if (config.retrieval || config.suggestion || config.adaptation || config.autocompletion) {
     req.init();
   }
 };
@@ -1272,6 +1288,8 @@ jQuery(function ($) {
   });
   $("#getSuggestion").on("click", getSuggestion);
   $("#getAdaptation").on("click", getAdaptation);
+  $("#getAutocompletion").on("click", getAutocompletion);
+  $("#getAutocompletionForBlocks").on("click", getAutocompletionForBlocks);
   $("#result, #suggestion").on("click", "button", function () {
     $(this).siblings("p, ol").slideToggle(200);
   });
