@@ -5,6 +5,7 @@ var config = {
   autocompletion: true,
   server: "localhost",
   port: 3030,
+  debug: true
 };
 
 export default config;

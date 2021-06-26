@@ -15,6 +15,8 @@ if (typeof String.prototype.startsWith != "function") {
   };
 }
 
+let debug = config.debug;
+
 // create empty nodes array
 let nodes = new DataSet([
   // {id: 1, label: 'Node 1', title: 'I have a popup!'},
@@ -274,7 +276,7 @@ document.querySelector(".saveType").onclick = function () {
       area: a,
       size: isNaN(parseInt(a)) ? 30 : parseInt(a) * 3 >= 81 ? 81 : parseInt(a) * 3 < 21 ? 21 : parseInt(a) * 3,
       windowsExist: w,
-      title: "Area: " + (isNaN(parseInt(a)) ? "undefined" : a + " m<sup>2</sup>") + "<br>Windows exist: " + w,
+      title: (debug ? nodeId + "<br>" : "") + "Area: " + (isNaN(parseInt(a)) ? "undefined" : a + " m<sup>2</sup>") + "<br>Windows exist: " + w,
     });
     showTypes("hide", "room-type");
     toggleManipulation("show");
@@ -628,10 +630,27 @@ const updateZonesLegend = function () {
   });
 };
 
+const getNumberOfClusters = function() {
+  // TODO calculate number of clusters depending on room count?
+  return 2;
+}
+
+const getClusterColors = function(numberOfClusters) {
+  let clusterColors = {};
+  for (let i = 0; i < numberOfClusters; i++) {
+    clusterColors[i] = getRandomColor();
+  }
+  return clusterColors;
+}
+
 // Apply AGraphML to a network
 const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkToUpdate, mappingColors, factor) {
   let currentFactor = factor !== undefined ? factor : 1;
   let mapping = mappingColors !== undefined && Object.entries(mappingColors).length > 0;
+  let clusterColors;
+  if (!mapping && agraphml.includes("cluster")) {
+    clusterColors = getClusterColors(getNumberOfClusters());
+  }
   let zonesAvailable = false;
   // first clear existing nodes, edges, and groups
   nodesToUpdate.clear();
@@ -647,6 +666,7 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
   let agraphmlEdges = xml.find("edge");
   agraphmlNodes.each(function () {
     let roomId = jQuery(this).attr("id");
+    let cluster = jQuery(this).attr("cluster");
     let color = "";
     let zone = jQuery(this).attr("zone");
     let zoneExists = zone !== undefined;
@@ -728,6 +748,9 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
           borderDashes: replacementText !== "" ? true : false,
         },
       };
+      if (cluster !== undefined) {
+        newNode.color = clusterColors[cluster];
+      }
       if (center.x !== undefined && center.y !== undefined) {
         newNode.x = center.x;
         newNode.y = center.y;
