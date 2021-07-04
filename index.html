@@ -18,6 +18,12 @@
                   <div id="disableDownload"></div>
                   <input type="button" value="</>" title="Show source" id="downloadAgraphml"/>
                 </div>
+                <div id="autocompletionNotifierWrapper">
+                    <button title="Autocompletion notifier" id="autocompletionNotifier">
+                        <span id="notifier">&#10035;</span>
+                        <span id="notifierText" class="hide">Autocompletion available</span>
+                    </button>
+                </div>
                 <textarea id="showAgraphml" class="hide"></textarea>
                 <div id="agraphmlControls" class="hide">
                   <input type="button" id="applyAgraphml" value="Apply AGraphML">
@@ -60,7 +66,7 @@
                           <div class="type hide edge-type">WINDOW</div>
                           <div class="type hide edge-type">EDGE</div>
                       </div>
-                      <div id="additional" class="hide room-type">
+                      <div class="additional hide room-type">
                         <div id="area">Area <input id="areaInput" type="number" min="1" /> m<sup>2</sup></div>
                         <div id="windows">Windows exist? <input id="windowsInput" type="checkbox" /></div>
                         <div id="roomLabel">Room label<br><textarea id="roomLabelText"></textarea></div>
@@ -191,6 +197,25 @@
                     <table id="result"></table>
                   </div>
                 </div>
+                <div id="clusteringView" class="hide">
+                  <div id="clusteringViewWrapper">
+                    <div id="clusteringHeader">Block detection results</div>
+                    <div id="clusteringViewContainer"></div>
+                      <div id="clusteringViewControls">
+                          <span id="clusteringViewMessage">
+                              Continue with autocompletion of the problematic block or discard if it looks consistent
+                          </span>
+                          <div id="clusteringViewButtons">
+                              <input type="button" value="Discard" id="closeClustering" class="vis-button"/>
+                              <input type="button" value="Continue" id="send4" class="sendQuery"/>
+                          </div>
+                      </div>
+                      <div id="clusteringConsent">
+                          This window shows the problematic or inconsistent blocks in the spatial configuration for which an autocompletion is available.
+                          <br><input type="checkbox" id="skipBlocks"/><span style="color:#6d6d6d">&nbsp;Skip this window for further autocompletions</span>
+                      </div>
+                  </div>
+                </div>
                 <div id="resultMappings" class="hide">
                   <div id="navigateMappingsWrapper">
                     <div id="navigateMappingsContainer">
@@ -208,7 +233,7 @@
                 <div id="zonesView" class="hide">
                   <div id="zonesViewWrapper">
                     <div id="zonesViewHeader">Inspect and Edit Zones</div>
-                    <div id="zonesViewContainer"> </div>
+                    <div id="zonesViewContainer"></div>
                     <div id="zonesViewControls">
                       <span id="zonesViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
                       <div id="zonesViewButtons">
@@ -223,7 +248,7 @@
                             <h2>Select New Zone</h2>
                             <span id="closeZonesOverlay" class="close-types">&times;</span>
                             <div class="types" id="availableZones"></div>
-                            <div id="additional">
+                            <div class="additional">
                               <div id="zoneLabel">Zone label<br><textarea disabled id="zoneLabelText"></textarea></div>
                             </div>
                             <div class="save">

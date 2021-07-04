@@ -8,6 +8,8 @@ import jQuery from "jquery";
 let lastFpCount = 0;
 let currentChain = [];
 let currentSelectedNode = "";
+let clusteringAgraphml = "";
+let skipBlocks = false;
 
 if (typeof String.prototype.startsWith != "function") {
   String.prototype.startsWith = function (str) {
@@ -331,6 +333,13 @@ let userView = {
     } else if (msg.startsWith('<span class="connection')) {
       // display connection message
       document.querySelector("#connMessages p").innerHTML = msg;
+    } else if (msg.startsWith("<clustering>")) {
+      document.querySelector('#autocompletionNotifier').classList.add('show');
+      document.querySelector('#notifier').classList.add('highlight');
+      setTimeout(function () {
+        document.querySelector('#notifierText').classList.remove('hide');
+      }, 300);
+      clusteringAgraphml = msg;
     } else {
       // display retrieval results or error message
       showRetrievalResults(msg);
@@ -376,8 +385,36 @@ let req = {
 };
 
 let start = '<?xml version="1.0" encoding="UTF-8"?><searchrequest>';
-let head =
-  '<agraphml><graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://graphml.graphdrawing.org/xmlns     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><graph id="searchGraph1" edgedefault="undirected"><key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"></key><key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"></key><key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"></key><key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"></key><key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"></key><key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"></key><key id="bimServerPoid" for="graph" attr.name="bimServerPoid" attr.type="long"></key><key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"></key><key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"></key><key id="name" for="node" attr.name="name" attr.type="string"></key><key id="roomType" for="node" attr.name="roomType" attr.type="string"></key><key id="center" for="node" attr.name="center" attr.type="string"></key><key id="corners" for="node" attr.name="corners" attr.type="string"></key><key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key><key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key><key id="area" for="node" attr.name="area" attr.type="float"></key>><key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key><data key="imageUri"></data><data key="imageMD5"></data><data key="validatedManually">false</data><data key="floorLevel">0.0</data><data key="buildingId">0</data><data key="ifcUri"></data><data key="bimServerPoid">0</data><data key="alignmentNorth">0.0</data><data key="geoReference">null</data>';
+let head = '<agraphml><graphml xmlns="http://graphml.graphdrawing.org/xmlns" '
+    + 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+    + 'xsi:schemalocation="http://graphml.graphdrawing.org/xmlns '
+    + 'http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">'
+    + '<graph id="searchGraph1" edgedefault="undirected">'
+    + '<key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"></key>'
+    + '<key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"></key>'
+    + '<key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"></key>'
+    + '<key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"></key>'
+    + '<key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"></key>'
+    + '<key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"></key>'
+    + '<key id="bimServerPoid" for="graph" attr.name="bimServerPoid" attr.type="long"></key>'
+    + '<key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"></key>'
+    + '<key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"></key>'
+    + '<key id="name" for="node" attr.name="name" attr.type="string"></key>'
+    + '<key id="roomType" for="node" attr.name="roomType" attr.type="string"></key>'
+    + '<key id="center" for="node" attr.name="center" attr.type="string"></key>'
+    + '<key id="corners" for="node" attr.name="corners" attr.type="string"></key>'
+    + '<key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key>'
+    + '<key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key>'
+    + '<key id="area" for="node" attr.name="area" attr.type="float"></key>'
+    + '<key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key>'
+    + '<data key="imageUri"></data><data key="imageMD5"></data>'
+    + '<data key="validatedManually">false</data>'
+    + '<data key="floorLevel">0.0</data>'
+    + '<data key="buildingId">0</data>'
+    + '<data key="ifcUri"></data>'
+    + '<data key="bimServerPoid">0</data>'
+    + '<data key="alignmentNorth">0.0</data>'
+    + '<data key="geoReference">null</data>';
 let foot = "</graph></graphml></agraphml>";
 let end = "</searchrequest>";
 
@@ -399,28 +436,11 @@ const getNodesAndEdges = function () {
     let area = node["area"] === undefined || node["area"] === "" ? 0 : node["area"];
     let windowsExist = node["windowsExist"] === undefined ? false : node["windowsExist"];
     let center = "(" + positions[nodeId].x + " " + positions[nodeId].y + ")";
-    queryElements +=
-      '<node id="' +
-      nodeId +
-      '"' +
-      zone +
-      ">" +
-      '<data key="roomType">' +
-      roomType +
-      "</data>" +
-      '<data key="name">' +
-      label +
-      "</data>" +
-      '<data key="area">' +
-      area +
-      "</data>" +
-      '<data key="windowExist">' +
-      windowsExist +
-      "</data>" +
-      '<data key="center">' +
-      center +
-      "</data>" +
-      "</node>";
+    queryElements += '<node id="' + nodeId + '"' + zone + ">" +
+      '<data key="roomType">' + roomType + "</data>" +
+      '<data key="name">' + label + "</data>" + '<data key="area">' + area + "</data>" +
+      '<data key="windowExist">' + windowsExist + "</data>" + '<data key="center">' + center +
+      "</data></node>";
   });
   edges.get().forEach((edge) => {
     let edgeId = edge["id"];
@@ -441,7 +461,8 @@ const getNodesAndEdges = function () {
     }
     let targetZone = targetGroup !== "" ? ' targetZone="' + targetGroup + '"' : "";
     let edgeType = edge["edgeType"];
-    queryElements += '<edge id="' + edgeId + '" source="' + source + '" target="' + target + '"' + sourceZone + targetZone + ">" + '<data key="edgeType">' + edgeType + "</data>" + "</edge>";
+    queryElements += '<edge id="' + edgeId + '" source="' + source + '" target="' + target + '"'
+      + sourceZone + targetZone + ">" + '<data key="edgeType">' + edgeType + "</data>" + "</edge>";
   });
   return queryElements;
 };
@@ -468,7 +489,9 @@ const getGraphML = function (ev) {
   if (ev === "search-graphmatch") {
     let inspect = document.querySelector("#inspectZones");
     if (inspect.checked) {
-      let zonesSet = nodesAndEdges.indexOf('zone="') > -1 && nodesAndEdges.indexOf('sourceZone="') > -1 && nodesAndEdges.indexOf('targetZone="') > -1;
+      let zonesSet = nodesAndEdges.indexOf('zone="') > -1 &&
+        nodesAndEdges.indexOf('sourceZone="') > -1 &&
+        nodesAndEdges.indexOf('targetZone="') > -1;
       inspectZones += '<inspectZones zonesSet="' + zonesSet + '"></inspectZones>';
     }
     let analyze = document.querySelector("#analyzeGraph");
@@ -496,7 +519,8 @@ const sendQuery = function (ev, continueSearch) {
   if (getNodesAndEdges() != "") {
     if (ev === "download") {
       let graphML = getGraphML();
-      document.querySelector("#showAgraphml").value = graphML.substring(graphML.indexOf("<graphml"), graphML.lastIndexOf("</graphml") + 10);
+      document.querySelector("#showAgraphml").value =
+        graphML.substring(graphML.indexOf("<graphml"), graphML.lastIndexOf("</graphml") + 10);
     } else if (ev === "search-cbr") {
       if (count === 0) {
         userView.print("<error>Please select fingerprints.</error>");
@@ -535,7 +559,8 @@ const sendQuery = function (ev, continueSearch) {
 const getSuggestion = function () {
   let roomCount = nodes.get().length;
   if (roomCount < 2) {
-    userView.print("<suggestion><error>At least two rooms should be " + "available to produce a suggestion.</error></suggestion>");
+    userView.print("<suggestion><error>At least two rooms should be "
+      + "available to produce a suggestion.</error></suggestion>");
   } else {
     userView.print("<suggestion></suggestion>"); // Clear suggestion field
     let edgeCount = edges.get().length;
@@ -550,7 +575,8 @@ const getSuggestion = function () {
       });
       roomsAndEdges.push(nodes.get(id).label + "-" + e.join("/"));
     });
-    let chainMetaMsg = "<chainMeta>" + currentChain.join(";") + "," + roomCount + "," + edgeCount + "," + actionCount + "," + lastFpCount + "," + roomsAndEdges.join("_") + "</chainMeta>";
+    let chainMetaMsg = "<chainMeta>" + currentChain.join(";") + "," + roomCount + "," + edgeCount
+      + "," + actionCount + "," + lastFpCount + "," + roomsAndEdges.join("_") + "</chainMeta>";
     let suggestionMsg = (head + getNodesAndEdges() + foot).replace("<agraphml>", "<suggestion>").replace("</agraphml>", "</suggestion>");
     document.querySelector("#suggestion .loading").classList.remove("ready");
     document.querySelector("#suggestion .loading").classList.remove("error");
@@ -564,7 +590,9 @@ const getSuggestion = function () {
 const getAdaptation = function () {
   userView.print("<adaptation></adaptation>"); // Clear suggestion field
   if (getNodesAndEdges() != "") {
-    let adaptationMsg = (head + getNodesAndEdges() + foot).replace("<agraphml>", "<adaptation>").replace("</agraphml>", "</adaptation>");
+    let adaptationMsg = (head + getNodesAndEdges() + foot)
+      .replace("<agraphml>", "<adaptation>")
+      .replace("</agraphml>", "</adaptation>");
     document.querySelector("#adaptation .loading").classList.remove("error");
     document.querySelector("#adaptation .loading").classList.add("active");
     jQuery("#getAdaptation").prop("disabled", true).addClass("disabled");
@@ -574,20 +602,25 @@ const getAdaptation = function () {
   }
 };
 
-const getAutocompletion = function () {
+const getAutocompletion = function (blocks) {
+  let bl = typeof blocks === "object" ? "" : blocks;
   if (getNodesAndEdges() != "") {
-    let autocompletionMsg = (head + getNodesAndEdges() + foot).replace("<agraphml>", "<autocompletion>").replace("</agraphml>", "</autocompletion>");
+    let autocompletionMsg =
+      (head + getNodesAndEdges() + foot)
+        .replace("<agraphml>", "<autocompletion>" + bl.replace("/", ""))
+        .replace("</agraphml>", bl + "</autocompletion>");
     console.log(autocompletionMsg);
     req.socket.send(autocompletionMsg);
   }
 }
 
 const getAutocompletionForBlocks = function () {
-  if (getNodesAndEdges() != "") {
-    let autocompletionMsg = (head + getNodesAndEdges() + foot).replace("<agraphml>", "<autocompletion><blocks>").replace("</agraphml>", "</blocks></autocompletion>");
-    console.log(autocompletionMsg);
-    req.socket.send(autocompletionMsg);
-  }
+  getAutocompletion("</blocks>");
+}
+
+const showAutocompletion = function (clusteringAgraphml) {
+  // TODO show autocompletion
+  console.log(clusteringAgraphml);
 }
 
 let cl = document.querySelector("#showAgraphml").classList;
@@ -814,6 +847,40 @@ document.querySelector("#applyAgraphml").onclick = function () {
   cl.add("hide");
   cl_ag.add("hide");
 };
+
+const immutableNetwork = function(container) {
+  let immutableNetwork = new Network(container, {}, options);
+  immutableNetwork.setOptions({
+    height: "700px",
+    width: "1306px",
+    interaction: {
+      dragView: false,
+      dragNodes: false,
+      zoomView: false,
+    },
+    physics: {
+      enabled: false,
+    },
+    manipulation: {
+      enabled: false,
+    },
+  });
+  return immutableNetwork;
+}
+
+const showImmutableNetwork = function(network, agraphml, viewTypeTag) {
+  document.querySelector("#sendAgraphml .loading").classList.remove("active");
+  let graphML = agraphml.indexOf("<" + viewTypeTag + ">") > -1 ?
+    agraphml.substring(agraphml.indexOf("<graphml"), agraphml.lastIndexOf("</" + viewTypeTag)) : agraphml;
+  let view = document.querySelector("#" + viewTypeTag + "View");
+  view.classList.remove("hide");
+  applyAgraphml(graphML, new DataSet([]), new DataSet([]), network);
+}
+
+const showClustering = function(msg) {
+  let clusteringViewContainer = document.querySelector("#clusteringViewContainer");
+  showImmutableNetwork(immutableNetwork(clusteringViewContainer), msg, "clustering");
+}
 
 const queryTypes = {
   Graph_Match_Exact: "Exact Graph Matching",
@@ -1079,7 +1146,8 @@ const addReplacements = function (adaptation) {
       try {
         let oldNode = nodes.get(oldRoom);
         let oldLabel = oldNode.label;
-        xml.find("node#" + newRoom).append("<replacement>" + oldLabel.replace("\n", " ") + "</replacement>");
+        xml.find("node#" + newRoom)
+          .append("<replacement>" + oldLabel.replace("\n", " ") + "</replacement>");
       } catch (e) {
         userView.print("<adaptation>Some adaptations might be displayed incompletely.</adaptation>");
       }
@@ -1107,7 +1175,10 @@ const drawAdaptation = function (msg) {
     currentConfigAndAdaptations = adaptations;
     for (let i = 0; i < adaptations.length; i++) {
       let adaptation = i == 0 ? "Original" : "Adaptation " + i;
-      jQuery("#adaptations").append('<input type="radio" name="adaptations" value="' + i + '" id="adaptation_' + i + '"><label for="adaptation_' + i + '">' + adaptation + "</label><br>");
+      jQuery("#adaptations")
+        .append('<input type="radio" name="adaptations" value="'
+        + i + '" id="adaptation_' + i + '"><label for="adaptation_'
+        + i + '">' + adaptation + "</label><br>");
     }
     closeAdaptation.classList.remove("hide");
     closeAdaptation.classList.add("show");
@@ -1126,31 +1197,10 @@ closeAdaptation.onclick = function () {
   jQuery("#getAdaptation").prop("disabled", false).removeClass("disabled");
 };
 
-let zonesViewContainer = document.querySelector("#zonesViewContainer");
-let zonesNetwork = new Network(zonesViewContainer, {}, options);
-zonesNetwork.setOptions({
-  height: "700px",
-  width: "1306px",
-  interaction: {
-    dragView: false,
-    dragNodes: false,
-    zoomView: false,
-  },
-  physics: {
-    enabled: false,
-  },
-  manipulation: {
-    enabled: false,
-  },
-});
-
-let zonesView = document.querySelector("#zonesView");
-const inspectZones = function (graphMLZones) {
-  document.querySelector("#sendAgraphml .loading").classList.remove("active");
-  let graphML = graphMLZones.indexOf("<zones>") > -1 ? graphMLZones.substring(graphMLZones.indexOf("<graphml"), graphMLZones.lastIndexOf("</zones")) : graphMLZones;
-  zonesView.classList.remove("hide");
-  applyAgraphml(graphML, new DataSet([]), new DataSet([]), zonesNetwork);
-};
+const inspectZones = function(msg) {
+  let zonesViewContainer = document.querySelector("#zonesViewContainer");
+  showImmutableNetwork(immutableNetwork(zonesViewContainer), msg, "zones");
+}
 
 let availableZones = jQuery("#availableZones");
 const appendNewZone = function () {
@@ -1185,6 +1235,7 @@ document.querySelector("#setZone").onclick = function () {
   }
 };
 
+let zonesNetwork = immutableNetwork(document.querySelector("#zonesViewContainer"));
 zonesNetwork.on("selectNode", function (params) {
   setZone.removeAttribute("disabled");
 });
@@ -1408,6 +1459,25 @@ jQuery(function ($) {
   });
   $("#navigateMappings .navigate.left").on("click", function () {
     navigateMappings("prev");
+  });
+  $("#autocompletionNotifier").on("click", function () {
+    if (clusteringAgraphml !== "") {
+      if (skipBlocks) {
+        showAutocompletion(clusteringAgraphml);
+      } else {
+        showClustering(clusteringAgraphml);
+      }
+    }
+  });
+  $("#closeClustering").on("click", function () {
+    $("#clusteringView").addClass("hide");
+    $('#autocompletionNotifier').removeClass('show');
+    $('#notifier').removeClass('highlight');
+    $('#notifierText').addClass('hide');
+    clusteringAgraphml = "";
+  });
+  $("#skipBlocks").on("change", function () {
+    skipBlocks = $(this).prop("checked");
   });
   $("#closeMappings").on("click", function () {
     let rm = $("#resultMappings");

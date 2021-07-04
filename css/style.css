@@ -113,9 +113,11 @@ header {
 .saveType,
 #send2,
 #send3,
+#send4,
 #getSuggestion,
 #getAdaptation,
 #applyAgraphml,
+#autocompletionNotifier,
 #downloadAgraphml {
   border-radius: 5px;
   border: 1px solid #333;
@@ -130,6 +132,7 @@ header {
 .saveType:hover,
 #send2:hover,
 #send3:hover,
+#send4:hover,
 #getSuggestion:hover,
 #getAdaptation:hover {
   background: #3c3c3c;
@@ -138,6 +141,7 @@ header {
 .saveType:active,
 #send2:active,
 #send3:active,
+#send4:active,
 #getSuggestion:active,
 #getAdaptation:active {
   background: #191919;
@@ -257,12 +261,14 @@ header {
   top: 178px;
 }
 
+#clusteringViewControls,
 #zonesViewControls {
   background: #f1f1f1;
   padding: 4px;
   border-top: 2px solid #ccc;
 }
 
+#clusteringViewMessage,
 #zonesViewMessage {
   color: #777;
   font-size: 15px;
@@ -271,10 +277,12 @@ header {
   width: 1050px;
 }
 
+#clusteringViewButtons,
 #zonesViewButtons {
   display: inline-block;
 }
 
+#send4,
 #send3 {
   padding-left: 14px;
   padding-right: 14px;
@@ -297,6 +305,7 @@ header {
   margin-right: 7px;
 }
 
+#clusteringConsent,
 #zonesLegend {
   position: absolute;
   z-index: 4;
@@ -343,7 +352,7 @@ header {
   padding-left: 10px;
 }
 
-#additional {
+.additional {
   position: absolute;
   right: 0;
   height: 72%;
@@ -618,6 +627,7 @@ td:nth-child(7) {
   opacity: 0.8;
 }
 
+#clusteringView,
 #resultMappings,
 #zonesView {
   position: absolute;
@@ -629,6 +639,7 @@ td:nth-child(7) {
   background: rgba(0, 0, 0, 0.3);
 }
 
+#clusteringViewWrapper,
 .mappingsView,
 #zonesViewWrapper {
   width: 1306px;
@@ -639,6 +650,7 @@ td:nth-child(7) {
   overflow: hidden;
 }
 
+#clusteringHeader,
 .mapping-header,
 #zonesViewHeader {
   position: absolute;
@@ -678,6 +690,7 @@ td:nth-child(7) {
   width: 100%;
 }
 
+#clusteringViewContainer,
 #navigateMappingsContainer {
   position: relative;
   width: 1304px;
@@ -783,16 +796,43 @@ input[disabled] + label:hover {
   text-decoration: none;
 }
 
+#autocompletionNotifierWrapper,
 #download {
   right: 25px;
   position: absolute;
   top: 23px;
 }
 
+#autocompletionNotifierWrapper {
+  right: 80px;
+}
+
+#autocompletionNotifier,
 #downloadAgraphml {
   height: 28px;
   width: 46px;
   font-size: 15px;
+}
+
+#autocompletionNotifier {
+  cursor: default;
+  text-align: left;
+  width: 38px;
+  padding: 0 12px;
+}
+
+#autocompletionNotifier.show {
+  width: 230px;
+  cursor: pointer;
+}
+
+#notifier {
+  font-weight: 700;
+  color: #aaa;
+}
+
+#notifier.highlight {
+  color: #fcff79;
 }
 
 #showAgraphml {
