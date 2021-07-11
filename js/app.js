@@ -216,7 +216,8 @@ const showTypes = function (order, type, concept) {
       document.querySelector("#areaInput").value = concept["area"];
       document.querySelector("#windowsInput").checked = concept["windowsExist"];
       let label = concept["label"];
-      document.querySelector("#roomLabelText").value = label.indexOf('"') > -1 ? label.substring(label.indexOf('"') + 1, label.length - 1) : "";
+      document.querySelector("#roomLabelText").value =
+        label.indexOf('"') > -1 ? label.substring(label.indexOf('"') + 1, label.length - 1) : "";
     } else {
       selectType.classList.add("edge-overlay");
     }
@@ -278,7 +279,8 @@ document.querySelector(".saveType").onclick = function () {
       area: a,
       size: isNaN(parseInt(a)) ? 30 : parseInt(a) * 3 >= 81 ? 81 : parseInt(a) * 3 < 21 ? 21 : parseInt(a) * 3,
       windowsExist: w,
-      title: (debug ? nodeId + "<br>" : "") + "Area: " + (isNaN(parseInt(a)) ? "undefined" : a + " m<sup>2</sup>") + "<br>Windows exist: " + w,
+      title: (debug ? nodeId + "<br>" : "") + "Area: "
+        + (isNaN(parseInt(a)) ? "undefined" : a + " m<sup>2</sup>") + "<br>Windows exist: " + w,
     });
     showTypes("hide", "room-type");
     toggleManipulation("show");
@@ -364,7 +366,8 @@ let req = {
       return;
     }
     req.socket.onopen = function () {
-      userView.print('<span class="connection green">' + "&#9679;</span> Connected via websocket to <b>" + server + "</b>");
+      userView
+        .print('<span class="connection green">' + "&#9679;</span> Connected via websocket to <b>" + server + "</b>");
       jQuery("#send2, #getAdaptation, #getSuggestion").prop("disabled", false).removeClass("disabled");
     };
     req.socket.onclose = function () {
@@ -477,7 +480,8 @@ const getGraphML = function (ev) {
     if (filters[i].checked === true) {
       if (weights[i].value !== "") {
         let wt = parseFloat(weights[i].value);
-        fingerprints += '<fingerprint name="' + filters[i].value + '" weight="' + weights[i].value + '"></fingerprint>';
+        fingerprints +=
+          '<fingerprint name="' + filters[i].value + '" weight="' + weights[i].value + '"></fingerprint>';
       } else {
         fingerprints += '<fingerprint name="' + filters[i].value + '" weight="1"></fingerprint>';
       }
@@ -577,7 +581,9 @@ const getSuggestion = function () {
     });
     let chainMetaMsg = "<chainMeta>" + currentChain.join(";") + "," + roomCount + "," + edgeCount
       + "," + actionCount + "," + lastFpCount + "," + roomsAndEdges.join("_") + "</chainMeta>";
-    let suggestionMsg = (head + getNodesAndEdges() + foot).replace("<agraphml>", "<suggestion>").replace("</agraphml>", "</suggestion>");
+    let suggMsgBody = head + getNodesAndEdges() + foot;
+    let suggestionMsg = suggMsgBody.replace("<agraphml>", "<suggestion>")
+      .replace("</agraphml>", "</suggestion>");
     document.querySelector("#suggestion .loading").classList.remove("ready");
     document.querySelector("#suggestion .loading").classList.remove("error");
     document.querySelector("#suggestion .loading").classList.add("active");
@@ -700,6 +706,7 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
   agraphmlNodes.each(function () {
     let roomId = jQuery(this).attr("id");
     let cluster = jQuery(this).attr("cluster");
+    let problematicCluster = jQuery(this).attr("problematicCluster");
     let color = "";
     let zone = jQuery(this).attr("zone");
     let zoneExists = zone !== undefined;
@@ -775,14 +782,17 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
         roomType: roomType,
         color: color !== "" ? color : mapping ? (roomId in mappingColors ? mappingColors[roomId] : "#eeeeee") : roomColors[roomType],
         title: replacementText + area + windowsExist + group,
-        borderWidth: replacementText !== "" ? 5 : 2,
+        borderWidth: (replacementText !== "" || problematicCluster !== undefined) ? 5 : 2,
         group: zone,
         shapeProperties: {
           borderDashes: replacementText !== "" ? true : false,
         },
       };
       if (cluster !== undefined) {
-        newNode.color = clusterColors[cluster];
+        newNode.color = {
+          background: clusterColors[cluster],
+          border: problematicCluster != undefined ? "#ec0000" : "#090"
+        }
       }
       if (center.x !== undefined && center.y !== undefined) {
         newNode.x = center.x;
@@ -923,7 +933,8 @@ const agraphmlToRoomConf = function () {
       });
       // add mappings view
       if (resultAgraphml.includes("<mappings>")) {
-        jQuery("#resultMappings").append('<div id="mappingsView_' + result + '" class="mappingsView hide"></div>');
+        jQuery("#resultMappings")
+          .append('<div id="mappingsView_' + result + '" class="mappingsView hide"></div>');
         let res = resultAgraphml.split("],[");
         let query = res[0].substring(1);
         let graphml = res[1];
@@ -959,24 +970,11 @@ const agraphmlToRoomConf = function () {
                   let queryId = "query_" + queryType + "_" + result + index;
                   let resultId = "result_" + queryType + "_" + result + index;
                   jQuery("#mappingsView_" + result).append(
-                    '<div id="mappings_' +
-                      queryType +
-                      "_" +
-                      result +
-                      index +
-                      '" class="mappings hide">' +
-                      '<div class="mapping-header">' +
-                      queryTypes[queryType] +
-                      " " +
-                      (index + 1) +
-                      "</div>" +
-                      '<agraphml id="' +
-                      queryId +
-                      '" class="mapping left"></agraphml>' +
-                      '<agraphml id="' +
-                      resultId +
-                      '" class="mapping"></agraphml>' +
-                      "</div>"
+                    '<div id="mappings_' + queryType + "_" + result + index +
+                      '" class="mappings hide">' + '<div class="mapping-header">' +
+                      queryTypes[queryType] + " " + (index + 1) + "</div>" +
+                      '<agraphml id="' + queryId + '" class="mapping left"></agraphml>' +
+                      '<agraphml id="' + resultId + '" class="mapping"></agraphml></div>'
                   );
                   let containers = {
                     containerQuery: document.querySelector("#" + queryId),
@@ -1029,8 +1027,10 @@ const createMappingsView = function (query, result, containers, mapping, queryTy
     }
   }
   let nameExists = result.includes('<data key="name">');
-  applyAgraphml(query, new DataSet([]), new DataSet([]), getNetworkForMapping(containers.containerQuery), queryNodeIds);
-  applyAgraphml(result, new DataSet([]), new DataSet([]), getNetworkForMapping(containers.containerResult), resultNodeIds, nameExists ? 40 : 1);
+  applyAgraphml(query, new DataSet([]), new DataSet([]),
+    getNetworkForMapping(containers.containerQuery), queryNodeIds);
+  applyAgraphml(result, new DataSet([]), new DataSet([]),
+    getNetworkForMapping(containers.containerResult), resultNodeIds, nameExists ? 40 : 1);
 };
 
 const showRetrievalResults = function (msg) {
@@ -1368,7 +1368,8 @@ jQuery(function ($) {
     $(this).siblings("p, ol").slideToggle(200);
   });
   $("#result, #suggestion").on("click", "button.see-more", function () {
-    $(this).parent().parent().siblings(".show-justification, .show-contexts, .show-stats").slideToggle(200);
+    $(this).parent().parent()
+      .siblings(".show-justification, .show-contexts, .show-stats").slideToggle(200);
   });
   $(".vis-close").remove();
   $("body").on("change", "#adaptations input", function () {
