@@ -609,19 +609,23 @@ const getAdaptation = function () {
 };
 
 const getAutocompletion = function (blocks) {
-  let bl = typeof blocks === "object" ? "" : blocks;
-  if (getNodesAndEdges() != "") {
-    let autocompletionMsg =
-      (head + getNodesAndEdges() + foot)
-        .replace("<agraphml>", "<autocompletion>" + bl.replace("/", ""))
-        .replace("</agraphml>", bl + "</autocompletion>");
+  if (typeof blocks !== "object" && blocks.indexOf("<clustering>") === 0) {
+    console.log(blocks);
+    let fingerprints = '<fingerprints><fingerprint name="Room_Graph" weight="1">'
+      + '</fingerprint></fingerprints>'
+    req.socket.send("<autocompletion>" + blocks + fingerprints + "</autocompletion>");
+  } else if (getNodesAndEdges() != "") {
+    let autocompletionMsg = (head + getNodesAndEdges() + foot)
+        .replace("<agraphml>", "<autocompletion>")
+        .replace("</agraphml>", "</autocompletion>");
     console.log(autocompletionMsg);
     req.socket.send(autocompletionMsg);
   }
 }
 
 const getAutocompletionForBlocks = function () {
-  getAutocompletion("</blocks>");
+  getAutocompletion(clusteringAgraphml);
+  closeClustering();
 }
 
 const showAutocompletion = function (clusteringAgraphml) {
@@ -890,6 +894,14 @@ const showImmutableNetwork = function(network, agraphml, viewTypeTag) {
 const showClustering = function(msg) {
   let clusteringViewContainer = document.querySelector("#clusteringViewContainer");
   showImmutableNetwork(immutableNetwork(clusteringViewContainer), msg, "clustering");
+}
+
+const closeClustering = function() {
+  document.querySelector("#clusteringView").classList.add("hide");
+  document.querySelector('#autocompletionNotifier').classList.remove('show');
+  document.querySelector('#notifier').classList.remove('highlight');
+  document.querySelector('#notifierText').classList.add('hide');
+  clusteringAgraphml = "";
 }
 
 const queryTypes = {
@@ -1363,7 +1375,7 @@ jQuery(function ($) {
   $("#getSuggestion").on("click", getSuggestion);
   $("#getAdaptation").on("click", getAdaptation);
   $("#getAutocompletion").on("click", getAutocompletion);
-  $("#getAutocompletionForBlocks").on("click", getAutocompletionForBlocks);
+  $("#send4").on("click", getAutocompletionForBlocks);
   $("#result, #suggestion").on("click", "button", function () {
     $(this).siblings("p, ol").slideToggle(200);
   });
@@ -1471,11 +1483,7 @@ jQuery(function ($) {
     }
   });
   $("#closeClustering").on("click", function () {
-    $("#clusteringView").addClass("hide");
-    $('#autocompletionNotifier').removeClass('show');
-    $('#notifier').removeClass('highlight');
-    $('#notifierText').addClass('hide');
-    clusteringAgraphml = "";
+    closeClustering();
   });
   $("#skipBlocks").on("change", function () {
     skipBlocks = $(this).prop("checked");
