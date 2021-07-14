@@ -171,7 +171,15 @@
                   </div>
                   <div id="autocompletion">
                     <div class="controls">
-                      <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
+                        <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
+                        <div>
+                            <label for="clusterings">Set clustering type:</label>
+                            <select name="clusterings" id="clusterings">
+                                <option value="betweenness">Betweenness (Girvan-Newman)</option>
+                                <option value="force-directed">Force-Directed (Fruchterman-Reingold)</option>
+                                <option value="distance-based">Distance-Based (DBScan)</option>
+                            </select>
+                        </div>
                     </div>
                     <!-- <div id="adaptations"></div>
                     <input type="button" value="Done" id="closeAdaptation" class="hide"> -->

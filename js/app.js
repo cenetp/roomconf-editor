@@ -612,12 +612,14 @@ const getAutocompletion = function (blocks) {
   if (typeof blocks !== "object" && blocks.indexOf("<clustering>") === 0) {
     console.log(blocks);
     let fingerprints = '<fingerprints><fingerprint name="Room_Graph" weight="1">'
-      + '</fingerprint></fingerprints>'
+          + '</fingerprint></fingerprints>';
     req.socket.send("<autocompletion>" + blocks + fingerprints + "</autocompletion>");
   } else if (getNodesAndEdges() != "") {
+    let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
+    let clusteringEl =  '<clusteringMethod>' + clusteringMethod + '</clusteringMethod>'
     let autocompletionMsg = (head + getNodesAndEdges() + foot)
-        .replace("<agraphml>", "<autocompletion>")
-        .replace("</agraphml>", "</autocompletion>");
+        .replace("<agraphml>", '<autocompletion>')
+        .replace("</agraphml>", clusteringEl + "</autocompletion>");
     console.log(autocompletionMsg);
     req.socket.send(autocompletionMsg);
   }
