@@ -616,7 +616,11 @@ const getAutocompletion = function (blocks) {
     req.socket.send("<autocompletion>" + blocks + fingerprints + "</autocompletion>");
   } else if (getNodesAndEdges() != "") {
     let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
-    let clusteringEl =  '<clusteringMethod>' + clusteringMethod + '</clusteringMethod>'
+    let distanceFunction = "[no_df_required]";
+    if (clusteringMethod == "distance-based" || clusteringMethod === "force-directed") {
+      distanceFunction = document.querySelector('#distanceFunctions').selectedOptions[0].value;
+    }
+    let clusteringEl =  '<clusteringMethod>' + clusteringMethod + '@' + distanceFunction + '</clusteringMethod>';
     let autocompletionMsg = (head + getNodesAndEdges() + foot)
         .replace("<agraphml>", '<autocompletion>')
         .replace("</agraphml>", clusteringEl + "</autocompletion>");
@@ -1489,6 +1493,13 @@ jQuery(function ($) {
   });
   $("#skipBlocks").on("change", function () {
     skipBlocks = $(this).prop("checked");
+  });
+  $('#clusterings').on('change', function () {
+    if ($(this).val() === 'distance-based' || $(this).val() === 'force-directed') {
+      $('#distanceFunctionsWrapper').removeClass('hide');
+    } else {
+      $('#distanceFunctionsWrapper').addClass('hide');
+    }
   });
   $("#closeMappings").on("click", function () {
     let rm = $("#resultMappings");
