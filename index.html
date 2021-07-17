@@ -182,12 +182,18 @@
                             <div id="distanceFunctionsWrapper" class="hide">
                                 <label for="distanceFunctions">Distance function:</label>
                                 <select name="distanceFunctions" id="distanceFunctions">
+                                    <option value="manhattan">Manhattan</option>
                                     <option value="euclidean">Euclidean</option>
                                     <option value="sq-euclidean">Squared Euclidean</option>
-                                    <option value="manhattan">Manhattan</option>
                                     <option value="min">Min</option>
                                     <option value="max">Max</option>
+                                    <option value="cosine">Cosine</option>
+                                    <option value="jaccard">Jaccard</option>
                                 </select>
+                            </div>
+                            <div id="clusterCountWrapper">
+                                <label for="clusterCount">Number of clusters:</label>
+                                <input type="number" min="2" id="clusterCount" value="2">
                             </div>
                         </div>
                     </div>

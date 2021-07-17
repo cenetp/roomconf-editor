@@ -616,11 +616,13 @@ const getAutocompletion = function (blocks) {
     req.socket.send("<autocompletion>" + blocks + fingerprints + "</autocompletion>");
   } else if (getNodesAndEdges() != "") {
     let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
-    let distanceFunction = "[no_df_required]";
+    let clusteringOption; // Distance function or number rooms in cluster
     if (clusteringMethod == "distance-based" || clusteringMethod === "force-directed") {
-      distanceFunction = document.querySelector('#distanceFunctions').selectedOptions[0].value;
+      clusteringOption = document.querySelector('#distanceFunctions').selectedOptions[0].value;
+    } else {
+      clusteringOption = document.querySelector('#clusterCount').value;
     }
-    let clusteringEl =  '<clusteringMethod>' + clusteringMethod + '@' + distanceFunction + '</clusteringMethod>';
+    let clusteringEl =  '<clusteringMethod>' + clusteringMethod + '@' + clusteringOption + '</clusteringMethod>';
     let autocompletionMsg = (head + getNodesAndEdges() + foot)
         .replace("<agraphml>", '<autocompletion>')
         .replace("</agraphml>", clusteringEl + "</autocompletion>");
@@ -1497,8 +1499,10 @@ jQuery(function ($) {
   $('#clusterings').on('change', function () {
     if ($(this).val() === 'distance-based' || $(this).val() === 'force-directed') {
       $('#distanceFunctionsWrapper').removeClass('hide');
+      $('#clusterCountWrapper').addClass('hide');
     } else {
       $('#distanceFunctionsWrapper').addClass('hide');
+      $('#clusterCountWrapper').removeClass('hide');
     }
   });
   $("#closeMappings").on("click", function () {
