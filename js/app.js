@@ -342,6 +342,8 @@ let userView = {
         document.querySelector('#notifierText').classList.remove('hide');
       }, 300);
       clusteringAgraphml = msg;
+    } else if (msg.startsWith("<autocompletions>")) {
+      console.log(msg);
     } else {
       // display retrieval results or error message
       showRetrievalResults(msg);
@@ -409,6 +411,8 @@ let head = '<agraphml><graphml xmlns="http://graphml.graphdrawing.org/xmlns" '
     + '<key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key>'
     + '<key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key>'
     + '<key id="area" for="node" attr.name="area" attr.type="float"></key>'
+    + '<key id="cluster" for="node" attr.name="cluster" attr.type="string"></key>'
+    + '<key id="problematicCluster" for="node" attr.name="problematicCluster" attr.type="string"></key>'
     + '<key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key>'
     + '<data key="imageUri"></data><data key="imageMD5"></data>'
     + '<data key="validatedManually">false</data>'
@@ -717,8 +721,6 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
   let agraphmlEdges = xml.find("edge");
   agraphmlNodes.each(function () {
     let roomId = jQuery(this).attr("id");
-    let cluster = jQuery(this).attr("cluster");
-    let problematicCluster = jQuery(this).attr("problematicCluster");
     let color = "";
     let zone = jQuery(this).attr("zone");
     let zoneExists = zone !== undefined;
@@ -749,6 +751,8 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
     let area = "";
     let windowsExist = "";
     let replacementText = "";
+    let cluster = "";
+    let problematicCluster = "";
     let data = jQuery(this).find("data");
     data.each(function () {
       let key = jQuery(this).attr("key");
@@ -769,6 +773,12 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
       }
       if (key === "windowExist") {
         windowsExist = "Windows exist: " + text;
+      }
+      if (key === "cluster") {
+        cluster = text;
+      }
+      if (key === "problematicCluster") {
+        problematicCluster = text;
       }
     });
     let replacement = jQuery(this).find("replacement");
@@ -794,16 +804,16 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
         roomType: roomType,
         color: color !== "" ? color : mapping ? (roomId in mappingColors ? mappingColors[roomId] : "#eeeeee") : roomColors[roomType],
         title: replacementText + area + windowsExist + group,
-        borderWidth: (replacementText !== "" || problematicCluster !== undefined) ? 5 : 2,
+        borderWidth: (replacementText !== "" || problematicCluster !== "") ? 5 : 2,
         group: zone,
         shapeProperties: {
           borderDashes: replacementText !== "" ? true : false,
         },
       };
-      if (cluster !== undefined) {
+      if (cluster !== "") {
         newNode.color = {
           background: clusterColors[cluster],
-          border: problematicCluster != undefined ? "#ec0000" : "#090"
+          border: problematicCluster != "" ? "#ec0000" : "#090"
         }
       }
       if (center.x !== undefined && center.y !== undefined) {
