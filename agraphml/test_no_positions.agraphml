@@ -1,6 +1,6 @@
-<graphml
-    xmlns="http://graphml.graphdrawing.org/xmlns"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://graphml.graphdrawing.org/xmlns     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemalocation="http://graphml.graphdrawing.org/xmlns     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
     <graph id="searchGraph1" edgedefault="undirected">
         <key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"></key>
         <key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"></key>
@@ -18,9 +18,6 @@
         <key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"></key>
         <key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"></key>
         <key id="area" for="node" attr.name="area" attr.type="float"></key>
-        <key id="sourceConnector" for="edge" attr.name="sourceConnector" attr.type="string"></key>
-        <key id="targetConnector" for="edge" attr.name="targetConnector" attr.type="string"></key>
-        <key id="hinge" for="edge" attr.name="hinge" attr.type="string"></key>
         <key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"></key>
         <data key="imageUri"></data>
         <data key="imageMD5"></data>
