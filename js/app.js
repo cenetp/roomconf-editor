@@ -335,15 +335,13 @@ let userView = {
     } else if (msg.startsWith('<span class="connection')) {
       // display connection message
       document.querySelector("#connMessages p").innerHTML = msg;
-    } else if (msg.startsWith("<clustering>")) {
+    } else if (msg.startsWith("<clustering>") || msg.startsWith("<autocompletions>")) {
       document.querySelector('#autocompletionNotifier').classList.add('show');
       document.querySelector('#notifier').classList.add('highlight');
       setTimeout(function () {
         document.querySelector('#notifierText').classList.remove('hide');
       }, 300);
       clusteringAgraphml = msg;
-    } else if (msg.startsWith("<autocompletions>")) {
-      console.log(msg);
     } else {
       // display retrieval results or error message
       showRetrievalResults(msg);
@@ -621,10 +619,14 @@ const getAutocompletion = function (blocks) {
   } else if (getNodesAndEdges() != "") {
     let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
     let clusteringOption; // Distance function or number rooms in cluster
+    let df = document.querySelector('#distanceFunctions').selectedOptions[0].value;
+    let count = document.querySelector('#clusterCount').value;
     if (clusteringMethod == "distance-based" || clusteringMethod === "force-directed") {
-      clusteringOption = document.querySelector('#distanceFunctions').selectedOptions[0].value;
+      clusteringOption = df;
+    } else if (clusteringMethod === "hierarchical") {
+      clusteringOption = df + '#' + count;
     } else {
-      clusteringOption = document.querySelector('#clusterCount').value;
+      clusteringOption = count;
     }
     let clusteringEl =  '<clusteringMethod>' + clusteringMethod + '@' + clusteringOption + '</clusteringMethod>';
     let autocompletionMsg = (head + getNodesAndEdges() + foot)
@@ -641,8 +643,18 @@ const getAutocompletionForBlocks = function () {
 }
 
 const showAutocompletion = function (clusteringAgraphml) {
-  // TODO show autocompletion
-  console.log(clusteringAgraphml);
+  document.querySelector("#output").classList.remove("hide");
+  document.querySelector("#output").classList.add("show");
+  //loading.classList.add("ready");
+  let autocomnpletionCount = msg.match(/<\/tr>/g).length;
+  document.querySelector('#resultCount').innerHTML = resultCount;
+  jQuery("#result").css("width", autocomnpletionCount * 250 + "px");
+  let index1 = clusteringAgraphml.indexOf("<autocompletions>") + 17;
+  let index2 = clusteringAgraphml.indexOf("</autocompletions>");
+  let autocompletions = clusteringAgraphml.substring(index1, index2);
+  renderResponse("tbody", "#result", autocompletions);
+  agraphmlToRoomConf();
+  //jQuery("tr").append('<td class="showExplanation">Info</td>');
 }
 
 let cl = document.querySelector("#showAgraphml").classList;
@@ -1510,6 +1522,9 @@ jQuery(function ($) {
     if ($(this).val() === 'distance-based' || $(this).val() === 'force-directed') {
       $('#distanceFunctionsWrapper').removeClass('hide');
       $('#clusterCountWrapper').addClass('hide');
+    } else if ($(this).val() === 'hierarchical') {
+      $('#distanceFunctionsWrapper').removeClass('hide');
+      $('#clusterCountWrapper').removeClass('hide');
     } else {
       $('#distanceFunctionsWrapper').addClass('hide');
       $('#clusterCountWrapper').removeClass('hide');

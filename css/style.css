@@ -54,21 +54,15 @@ header {
   position: relative;
 }
 
-#suggestion {
+#suggestion,
+#adaptation,
+#autocompletion {
   background: #fff;
   border: 1px solid #ccc;
   color: #222222;
   padding: 6px;
   border-radius: 5px;
   margin-bottom: 10px;
-}
-
-#adaptation {
-  background: #fff;
-  border: 1px solid #ccc;
-  color: #222222;
-  padding: 6px;
-  border-radius: 5px;
 }
 
 #overlay {
@@ -118,6 +112,7 @@ header {
 #getAdaptation,
 #applyAgraphml,
 #autocompletionNotifier,
+#getAutocompletion,
 #downloadAgraphml {
   border-radius: 5px;
   border: 1px solid #333;
