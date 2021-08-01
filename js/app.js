@@ -9,6 +9,7 @@ let lastFpCount = 0;
 let currentChain = [];
 let currentSelectedNode = "";
 let clusteringAgraphml = "";
+let autocompletionsMsg = "";
 let skipBlocks = false;
 
 if (typeof String.prototype.startsWith != "function") {
@@ -335,13 +336,23 @@ let userView = {
     } else if (msg.startsWith('<span class="connection')) {
       // display connection message
       document.querySelector("#connMessages p").innerHTML = msg;
-    } else if (msg.startsWith("<clustering>") || msg.startsWith("<autocompletions>")) {
-      document.querySelector('#autocompletionNotifier').classList.add('show');
-      document.querySelector('#notifier').classList.add('highlight');
-      setTimeout(function () {
-        document.querySelector('#notifierText').classList.remove('hide');
-      }, 300);
+    } else if (msg.startsWith("<clustering>")) {
+      console.log('clustering resp arrived');
       clusteringAgraphml = msg;
+      if (skipBlocks) {
+        getAutocompletionForBlocks();
+      } else {
+        activateAutocompletionNotifier('show');
+      }
+    } else if (msg.includes('<autocompletions>')) {
+      console.log('autocompletions resp arrived');
+      autocompletionsMsg = msg;
+      if (skipBlocks) {
+        activateAutocompletionNotifier('show');
+      } else {
+        showAutocompletions();
+        autocompletionsMsg = "";
+      }
     } else {
       // display retrieval results or error message
       showRetrievalResults(msg);
@@ -610,13 +621,30 @@ const getAdaptation = function () {
   }
 };
 
+const activateAutocompletionNotifier = function (order) {
+  if (order === 'show') {
+    document.querySelector('#autocompletionNotifier').classList.add('show');
+    document.querySelector('#notifier').classList.add('highlight');
+    setTimeout(function () {
+      document.querySelector('#notifierText').classList.remove('hide');
+    }, 300);
+  } else {
+    setTimeout(function () {
+      document.querySelector('#autocompletionNotifier').classList.remove('show');
+      document.querySelector('#notifier').classList.remove('highlight');
+      document.querySelector('#notifierText').classList.add('hide');
+    }, 300);
+  }
+}
+
 const getAutocompletion = function (blocks) {
   if (typeof blocks !== "object" && blocks.indexOf("<clustering>") === 0) {
-    console.log(blocks);
+    console.log('with blocks');
     let fingerprints = '<fingerprints><fingerprint name="Room_Graph" weight="1">'
           + '</fingerprint></fingerprints>';
     req.socket.send("<autocompletion>" + blocks + fingerprints + "</autocompletion>");
   } else if (getNodesAndEdges() != "") {
+    console.log('no blocks');
     let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
     let clusteringOption; // Distance function or number rooms in cluster
     let df = document.querySelector('#distanceFunctions').selectedOptions[0].value;
@@ -632,29 +660,30 @@ const getAutocompletion = function (blocks) {
     let autocompletionMsg = (head + getNodesAndEdges() + foot)
         .replace("<agraphml>", '<autocompletion>')
         .replace("</agraphml>", clusteringEl + "</autocompletion>");
-    console.log(autocompletionMsg);
     req.socket.send(autocompletionMsg);
   }
 }
 
 const getAutocompletionForBlocks = function () {
   getAutocompletion(clusteringAgraphml);
-  closeClustering();
+  if (!skipBlocks) {
+    closeClustering();
+  }
 }
 
-const showAutocompletion = function (clusteringAgraphml) {
+const showAutocompletions = function () {
   document.querySelector("#output").classList.remove("hide");
   document.querySelector("#output").classList.add("show");
-  //loading.classList.add("ready");
-  let autocomnpletionCount = msg.match(/<\/tr>/g).length;
-  document.querySelector('#resultCount').innerHTML = resultCount;
+  let autocomnpletionCount = autocompletionsMsg.match(/<\/tr>/g).length;
   jQuery("#result").css("width", autocomnpletionCount * 250 + "px");
-  let index1 = clusteringAgraphml.indexOf("<autocompletions>") + 17;
-  let index2 = clusteringAgraphml.indexOf("</autocompletions>");
-  let autocompletions = clusteringAgraphml.substring(index1, index2);
+  let index1 = autocompletionsMsg.indexOf("<autocompletions>") + 17;
+  let index2 = autocompletionsMsg.indexOf("</autocompletions>");
+  let autocompletions = autocompletionsMsg.substring(index1, index2);
   renderResponse("tbody", "#result", autocompletions);
-  agraphmlToRoomConf();
-  //jQuery("tr").append('<td class="showExplanation">Info</td>');
+  jQuery("tr").append('<td class="showExplanation">Info</td>');
+  let applyMessage = 'Apply <span style="color:blue">autocompletion</span> '
+   + 'or close the window and select another result.';
+  agraphmlToRoomConf(applyMessage);
 }
 
 let cl = document.querySelector("#showAgraphml").classList;
@@ -680,19 +709,9 @@ let groups = {};
 const updateZonesLegend = function () {
   jQuery(".zonesLegendEntry").remove();
   Object.keys(groups).forEach((groupId) => {
-    let entry =
-      '<div class="zonesLegendEntry">' +
-      '<span class="zoneColor" style="background:' +
-      groups[groupId].color.background +
-      '"></span>' +
-      " <span>(" +
-      groups[groupId].count +
-      ")</span>" +
-      " <span>" +
-      groupId +
-      " <i>" +
-      groups[groupId].name +
-      "<i></span></div>";
+    let entry = '<div class="zonesLegendEntry"><span class="zoneColor" style="background:' +
+      groups[groupId].color.background + '"></span> <span>("' + groups[groupId].count +
+      ")</span> <span>" + groupId + " <i>" + groups[groupId].name + "<i></span></div>";
     jQuery("#zonesLegend").append(entry);
   });
 };
@@ -703,9 +722,9 @@ const getNumberOfClusters = function() {
 }
 
 const getClusterColors = function(numberOfClusters) {
-  let clusterColors = {};
+  let clusterColors = [];
   for (let i = 0; i < numberOfClusters; i++) {
-    clusterColors[i] = getRandomColor();
+    clusterColors.push(getRandomColor());
   }
   return clusterColors;
 }
@@ -928,9 +947,6 @@ const showClustering = function(msg) {
 
 const closeClustering = function() {
   document.querySelector("#clusteringView").classList.add("hide");
-  document.querySelector('#autocompletionNotifier').classList.remove('show');
-  document.querySelector('#notifier').classList.remove('highlight');
-  document.querySelector('#notifierText').classList.add('hide');
   clusteringAgraphml = "";
 }
 
@@ -942,7 +958,12 @@ const queryTypes = {
   Subgraph_Match_Inexact: "Inexact Subgraph Matching",
 };
 
-const agraphmlToRoomConf = function () {
+const agraphmlToRoomConf = function (applyMessage) {
+  let controls = '<div class="overViewControls">'
+   + '<span class="overViewMessage">' + applyMessage + '</span>'
+   + '<div class="overViewButtons">'
+   + '<input type="button" value="Apply" id="applyRoomconf"/>'
+   + '</div></div>';
   let results = jQuery("#result tr");
   // remove available mappings
   jQuery(".mappingsView").remove();
@@ -990,7 +1011,7 @@ const agraphmlToRoomConf = function () {
               '<div class="mapping-header">Result ' + (result + 1) + '</div>' +
               '<agraphml id="' + queryId + '" class="mapping left"></agraphml>' +
               '<agraphml id="' + resultId + '" class="mapping"></agraphml>' +
-              "</div>"
+              controls + "</div>"
           );
           let containers = {
             containerQuery: document.querySelector("#" + queryId),
@@ -1016,7 +1037,8 @@ const agraphmlToRoomConf = function () {
                       '" class="mappings hide">' + '<div class="mapping-header">' +
                       queryTypes[queryType] + " " + (index + 1) + "</div>" +
                       '<agraphml id="' + queryId + '" class="mapping left"></agraphml>' +
-                      '<agraphml id="' + resultId + '" class="mapping"></agraphml></div>'
+                      '<agraphml id="' + resultId + '" class="mapping"></agraphml>' +
+                      controls + '</div>'
                   );
                   let containers = {
                     containerQuery: document.querySelector("#" + queryId),
@@ -1087,10 +1109,10 @@ const showRetrievalResults = function (msg) {
     document.querySelector("#output").classList.add("show");
     loading.classList.add("ready");
     let resultCount = msg.match(/<\/tr>/g).length;
-    //document.querySelector('#resultCount').innerHTML = resultCount;
     jQuery("#result").css("width", resultCount * 250 + "px");
     renderResponse("tbody", "#result", msg);
-    agraphmlToRoomConf();
+    let applyMessage = 'You can continue with the search result on the right side as your current room configuration.';
+    agraphmlToRoomConf(applyMessage);
     jQuery("tr").append('<td class="showExplanation">Info</td>');
   }
 };
@@ -1504,19 +1526,24 @@ jQuery(function ($) {
     navigateMappings("prev");
   });
   $("#autocompletionNotifier").on("click", function () {
-    if (clusteringAgraphml !== "") {
-      if (skipBlocks) {
-        showAutocompletion(clusteringAgraphml);
-      } else {
-        showClustering(clusteringAgraphml);
-      }
+    if (skipBlocks) {
+      showAutocompletions();
+      autocompletionsMsg = "";
+    } else if (clusteringAgraphml !== "") {
+      showClustering(clusteringAgraphml);
     }
+    activateAutocompletionNotifier('hide');
   });
   $("#closeClustering").on("click", function () {
     closeClustering();
   });
   $("#skipBlocks").on("change", function () {
     skipBlocks = $(this).prop("checked");
+    if (skipBlocks) {
+      $('#clusterings, #clusterCount').prop('disabled', true);
+    } else {
+      $('#clusterings, #clusterCount').prop('disabled', false);
+    }
   });
   $('#clusterings').on('change', function () {
     if ($(this).val() === 'distance-based' || $(this).val() === 'force-directed') {

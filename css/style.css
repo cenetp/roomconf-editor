@@ -256,15 +256,13 @@ header {
   top: 178px;
 }
 
-#clusteringViewControls,
-#zonesViewControls {
+.overViewControls {
   background: #f1f1f1;
   padding: 4px;
   border-top: 2px solid #ccc;
 }
 
-#clusteringViewMessage,
-#zonesViewMessage {
+.overViewMessage {
   color: #777;
   font-size: 15px;
   padding-left: 10px;
@@ -272,8 +270,7 @@ header {
   width: 1050px;
 }
 
-#clusteringViewButtons,
-#zonesViewButtons {
+.overViewButtons {
   display: inline-block;
 }
 

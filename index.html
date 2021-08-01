@@ -173,6 +173,10 @@
                     <div class="controls">
                         <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
                         <div>
+                            <div>
+                                <input type="checkbox" id="skipBlocks"/>
+                                <span style="color:#6d6d6d">Skip clustering view</span>
+                            </div>
                             <label for="clusterings">Set clustering type:</label>
                             <select name="clusterings" id="clusterings">
                                 <option value="betweenness">Betweenness</option>
@@ -207,7 +211,6 @@
                   <div id="outputInfo">
                     <div id="outputStats">
                       <p>Click on preview to open mapping view.</p>
-                      <!-- <p><span id="resultCount"></span> similar room configurations found.</p> -->
                     </div>
                     <div id="navigateOutput">
                       <button class="navigate left">&#9664;</button><button class="navigate right">&#9654;</button>
@@ -222,18 +225,18 @@
                   <div id="clusteringViewWrapper">
                     <div id="clusteringHeader">Block detection results</div>
                     <div id="clusteringViewContainer"></div>
-                      <div id="clusteringViewControls">
-                          <span id="clusteringViewMessage">
+                      <div class="overViewControls">
+                          <span class="overViewMessage">
                               Continue with autocompletion of the problematic block or discard if everything looks consistent
                           </span>
-                          <div id="clusteringViewButtons">
+                          <div class="overViewButtons">
                               <input type="button" value="Discard" id="closeClustering" class="vis-button"/>
                               <input type="button" value="Continue" id="send4" class="sendQuery"/>
                           </div>
                       </div>
                       <div id="clusteringConsent">
-                          This window shows the potential <span style="color:#ec0000; font-weight:bold">inconsistent block</span> in the spatial configuration for which an autocompletion is available.
-                          <br><input type="checkbox" id="skipBlocks"/><span style="color:#6d6d6d">&nbsp;Skip this window for further autocompletions</span>
+                          This window shows the potential <span style="color:#ec0000; font-weight:bold">
+                          inconsistent block</span> in the spatial configuration for which an autocompletion is available.
                       </div>
                   </div>
                 </div>
@@ -255,9 +258,9 @@
                   <div id="zonesViewWrapper">
                     <div id="zonesViewHeader">Inspect and Edit Zones</div>
                     <div id="zonesViewContainer"></div>
-                    <div id="zonesViewControls">
-                      <span id="zonesViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
-                      <div id="zonesViewButtons">
+                    <div class="overViewControls">
+                      <span class="overViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
+                      <div class="overViewButtons">
                         <input disabled type="button" value="Set zone" id="setZone" class="vis-button"/>
                         <input type="button" value="Continue" id="send3" class="sendQuery" data-search-mode="search-graphmatch"/>
                       </div>
