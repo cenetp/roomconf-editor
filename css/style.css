@@ -198,6 +198,30 @@ header {
   margin-right: 5%;
 }
 
+.edge-category {
+  padding: 1px 0 !important;
+  background: #1313139c;
+  pointer-events: none;
+}
+
+.edge-category-icon {
+  font-size: 7px;
+  vertical-align: text-top;
+  line-height: 2.432;
+}
+
+.edge-category-icon.accessibility {
+  color: #090;
+}
+
+.edge-category-icon.blocking {
+  color: #bb0000;
+}
+
+.edge-category-icon.generic {
+  color: #96c2fc;
+}
+
 .type {
   border-bottom: 1px solid #555;
   padding: 7px 0;

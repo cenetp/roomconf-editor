@@ -184,15 +184,16 @@ const toggleManipulation = function (order) {
   }
 };
 
-// display the concept attributes dialog
 let overlay = document.querySelector("#overlay");
 let selectType = document.querySelector(".selectType");
+
 const showOverlay = function (cls1, cls2) {
   overlay.classList.remove(cls1);
   overlay.classList.add(cls2);
   selectType.classList.remove(cls1);
   selectType.classList.add(cls2);
 };
+
 const hideWithSelected = function (selector) {
   document.querySelectorAll(selector).forEach((el) => {
     el.classList.remove("show");
@@ -200,6 +201,7 @@ const hideWithSelected = function (selector) {
     el.classList.remove("type-selected");
   });
 };
+
 const showTypes = function (order, type, concept) {
   if (order === "show") {
     showOverlay("hide", "show");
@@ -231,6 +233,7 @@ const showTypes = function (order, type, concept) {
     }
   }
 };
+
 document.querySelector("#closeTypes").onclick = function () {
   showTypes("hide");
   toggleManipulation("show");
@@ -251,6 +254,17 @@ let roomColors = {
   STORAGE: "#f1c4b5",
   BUILDINGSERVICES: "#b5f1d1",
 };
+
+let edgeColors = {
+  DOOR: '#009900',
+  PASSAGE: '#009900',
+  WALL: '#bb0000',
+  ENTRANCE: '#009900',
+  SLAB: '#bb0000',
+  STAIRS: '#009900',
+  WINDOW: '#bb0000',
+  EDGE: '#96c2fc'
+}
 
 const getRandomColor = function () {
   let color = Math.floor(Math.random() * 16777215).toString(16);
@@ -290,6 +304,7 @@ document.querySelector(".saveType").onclick = function () {
       id: edgeId,
       label: type,
       edgeType: type,
+      color: edgeColors[type],
     });
     showTypes("hide", "edge-type");
     toggleManipulation("show");
@@ -877,7 +892,7 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
         to: target,
         edgeType: edgeType,
         label: edgeType,
-        color: mapping ? (source in mappingColors && target in mappingColors ? mappingColors[source] : "#dddddd") : roomColors[source],
+        color: mapping ? (source in mappingColors && target in mappingColors ? edgeColors[edgeType] : "#dddddd") : edgeColors[edgeType],
       };
       edgesToUpdate.update(newEdge);
     }
