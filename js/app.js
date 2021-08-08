@@ -1406,6 +1406,9 @@ const initApp = function () {
   if (!config.adaptation) {
     document.querySelector("#adaptation").classList.add("hide");
   }
+  if (!config.autocompletion) {
+    document.querySelector("#autocompletion").classList.add("hide");
+  }
   // Initialize WebSocket
   if (config.retrieval || config.suggestion || config.adaptation || config.autocompletion) {
     req.init();
