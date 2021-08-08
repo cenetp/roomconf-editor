@@ -18,6 +18,12 @@
                   <div id="disableDownload"></div>
                   <input type="button" value="</>" title="Show source" id="downloadAgraphml"/>
                 </div>
+                <div id="autocompletionNotifierWrapper">
+                    <button title="Autocompletion notifier" id="autocompletionNotifier">
+                        <span id="notifier">&#10035;</span>
+                        <span id="notifierText" class="hide">Autocompletion available</span>
+                    </button>
+                </div>
                 <textarea id="showAgraphml" class="hide"></textarea>
                 <div id="agraphmlControls" class="hide">
                   <input type="button" id="applyAgraphml" value="Apply AGraphML">
@@ -51,16 +57,28 @@
                           <div class="type hide room-type">STORAGE</div>
                           <div class="type hide room-type">BUILDINGSERVICES</div>
                           <div class="type hide room-type">ROOM</div>
+                          <div class="type hide edge-type edge-category">
+                              <span class="edge-category-icon accessibility">&#11044;</span>
+                              Accessibility edges
+                          </div>
                           <div class="type hide edge-type">DOOR</div>
                           <div class="type hide edge-type">PASSAGE</div>
-                          <div class="type hide edge-type">WALL</div>
                           <div class="type hide edge-type">ENTRANCE</div>
-                          <div class="type hide edge-type">SLAB</div>
                           <div class="type hide edge-type">STAIRS</div>
+                          <div class="type hide edge-type edge-category">
+                              <span class="edge-category-icon blocking">&#11044;</span>
+                              Blocking edges
+                          </div>
+                          <div class="type hide edge-type">WALL</div>
+                          <div class="type hide edge-type">SLAB</div>
                           <div class="type hide edge-type">WINDOW</div>
+                          <div class="type hide edge-type edge-category">
+                              <span class="edge-category-icon generic">&#11044;</span>
+                              Generic
+                          </div>
                           <div class="type hide edge-type">EDGE</div>
                       </div>
-                      <div id="additional" class="hide room-type">
+                      <div class="additional hide room-type">
                         <div id="area">Area <input id="areaInput" type="number" min="1" /> m<sup>2</sup></div>
                         <div id="windows">Windows exist? <input id="windowsInput" type="checkbox" /></div>
                         <div id="roomLabel">Room label<br><textarea id="roomLabelText"></textarea></div>
@@ -163,12 +181,48 @@
                     <div id="adaptations"></div>
                     <input type="button" value="Done" id="closeAdaptation" class="hide">
                   </div>
+                  <div id="autocompletion">
+                    <div class="controls">
+                        <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
+                        <div>
+                            <div>
+                                <input type="checkbox" id="skipBlocks"/>
+                                <span style="color:#6d6d6d">Skip clustering view</span>
+                            </div>
+                            <label for="clusterings">Set clustering type:</label>
+                            <select name="clusterings" id="clusterings">
+                                <option value="betweenness">Betweenness</option>
+                                <option value="force-directed">Force-Directed</option>
+                                <option value="distance-based">DBScan</option>
+                                <option value="hierarchical">Hierarchical</option>
+                                <option value="spectral">Spectral</option>
+                            </select>
+                            <div id="distanceFunctionsWrapper" class="hide">
+                                <label for="distanceFunctions">Distance function:</label>
+                                <select name="distanceFunctions" id="distanceFunctions">
+                                    <option value="manhattan">Manhattan</option>
+                                    <option value="euclidean">Euclidean</option>
+                                    <option value="sq-euclidean">Squared Euclidean</option>
+                                    <option value="min">Min</option>
+                                    <option value="max">Max</option>
+                                    <option value="cosine">Cosine</option>
+                                    <option value="jaccard">Jaccard</option>
+                                </select>
+                            </div>
+                            <div id="clusterCountWrapper">
+                                <label for="clusterCount">Min. clusters:</label>
+                                <input type="number" min="2" id="clusterCount" value="2">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div id="adaptations"></div>
+                    <input type="button" value="Done" id="closeAdaptation" class="hide"> -->
+                  </div>
                 </div>
                 <div id="output" class="w3-light-grey hide">
                   <div id="outputInfo">
                     <div id="outputStats">
                       <p>Click on preview to open mapping view.</p>
-                      <!-- <p><span id="resultCount"></span> similar room configurations found.</p> -->
                     </div>
                     <div id="navigateOutput">
                       <button class="navigate left">&#9664;</button><button class="navigate right">&#9654;</button>
@@ -177,6 +231,25 @@
                   </div>
                   <div id="outputResults">
                     <table id="result"></table>
+                  </div>
+                </div>
+                <div id="clusteringView" class="hide">
+                  <div id="clusteringViewWrapper">
+                    <div id="clusteringHeader">Block detection results</div>
+                    <div id="clusteringViewContainer"></div>
+                      <div class="overViewControls">
+                          <span class="overViewMessage">
+                              Continue with autocompletion of the problematic block or discard if everything looks consistent
+                          </span>
+                          <div class="overViewButtons">
+                              <input type="button" value="Discard" id="closeClustering" class="vis-button"/>
+                              <input type="button" value="Continue" id="send4" class="sendQuery"/>
+                          </div>
+                      </div>
+                      <div id="clusteringConsent">
+                          This window shows the potential <span style="color:#ec0000; font-weight:bold">
+                          inconsistent block</span> in the spatial configuration for which an autocompletion is available.
+                      </div>
                   </div>
                 </div>
                 <div id="resultMappings" class="hide">
@@ -196,10 +269,10 @@
                 <div id="zonesView" class="hide">
                   <div id="zonesViewWrapper">
                     <div id="zonesViewHeader">Inspect and Edit Zones</div>
-                    <div id="zonesViewContainer"> </div>
-                    <div id="zonesViewControls">
-                      <span id="zonesViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
-                      <div id="zonesViewButtons">
+                    <div id="zonesViewContainer"></div>
+                    <div class="overViewControls">
+                      <span class="overViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
+                      <div class="overViewButtons">
                         <input disabled type="button" value="Set zone" id="setZone" class="vis-button"/>
                         <input type="button" value="Continue" id="send3" class="sendQuery" data-search-mode="search-graphmatch"/>
                       </div>
@@ -211,7 +284,7 @@
                             <h2>Select New Zone</h2>
                             <span id="closeZonesOverlay" class="close-types">&times;</span>
                             <div class="types" id="availableZones"></div>
-                            <div id="additional">
+                            <div class="additional">
                               <div id="zoneLabel">Zone label<br><textarea disabled id="zoneLabelText"></textarea></div>
                             </div>
                             <div class="save">

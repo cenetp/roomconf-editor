@@ -54,21 +54,15 @@ header {
   position: relative;
 }
 
-#suggestion {
+#suggestion,
+#adaptation,
+#autocompletion {
   background: #fff;
   border: 1px solid #ccc;
   color: #222222;
   padding: 6px;
   border-radius: 5px;
   margin-bottom: 10px;
-}
-
-#adaptation {
-  background: #fff;
-  border: 1px solid #ccc;
-  color: #222222;
-  padding: 6px;
-  border-radius: 5px;
 }
 
 #overlay {
@@ -113,9 +107,13 @@ header {
 .saveType,
 #send2,
 #send3,
+#send4,
 #getSuggestion,
 #getAdaptation,
 #applyAgraphml,
+#autocompletionNotifier,
+#getAutocompletion,
+.applyRoomconf,
 #downloadAgraphml {
   border-radius: 5px;
   border: 1px solid #333;
@@ -130,6 +128,8 @@ header {
 .saveType:hover,
 #send2:hover,
 #send3:hover,
+#send4:hover,
+#applyRoomconf:hover,
 #getSuggestion:hover,
 #getAdaptation:hover {
   background: #3c3c3c;
@@ -138,6 +138,8 @@ header {
 .saveType:active,
 #send2:active,
 #send3:active,
+#send4:active,
+#applyRoomconf:active,
 #getSuggestion:active,
 #getAdaptation:active {
   background: #191919;
@@ -199,6 +201,30 @@ header {
   margin-right: 5%;
 }
 
+.edge-category {
+  padding: 1px 0 !important;
+  background: #1313139c;
+  pointer-events: none;
+}
+
+.edge-category-icon {
+  font-size: 7px;
+  vertical-align: text-top;
+  line-height: 2.432;
+}
+
+.edge-category-icon.accessibility {
+  color: #090;
+}
+
+.edge-category-icon.blocking {
+  color: #bb0000;
+}
+
+.edge-category-icon.generic {
+  color: #96c2fc;
+}
+
 .type {
   border-bottom: 1px solid #555;
   padding: 7px 0;
@@ -257,24 +283,30 @@ header {
   top: 178px;
 }
 
-#zonesViewControls {
+.overViewControls {
   background: #f1f1f1;
   padding: 4px;
-  border-top: 2px solid #ccc;
+  position: absolute;
+  bottom: -40px;
+  left: -2px;
+  width: 1306px;
+  height: 38px;
+  border: 2px solid #171717;
+  border-top: none;
 }
 
-#zonesViewMessage {
-  color: #777;
+.overViewMessage {
   font-size: 15px;
   padding-left: 10px;
   display: inline-block;
   width: 1050px;
 }
 
-#zonesViewButtons {
+.overViewButtons {
   display: inline-block;
 }
 
+#send4,
 #send3 {
   padding-left: 14px;
   padding-right: 14px;
@@ -297,6 +329,7 @@ header {
   margin-right: 7px;
 }
 
+#clusteringConsent,
 #zonesLegend {
   position: absolute;
   z-index: 4;
@@ -339,11 +372,11 @@ header {
 
 #scale {
   display: inline-block;
-  color: #777;
+  color: #171717;
   padding-left: 10px;
 }
 
-#additional {
+.additional {
   position: absolute;
   right: 0;
   height: 72%;
@@ -618,6 +651,7 @@ td:nth-child(7) {
   opacity: 0.8;
 }
 
+#clusteringView,
 #resultMappings,
 #zonesView {
   position: absolute;
@@ -629,16 +663,17 @@ td:nth-child(7) {
   background: rgba(0, 0, 0, 0.3);
 }
 
+#clusteringViewWrapper,
 .mappingsView,
 #zonesViewWrapper {
   width: 1306px;
+  height: 604px;
   margin: 0 auto;
   position: relative;
-  border-radius: 6px;
-  border: 2px solid #777;
-  overflow: hidden;
+  border: 2px solid #171717;
 }
 
+#clusteringHeader,
 .mapping-header,
 #zonesViewHeader {
   position: absolute;
@@ -678,6 +713,7 @@ td:nth-child(7) {
   width: 100%;
 }
 
+#clusteringViewContainer,
 #navigateMappingsContainer {
   position: relative;
   width: 1304px;
@@ -783,25 +819,52 @@ input[disabled] + label:hover {
   text-decoration: none;
 }
 
+#autocompletionNotifierWrapper,
 #download {
   right: 25px;
   position: absolute;
   top: 23px;
 }
 
+#autocompletionNotifierWrapper {
+  right: 80px;
+}
+
+#autocompletionNotifier,
 #downloadAgraphml {
   height: 28px;
   width: 46px;
   font-size: 15px;
 }
 
+#autocompletionNotifier {
+  cursor: default;
+  text-align: left;
+  width: 38px;
+  padding: 0 12px;
+}
+
+#autocompletionNotifier.show {
+  width: 230px;
+  cursor: pointer;
+}
+
+#notifier {
+  font-weight: 700;
+  color: #aaa;
+}
+
+#notifier.highlight {
+  color: #fcff79;
+}
+
 #showAgraphml {
   position: absolute;
   right: 26px;
   top: 53px;
-  border: 2px solid #ccc;
-  color: #e4e4e4;
-  background: #656565;
+  border: 2px solid #171717;
+  color: #171717;
+  background: #ccc;
   width: 700px;
   height: 500px;
   overflow-y: scroll;
@@ -809,6 +872,7 @@ input[disabled] + label:hover {
   font-family: monospace;
   z-index: 99999 !important;
   font-size: 12px;
+  outline: none;
 }
 
 #agraphmlControls {
@@ -817,7 +881,7 @@ input[disabled] + label:hover {
   right: 26px;
   background: #f1f1f1;
   padding: 4px;
-  border: 2px solid #ccc;
+  border: 2px solid #171717;
   border-top: 0;
   width: 700px;
   z-index: 9999;
@@ -827,7 +891,7 @@ input[disabled] + label:hover {
   display: inline-block;
   float: right;
   padding-right: 5px;
-  color: #777;
+  color: #171717;
   font-size: 17px;
 }
 
