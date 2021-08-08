@@ -352,7 +352,6 @@ let userView = {
       // display connection message
       document.querySelector("#connMessages p").innerHTML = msg;
     } else if (msg.startsWith("<clustering>")) {
-      console.log('clustering resp arrived');
       clusteringAgraphml = msg;
       if (skipBlocks) {
         getAutocompletionForBlocks();
@@ -360,7 +359,6 @@ let userView = {
         activateAutocompletionNotifier('show');
       }
     } else if (msg.includes('<autocompletions>')) {
-      console.log('autocompletions resp arrived');
       autocompletionsMsg = msg;
       if (skipBlocks) {
         activateAutocompletionNotifier('show');
@@ -654,12 +652,10 @@ const activateAutocompletionNotifier = function (order) {
 
 const getAutocompletion = function (blocks) {
   if (typeof blocks !== "object" && blocks.indexOf("<clustering>") === 0) {
-    console.log('with blocks');
     let fingerprints = '<fingerprints><fingerprint name="Room_Graph" weight="1">'
           + '</fingerprint></fingerprints>';
     req.socket.send("<autocompletion>" + blocks + fingerprints + "</autocompletion>");
   } else if (getNodesAndEdges() != "") {
-    console.log('no blocks');
     let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
     let clusteringOption; // Distance function or number rooms in cluster
     let df = document.querySelector('#distanceFunctions').selectedOptions[0].value;
@@ -745,7 +741,13 @@ const getClusterColors = function(numberOfClusters) {
 }
 
 // Apply AGraphML to a network
-const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkToUpdate, mappingColors, factor) {
+const applyAgraphml = function (agraphml,
+                                nodesToUpdate,
+                                edgesToUpdate,
+                                networkToUpdate,
+                                mappingColors,
+                                factor,
+                                ignoreClustering) {
   let currentFactor = factor !== undefined ? factor : 1;
   let mapping = mappingColors !== undefined && Object.entries(mappingColors).length > 0;
   let clusterColors;
@@ -820,11 +822,13 @@ const applyAgraphml = function (agraphml, nodesToUpdate, edgesToUpdate, networkT
       if (key === "windowExist") {
         windowsExist = "Windows exist: " + text;
       }
-      if (key === "cluster") {
-        cluster = text;
-      }
-      if (key === "problematicCluster") {
-        problematicCluster = text;
+      if (!ignoreClustering) {
+        if (key === "cluster") {
+          cluster = text;
+        }
+        if (key === "problematicCluster") {
+          problematicCluster = text;
+        }
       }
     });
     let replacement = jQuery(this).find("replacement");
@@ -973,11 +977,26 @@ const queryTypes = {
   Subgraph_Match_Inexact: "Inexact Subgraph Matching",
 };
 
+let availableResultAgraphmls = {}
+const applyRoomconf = function (mappingId) {
+  let resultAgraphml = availableResultAgraphmls[mappingId];
+  let ignoreClustering = true;
+  applyAgraphml(resultAgraphml, nodes, edges, network, "", 1, true);
+  // clear all available result Agraphmls
+  for (const id of Object.getOwnPropertyNames(availableResultAgraphmls)) {
+    delete availableResultAgraphmls[id];
+  }
+  availableMappingNetworks
+  // TODO set position of the added node(s) from the current position in mapping view
+  // NOTE: do not try to add all nodes to main network, applyAgraphml does this already,
+  // just try to transfer position from the mapping network from the availableMappingNetworks object
+}
+
 const agraphmlToRoomConf = function (applyMessage) {
   let controls = '<div class="overViewControls">'
    + '<span class="overViewMessage">' + applyMessage + '</span>'
    + '<div class="overViewButtons">'
-   + '<input type="button" value="Apply design" id="applyRoomconf"/>'
+   + '<input type="button" value="Apply design" class="applyRoomconf"/>'
    + '</div></div>';
   let results = jQuery("#result tr");
   // remove available mappings
@@ -1025,9 +1044,10 @@ const agraphmlToRoomConf = function (applyMessage) {
             '<div id="mappings_' + result + '" class="mappings hide">' +
               '<div class="mapping-header">Result ' + (result + 1) + '</div>' +
               '<agraphml id="' + queryId + '" class="mapping left"></agraphml>' +
-              '<agraphml id="' + resultId + '" class="mapping"></agraphml>' +
+              '<agraphml id="' + resultId + '" class="mapping right"></agraphml>' +
               controls + "</div>"
           );
+          availableResultAgraphmls[resultId] = graphml;
           let containers = {
             containerQuery: document.querySelector("#" + queryId),
             containerResult: document.querySelector("#" + resultId),
@@ -1052,9 +1072,10 @@ const agraphmlToRoomConf = function (applyMessage) {
                       '" class="mappings hide">' + '<div class="mapping-header">' +
                       queryTypes[queryType] + " " + (index + 1) + "</div>" +
                       '<agraphml id="' + queryId + '" class="mapping left"></agraphml>' +
-                      '<agraphml id="' + resultId + '" class="mapping"></agraphml>' +
+                      '<agraphml id="' + resultId + '" class="mapping right"></agraphml>' +
                       controls + '</div>'
                   );
+                  availableResultAgraphmls[resultId] = graphml;
                   let containers = {
                     containerQuery: document.querySelector("#" + queryId),
                     containerResult: document.querySelector("#" + resultId),
@@ -1139,6 +1160,10 @@ closeOutput.onclick = function () {
   jQuery("#send2").prop("disabled", false).removeClass("disabled");
   let loading = document.querySelector("#sendAgraphml .loading");
   loading.classList.remove("ready");
+  // clear all available mapping networks
+  for (const id of Object.getOwnPropertyNames(availableMappingNetworks)) {
+    delete availableMappingNetworks[id];
+  }
 };
 
 const showSuggestion = function (msg) {
@@ -1580,5 +1605,11 @@ jQuery(function ($) {
   });
   $("#showRetrievalSettings").on("click", function () {
     $("#retrievalSettingsWrapper").toggleClass("hide");
+  });
+  $("body").on("click", ".applyRoomconf", function () {
+    let controls = $(this).parents('.overViewControls').get(0);
+    let mappingId = $(controls).siblings('.mapping.right').prop('id');
+    applyRoomconf(mappingId);
+    $("#closeMappings, #closeOutput").click();
   });
 });
