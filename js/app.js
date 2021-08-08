@@ -696,8 +696,8 @@ const showAutocompletions = function () {
   let autocompletions = autocompletionsMsg.substring(index1, index2);
   renderResponse("tbody", "#result", autocompletions);
   jQuery("tr").append('<td class="showExplanation">Info</td>');
-  let applyMessage = 'Apply <span style="color:blue">autocompletion</span> '
-   + 'or close the window and select another result.';
+  let applyMessage = 'Apply <span style="color:#96c2fc;font-weight:600">autocompletion</span> '
+   + 'on the right side or select another result.';
   agraphmlToRoomConf(applyMessage);
 }
 
@@ -929,8 +929,8 @@ document.querySelector("#applyAgraphml").onclick = function () {
 const immutableNetwork = function(container) {
   let immutableNetwork = new Network(container, {}, options);
   immutableNetwork.setOptions({
-    height: "700px",
-    width: "1306px",
+    height: "600px",
+    width: "1302px",
     interaction: {
       dragView: false,
       dragNodes: false,
@@ -977,7 +977,7 @@ const agraphmlToRoomConf = function (applyMessage) {
   let controls = '<div class="overViewControls">'
    + '<span class="overViewMessage">' + applyMessage + '</span>'
    + '<div class="overViewButtons">'
-   + '<input type="button" value="Apply" id="applyRoomconf"/>'
+   + '<input type="button" value="Apply design" id="applyRoomconf"/>'
    + '</div></div>';
   let results = jQuery("#result tr");
   // remove available mappings
