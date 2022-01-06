@@ -3,4 +3,5 @@ node_modules
 .DS_Store
 dist/*
 deploy.sh
-roomconf-editor.iml
+*.iml
+.idea
