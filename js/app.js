@@ -986,7 +986,6 @@ const applyRoomconf = function (mappingId) {
   for (const id of Object.getOwnPropertyNames(availableResultAgraphmls)) {
     delete availableResultAgraphmls[id];
   }
-  availableMappingNetworks
   // TODO set position of the added node(s) from the current position in mapping view
   // NOTE: do not try to add all nodes to main network, applyAgraphml does this already,
   // just try to transfer position from the mapping network from the availableMappingNetworks object
