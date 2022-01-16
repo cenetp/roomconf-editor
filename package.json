@@ -33,7 +33,8 @@
     "node-forge": ">=0.10.0",
     "tar": ">=6.1.9",
     "nth-check": ">=2.0.1",
-    "url-parse": ">=1.5.2"
+    "url-parse": ">=1.5.2",
+    "follow-redirects": ">=1.14.7"
   },
   "dependencies": {
     "jquery": "^3.5.1",
