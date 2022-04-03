@@ -13,13 +13,9 @@ module.exports = {
     filename: "js/bundle.js",
   },
   devServer: {
-    contentBase: "./dist",
+    static: "./dist",
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      filename: "index.html",
-      template: "./index.html",
-    }),
     new CopyPlugin({
       patterns: [{ from: "img", to: "img" }],
     }),
@@ -29,7 +25,17 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                publicPath: ''
+              }
+            },
+            {
+              loader: "css-loader"
+            }
+          ]
       },
       {
         test: /\.(ttf|eot|woff|woff2|svg)$/,

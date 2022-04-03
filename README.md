@@ -6,7 +6,10 @@ See the editor in action: http://veisen.de/metiscbr/roomconf.
 
 # Installation
 
-Install `npm` for your OS and run `npm install` in the application's root directory.
+Install `npm` for your OS and run following commands in the application's root directory:
+
+    npm install --save --legacy-peer-deps
+    npm install -D @webpack-cli/serve --save --legacy-peer-deps
 
 # Run
 
