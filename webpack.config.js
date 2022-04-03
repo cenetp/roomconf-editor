@@ -16,6 +16,10 @@ module.exports = {
     static: "./dist",
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      filename: "index.html",
+      template: "./index.html"
+    }),
     new CopyPlugin({
       patterns: [{ from: "img", to: "img" }],
     }),
