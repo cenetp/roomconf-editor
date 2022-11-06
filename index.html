@@ -186,11 +186,11 @@
                         <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
                         <div>
                             <div>
-                                <input type="checkbox" id="skipBlocks"/>
+                                <input disabled type="checkbox" id="skipBlocks"/>
                                 <span style="color:#6d6d6d">Skip clustering view</span>
                             </div>
                             <label for="clusterings">Set clustering type:</label>
-                            <select name="clusterings" id="clusterings">
+                            <select disabled name="clusterings" id="clusterings">
                                 <option value="betweenness">Betweenness</option>
                                 <option value="force-directed">Force-Directed</option>
                                 <option value="distance-based">DBScan</option>
@@ -198,7 +198,7 @@
                             </select>
                             <div id="distanceFunctionsWrapper" class="hide">
                                 <label for="distanceFunctions">Distance function:</label>
-                                <select name="distanceFunctions" id="distanceFunctions">
+                                <select disabled name="distanceFunctions" id="distanceFunctions">
                                     <option value="manhattan">Manhattan</option>
                                     <option value="euclidean">Euclidean</option>
                                     <option value="sq-euclidean">Squared Euclidean</option>
@@ -210,7 +210,7 @@
                             </div>
                             <div id="clusterCountWrapper">
                                 <label for="clusterCount">Min. clusters:</label>
-                                <input type="number" min="2" id="clusterCount" value="2">
+                                <input disabled type="number" min="2" id="clusterCount" value="2">
                             </div>
                         </div>
                     </div>
