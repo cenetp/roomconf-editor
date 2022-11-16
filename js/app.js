@@ -266,6 +266,19 @@ let edgeColors = {
   EDGE: '#96c2fc'
 }
 
+let allClusterColors = {
+  0: "#96c2fc", // blue
+  1: "#e9f1b5", // green
+  2: "#cef1b5", // yellow
+  3: "#f1e5b5", // brown
+  4: "#dbb5f1", // violet
+  5: "#f1b5d5", // pink
+  6: "#b5ebf1", // azure
+  7: "#b7b5f1", // purple
+  8: "#b5f1d1", // light green
+  9: "#aad2e6"  // türkis
+}
+
 const getRandomColor = function () {
   let color = Math.floor(Math.random() * 16777215).toString(16);
   return "#" + (color.length === 6 ? color : color + "0");
@@ -735,7 +748,7 @@ const getNumberOfClusters = function() {
 const getClusterColors = function(numberOfClusters) {
   let clusterColors = [];
   for (let i = 0; i < numberOfClusters; i++) {
-    clusterColors.push(getRandomColor());
+    clusterColors.push(allClusterColors[i]);
   }
   return clusterColors;
 }

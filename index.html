@@ -1,299 +1,324 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="shortcut icon" href="favicons/favicon.ico"/>
-        <script type="js" src="js/index.js"></script>
-        <title>RoomConf Editor</title>
-    </head>
-    <body class="w3-theme-l4">
-        <div id="root" class="w3-card-2 w3-light-grey">
-            <header class="w3-container w3-large w3-theme-d4 w3-teal">
-                <h1><b>RoomConf</b> Editor</h1>
-                <div id="connMessages"><p></p></div>
-                <div id="download">
-                  <div id="disableDownload"></div>
-                  <input type="button" value="</>" title="Show source" id="downloadAgraphml"/>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="shortcut icon" href="favicons/favicon.ico"/>
+    <script type="js" src="js/index.js"></script>
+    <title>RoomConf Editor</title>
+</head>
+<body class="w3-theme-l4">
+<div id="root" class="w3-card-2 w3-light-grey">
+    <header class="w3-container w3-large w3-theme-d4 w3-teal">
+        <h1><b>RoomConf</b> Editor</h1>
+        <div id="connMessages"><p></p></div>
+        <div id="download">
+            <div id="disableDownload"></div>
+            <input type="button" value="</>" title="Show source" id="downloadAgraphml"/>
+        </div>
+        <div id="autocompletionNotifierWrapper">
+            <button title="Autocompletion notifier" id="autocompletionNotifier">
+                <span id="notifier">&#10035;</span>
+                <span id="notifierText" class="hide">Autocompletion available</span>
+            </button>
+        </div>
+        <textarea id="showAgraphml" class="hide"></textarea>
+        <div id="agraphmlControls" class="hide">
+            <input type="button" id="applyAgraphml" value="Apply AGraphML">
+            <div id="scale">
+                Scale:
+                <input type="radio" class="scaleFactor" name="scale-factor" value="1" checked>1
+                <input type="radio" class="scaleFactor" name="scale-factor" value="10">10
+                <input type="radio" class="scaleFactor" name="scale-factor" value="100">100
+            </div>
+            <div id="agraphmlMessage">Copy, paste, or edit AGraphML</div>
+        </div>
+    </header>
+    <div id="graphui-content" class="w3-row w3-light-grey">
+        <div id="disableManipulation"></div>
+        <div id="metiscbr-graphui" class="w3-white w3-col l9 m9"></div>
+        <div id="overlay" class="hide">
+            <div class="selectType hide">
+                <h2>Select Type</h2>
+                <span id="closeTypes" class="close-types">&times;</span>
+                <div class="types">
+                    <div class="type hide room-type">LIVING</div>
+                    <div class="type hide room-type">SLEEPING</div>
+                    <div class="type hide room-type">WORKING</div>
+                    <div class="type hide room-type">KITCHEN</div>
+                    <div class="type hide room-type">CORRIDOR</div>
+                    <div class="type hide room-type">BATH</div>
+                    <div class="type hide room-type">TOILET</div>
+                    <div class="type hide room-type">PARKING</div>
+                    <div class="type hide room-type">CHILDREN</div>
+                    <div class="type hide room-type">EXTERIOR</div>
+                    <div class="type hide room-type">STORAGE</div>
+                    <div class="type hide room-type">BUILDINGSERVICES</div>
+                    <div class="type hide room-type">ROOM</div>
+                    <div class="type hide edge-type edge-category">
+                        <span class="edge-category-icon accessibility">&#11044;</span>
+                        Accessibility edges
+                    </div>
+                    <div class="type hide edge-type">DOOR</div>
+                    <div class="type hide edge-type">PASSAGE</div>
+                    <div class="type hide edge-type">ENTRANCE</div>
+                    <div class="type hide edge-type">STAIRS</div>
+                    <div class="type hide edge-type edge-category">
+                        <span class="edge-category-icon blocking">&#11044;</span>
+                        Blocking edges
+                    </div>
+                    <div class="type hide edge-type">WALL</div>
+                    <div class="type hide edge-type">SLAB</div>
+                    <div class="type hide edge-type">WINDOW</div>
+                    <div class="type hide edge-type edge-category">
+                        <span class="edge-category-icon generic">&#11044;</span>
+                        Generic
+                    </div>
+                    <div class="type hide edge-type">EDGE</div>
                 </div>
-                <div id="autocompletionNotifierWrapper">
-                    <button title="Autocompletion notifier" id="autocompletionNotifier">
-                        <span id="notifier">&#10035;</span>
-                        <span id="notifierText" class="hide">Autocompletion available</span>
-                    </button>
+                <div class="additional hide room-type">
+                    <div id="area">Area <input id="areaInput" type="number" min="1"/> m<sup>2</sup>
+                    </div>
+                    <div id="windows">Windows exist? <input id="windowsInput" type="checkbox"/>
+                    </div>
+                    <div id="roomLabel">Room label<br><textarea id="roomLabelText"></textarea></div>
                 </div>
-                <textarea id="showAgraphml" class="hide"></textarea>
-                <div id="agraphmlControls" class="hide">
-                  <input type="button" id="applyAgraphml" value="Apply AGraphML">
-                  <div id="scale">
-                    Scale:
-                    <input type="radio" class="scaleFactor" name="scale-factor" value="1" checked>1
-                    <input type="radio" class="scaleFactor" name="scale-factor" value="10">10
-                    <input type="radio" class="scaleFactor" name="scale-factor" value="100">100
-                  </div>
-                  <div id="agraphmlMessage">Copy, paste, or edit AGraphML</div>
+                <div class="save">
+                    <input style="display: block;" type="button" value="Save" class="saveType"/>
                 </div>
-            </header>
-            <div id="graphui-content" class="w3-row w3-light-grey">
-                <div id="disableManipulation"></div>
-                <div id="metiscbr-graphui" class="w3-white w3-col l9 m9"></div>
-                <div id="overlay" class="hide">
-                  <div class="selectType hide">
-                      <h2>Select Type</h2>
-                      <span id="closeTypes" class="close-types">&times;</span>
-                      <div class="types">
-                          <div class="type hide room-type">LIVING</div>
-                          <div class="type hide room-type">SLEEPING</div>
-                          <div class="type hide room-type">WORKING</div>
-                          <div class="type hide room-type">KITCHEN</div>
-                          <div class="type hide room-type">CORRIDOR</div>
-                          <div class="type hide room-type">BATH</div>
-                          <div class="type hide room-type">TOILET</div>
-                          <div class="type hide room-type">PARKING</div>
-                          <div class="type hide room-type">CHILDREN</div>
-                          <div class="type hide room-type">EXTERIOR</div>
-                          <div class="type hide room-type">STORAGE</div>
-                          <div class="type hide room-type">BUILDINGSERVICES</div>
-                          <div class="type hide room-type">ROOM</div>
-                          <div class="type hide edge-type edge-category">
-                              <span class="edge-category-icon accessibility">&#11044;</span>
-                              Accessibility edges
-                          </div>
-                          <div class="type hide edge-type">DOOR</div>
-                          <div class="type hide edge-type">PASSAGE</div>
-                          <div class="type hide edge-type">ENTRANCE</div>
-                          <div class="type hide edge-type">STAIRS</div>
-                          <div class="type hide edge-type edge-category">
-                              <span class="edge-category-icon blocking">&#11044;</span>
-                              Blocking edges
-                          </div>
-                          <div class="type hide edge-type">WALL</div>
-                          <div class="type hide edge-type">SLAB</div>
-                          <div class="type hide edge-type">WINDOW</div>
-                          <div class="type hide edge-type edge-category">
-                              <span class="edge-category-icon generic">&#11044;</span>
-                              Generic
-                          </div>
-                          <div class="type hide edge-type">EDGE</div>
-                      </div>
-                      <div class="additional hide room-type">
-                        <div id="area">Area <input id="areaInput" type="number" min="1" /> m<sup>2</sup></div>
-                        <div id="windows">Windows exist? <input id="windowsInput" type="checkbox" /></div>
-                        <div id="roomLabel">Room label<br><textarea id="roomLabelText"></textarea></div>
-                      </div>
-                      <div class="save">
-                        <input style="display: block;" type="button" value="Save" class="saveType"/>
-                      </div>
-                  </div>
-                </div>
+            </div>
+        </div>
 
-                <div id="sidebar" class="w3-rest">
-                  <div id="disableActions"></div>
-                  <div id="sendAgraphml">
-                      <textarea hidden id="queryText"></textarea>
-                      <form method="post">
-                          <!-- <div class="selectFp">
-                              <input type="checkbox" class="filterCheckbox" id="find-roomcount" name="fp-filter" value="Room_Count">
-                              <input type="text" class="weightValue">
-                              <label for="find-roomcount">Room Count</label>
-                              <img src="img/fp1.svg" class="fpImage">
-                          </div>
-                          <div class="selectFp">
-                              <input type="checkbox" class="filterCheckbox" id="find-relationcount" name="fp-filter" value="Relation_Count">
-                              <input type="text" class="weightValue">
-                              <label for="find-relationcount">Relation Count</label>
-                              <img src="img/fp2.svg" class="fpImage">
-                          </div> -->
-                          <div class="selectFp">
-                              <input type="radio" class="filterCheckbox" id="find-roomgraph" name="fp-filter" value="Room_Graph">
-                              <input type="text" class="weightValue">
-                              <label for="find-roomgraph">Room Graph</label>
-                              <img src="img/fp3.svg" class="fpImage">
-                          </div>
-                          <!-- <div class="selectFp">
-                              <input type="checkbox" class="filterCheckbox" id="find-roomtypes" name="fp-filter" value="Room_Types">
-                              <input type="text" class="weightValue">
-                              <label for="find-roomtypes">Room Types</label>
-                              <img src="img/fp4.svg" class="fpImage">
-                          </div> -->
-                          <div class="selectFp">
-                              <input type="radio" class="filterCheckbox" id="find-adjacency" name="fp-filter" value="Adjacency">
-                              <input type="text" class="weightValue">
-                              <label for="find-adjacency">Adjacency</label>
-                              <img src="img/fp5.svg" class="fpImage">
-                          </div>
-                          <div class="selectFp">
-                              <input type="radio" class="filterCheckbox" id="find-accessibility" name="fp-filter" value="Accessibility">
-                              <input type="text" class="weightValue">
-                              <label for="find-accessibility">Accessibility</label>
-                              <img src="img/fp6.svg" class="fpImage">
-                          </div>
-                          <div class="selectFp last">
-                              <input type="radio" class="filterCheckbox" id="find-fullroomgraph" name="fp-filter" value="Full_Room_Graph">
-                              <input type="text" class="weightValue">
-                              <label for="find-fullroomgraph">Full Room Graph</label>
-                              <img src="img/fp7.svg" class="fpImage">
-                          </div>
-                          <!-- <div class="disabled">
-                              <input disabled type="checkbox" class="filterCheckbox" id="find-naturallight" name="fp-filter" value="Natural_Light">
-                              <input disabled type="text" class="weightValue">
-                              <label for="find-naturallight">Natural Light</label>
-                              <img src="img/fp8.svg" class="fpImage">
-                          </div> -->
-                          <div class="controls">
-                            <input type="button" value="Find designs" id="send2" class="sendQuery" data-search-mode="search-graphmatch"/>
-                            <span class="loading"></span>
-                            <div id="retrievalSettings">
-                              <span id="showRetrievalSettings" title="Retrieval settings">&#9881;</span>
-                              <div id="retrievalSettingsWrapper" class="hide">
-                                <div>
-                                  <input class="retrievalSetting" type="checkbox" name="inspectZones" id="inspectZones" value="inspectZones">
-                                  <label class="retrievalSettingsLabel" id="inspectZonesLabel" for="inspectZones">Inspect zones</label>
-                                </div>
-                                <div>
-                                  <input class="retrievalSetting" type="checkbox" name="analyzeGraph" id="analyzeGraph" value="analyzeGraph">
-                                  <label class="retrievalSettingsLabel" id="analyzeGraphLabel" for="analyzeGraph">Analyze graph</label>
-                                </div>
-                                <div>
-                                  <input class="retrievalSetting" type="checkbox" name="useCbr" id="useCbr" value="useCbr">
-                                  <label class="retrievalSettingsLabel" id="useCbrLabel" for="useCbr">Use CBR search</label>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div id="retrievalMessages"></div>
-                      </form>
-                  </div>
-                  <div id="suggestion">
-                    <div class="controls">
-                      <input type="button" value="Get suggestion" id="getSuggestion"/>
-                      <span class="loading"></span>
+        <div id="sidebar" class="w3-rest">
+            <div id="disableActions"></div>
+            <div id="sendAgraphml">
+                <textarea hidden id="queryText"></textarea>
+                <form method="post">
+                    <!-- <div class="selectFp">
+                        <input type="checkbox" class="filterCheckbox" id="find-roomcount" name="fp-filter" value="Room_Count">
+                        <input type="text" class="weightValue">
+                        <label for="find-roomcount">Room Count</label>
+                        <img src="img/fp1.svg" class="fpImage">
                     </div>
-                    <div id="suggestions"></div>
-                  </div>
-                  <div id="adaptation">
-                    <div class="controls">
-                      <input type="button" value="Get adaptation" id="getAdaptation"/>
-                      <span class="loading"></span>
+                    <div class="selectFp">
+                        <input type="checkbox" class="filterCheckbox" id="find-relationcount" name="fp-filter" value="Relation_Count">
+                        <input type="text" class="weightValue">
+                        <label for="find-relationcount">Relation Count</label>
+                        <img src="img/fp2.svg" class="fpImage">
+                    </div> -->
+                    <div class="selectFp">
+                        <input type="radio" class="filterCheckbox" id="find-roomgraph"
+                               name="fp-filter" value="Room_Graph">
+                        <input type="text" class="weightValue">
+                        <label for="find-roomgraph">Room Graph</label>
+                        <img src="img/fp3.svg" class="fpImage">
                     </div>
-                    <div id="adaptations"></div>
-                    <input type="button" value="Done" id="closeAdaptation" class="hide">
-                  </div>
-                  <div id="autocompletion">
+                    <!-- <div class="selectFp">
+                        <input type="checkbox" class="filterCheckbox" id="find-roomtypes" name="fp-filter" value="Room_Types">
+                        <input type="text" class="weightValue">
+                        <label for="find-roomtypes">Room Types</label>
+                        <img src="img/fp4.svg" class="fpImage">
+                    </div> -->
+                    <div class="selectFp">
+                        <input type="radio" class="filterCheckbox" id="find-adjacency"
+                               name="fp-filter" value="Adjacency">
+                        <input type="text" class="weightValue">
+                        <label for="find-adjacency">Adjacency</label>
+                        <img src="img/fp5.svg" class="fpImage">
+                    </div>
+                    <div class="selectFp">
+                        <input type="radio" class="filterCheckbox" id="find-accessibility"
+                               name="fp-filter" value="Accessibility">
+                        <input type="text" class="weightValue">
+                        <label for="find-accessibility">Accessibility</label>
+                        <img src="img/fp6.svg" class="fpImage">
+                    </div>
+                    <div class="selectFp last">
+                        <input type="radio" class="filterCheckbox" id="find-fullroomgraph"
+                               name="fp-filter" value="Full_Room_Graph">
+                        <input type="text" class="weightValue">
+                        <label for="find-fullroomgraph">Full Room Graph</label>
+                        <img src="img/fp7.svg" class="fpImage">
+                    </div>
+                    <!-- <div class="disabled">
+                        <input disabled type="checkbox" class="filterCheckbox" id="find-naturallight" name="fp-filter" value="Natural_Light">
+                        <input disabled type="text" class="weightValue">
+                        <label for="find-naturallight">Natural Light</label>
+                        <img src="img/fp8.svg" class="fpImage">
+                    </div> -->
                     <div class="controls">
-                        <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
-                        <div>
-                            <div>
-                                <input disabled type="checkbox" id="skipBlocks"/>
-                                <span style="color:#6d6d6d">Skip clustering view</span>
-                            </div>
-                            <label for="clusterings">Set clustering type:</label>
-                            <select disabled name="clusterings" id="clusterings">
-                                <option value="betweenness">Betweenness</option>
-                                <option value="force-directed">Force-Directed</option>
-                                <option value="distance-based">DBScan</option>
-                                <option value="hierarchical">Hierarchical</option>
-                            </select>
-                            <div id="distanceFunctionsWrapper" class="hide">
-                                <label for="distanceFunctions">Distance function:</label>
-                                <select disabled name="distanceFunctions" id="distanceFunctions">
-                                    <option value="manhattan">Manhattan</option>
-                                    <option value="euclidean">Euclidean</option>
-                                    <option value="sq-euclidean">Squared Euclidean</option>
-                                    <option value="min">Min</option>
-                                    <option value="max">Max</option>
-                                    <option value="cosine">Cosine</option>
-                                    <option value="jaccard">Jaccard</option>
-                                </select>
-                            </div>
-                            <div id="clusterCountWrapper">
-                                <label for="clusterCount">Min. clusters:</label>
-                                <input disabled type="number" min="2" id="clusterCount" value="2">
+                        <input type="button" value="Find designs" id="send2" class="sendQuery"
+                               data-search-mode="search-graphmatch"/>
+                        <span class="loading"></span>
+                        <div id="retrievalSettings">
+                            <span id="showRetrievalSettings"
+                                  title="Retrieval settings">&#9881;</span>
+                            <div id="retrievalSettingsWrapper" class="hide">
+                                <div>
+                                    <input class="retrievalSetting" type="checkbox"
+                                           name="inspectZones" id="inspectZones"
+                                           value="inspectZones">
+                                    <label class="retrievalSettingsLabel" id="inspectZonesLabel"
+                                           for="inspectZones">Inspect zones</label>
+                                </div>
+                                <div>
+                                    <input class="retrievalSetting" type="checkbox"
+                                           name="analyzeGraph" id="analyzeGraph"
+                                           value="analyzeGraph">
+                                    <label class="retrievalSettingsLabel" id="analyzeGraphLabel"
+                                           for="analyzeGraph">Analyze graph</label>
+                                </div>
+                                <div>
+                                    <input class="retrievalSetting" type="checkbox" name="useCbr"
+                                           id="useCbr" value="useCbr">
+                                    <label class="retrievalSettingsLabel" id="useCbrLabel"
+                                           for="useCbr">Use CBR search</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- <div id="adaptations"></div>
-                    <input type="button" value="Done" id="closeAdaptation" class="hide"> -->
-                  </div>
+                    <div id="retrievalMessages"></div>
+                </form>
+            </div>
+            <div id="suggestion">
+                <div class="controls">
+                    <input type="button" value="Get suggestion" id="getSuggestion"/>
+                    <span class="loading"></span>
                 </div>
-                <div id="output" class="w3-light-grey hide">
-                  <div id="outputInfo">
-                    <div id="outputStats">
-                      <p>Click on preview to open mapping view.</p>
-                    </div>
-                    <div id="navigateOutput">
-                      <button class="navigate left">&#9664;</button><button class="navigate right">&#9654;</button>
-                    </div>
-                    <div id="closeOutput">&times;</div>
-                  </div>
-                  <div id="outputResults">
-                    <table id="result"></table>
-                  </div>
+                <div id="suggestions"></div>
+            </div>
+            <div id="adaptation">
+                <div class="controls">
+                    <input type="button" value="Get adaptation" id="getAdaptation"/>
+                    <span class="loading"></span>
                 </div>
-                <div id="clusteringView" class="hide">
-                  <div id="clusteringViewWrapper">
-                    <div id="clusteringHeader">Block detection results</div>
-                    <div id="clusteringViewContainer"></div>
-                      <div class="overViewControls">
+                <div id="adaptations"></div>
+                <input type="button" value="Done" id="closeAdaptation" class="hide">
+            </div>
+            <div id="autocompletion">
+                <div class="controls">
+                    <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
+                    <div>
+                        <div>
+                            <input disabled type="checkbox" id="skipBlocks"/>
+                            <span style="color:#6d6d6d">Skip clustering view</span>
+                        </div>
+                        <label for="clusterings">Set clustering type:</label>
+                        <select disabled name="clusterings" id="clusterings">
+                            <option value="betweenness">Betweenness</option>
+                            <option value="force-directed">Force-Directed</option>
+                            <option value="distance-based">DBScan</option>
+                            <option value="hierarchical">Hierarchical</option>
+                        </select>
+                        <div id="distanceFunctionsWrapper" class="hide">
+                            <label for="distanceFunctions">Distance function:</label>
+                            <select disabled name="distanceFunctions" id="distanceFunctions">
+                                <option value="manhattan">Manhattan</option>
+                                <option value="euclidean">Euclidean</option>
+                                <option value="sq-euclidean">Squared Euclidean</option>
+                                <option value="min">Min</option>
+                                <option value="max">Max</option>
+                                <option value="cosine">Cosine</option>
+                                <option value="jaccard">Jaccard</option>
+                            </select>
+                        </div>
+                        <div id="clusterCountWrapper">
+                            <label for="clusterCount">Min. clusters:</label>
+                            <input disabled type="number" min="2" id="clusterCount" value="2">
+                        </div>
+                    </div>
+                </div>
+                <!-- <div id="adaptations"></div>
+                <input type="button" value="Done" id="closeAdaptation" class="hide"> -->
+            </div>
+        </div>
+        <div id="output" class="w3-light-grey hide">
+            <div id="outputInfo">
+                <div id="outputStats">
+                    <p>Click on preview to open mapping view.</p>
+                </div>
+                <div id="navigateOutput">
+                    <button class="navigate left">&#9664;</button>
+                    <button class="navigate right">&#9654;</button>
+                </div>
+                <div id="closeOutput">&times;</div>
+            </div>
+            <div id="outputResults">
+                <table id="result"></table>
+            </div>
+        </div>
+        <div id="clusteringView" class="hide">
+            <div id="clusteringViewWrapper">
+                <div id="clusteringHeader">Block detection results</div>
+                <div id="clusteringViewContainer"></div>
+                <div id="clusteringConsent">
+                    This window shows the potential <span style="color:#ec0000; font-weight:bold">
+                          incomplete clusters</span> in the spatial configuration for which an
+                    autocompletion is available
+                </div>
+                <div class="overViewControls">
                           <span class="overViewMessage">
-                              Continue with autocompletion of the problematic block or discard if everything looks consistent
+                              Continue with autocompletion of the selected clusters or discard if everything looks consistent
                           </span>
-                          <div class="overViewButtons">
-                              <input type="button" value="Discard" id="closeClustering" class="vis-button"/>
-                              <input type="button" value="Continue" id="send4" class="sendQuery"/>
-                          </div>
-                      </div>
-                      <div id="clusteringConsent">
-                          This window shows the potential <span style="color:#ec0000; font-weight:bold">
-                          inconsistent block</span> in the spatial configuration for which an autocompletion is available.
-                      </div>
-                  </div>
+                    <div class="overViewButtons">
+                        <input type="button" value="Discard" id="closeClustering"
+                               class="vis-button"/>
+                        <input type="button" value="Continue" id="send4" class="sendQuery"/>
+                    </div>
                 </div>
-                <div id="resultMappings" class="hide">
-                  <div id="navigateMappingsWrapper">
-                    <div id="navigateMappingsContainer">
-                      <div id="mappingCounter">Mapping
+            </div>
+        </div>
+        <div id="resultMappings" class="hide">
+            <div id="navigateMappingsWrapper">
+                <div id="navigateMappingsContainer">
+                    <div id="mappingCounter">Mapping
                         <span id="currentMapping"></span> / <span id="totalMappings"></span>
-                      </div>
-                      <div id="navigateMappings">
+                    </div>
+                    <div id="navigateMappings">
                         <button class="navigate left">&#9664;</button>
                         <button class="navigate right">&#9654;</button>
-                      </div>
-                      <div id="closeMappings">&times;</div>
                     </div>
-                  </div>
+                    <div id="closeMappings">&times;</div>
                 </div>
-                <div id="zonesView" class="hide">
-                  <div id="zonesViewWrapper">
-                    <div id="zonesViewHeader">Inspect and Edit Zones</div>
-                    <div id="zonesViewContainer"></div>
-                    <div class="overViewControls">
-                      <span class="overViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
-                      <div class="overViewButtons">
-                        <input disabled type="button" value="Set zone" id="setZone" class="vis-button"/>
-                        <input type="button" value="Continue" id="send3" class="sendQuery" data-search-mode="search-graphmatch"/>
-                      </div>
+            </div>
+        </div>
+        <div id="zonesView" class="hide">
+            <div id="zonesViewWrapper">
+                <div id="zonesViewHeader">Inspect and Edit Zones</div>
+                <div id="zonesViewContainer"></div>
+                <div class="overViewControls">
+                    <span class="overViewMessage">Select rooms and assign new zone or continue with search without modifications</span>
+                    <div class="overViewButtons">
+                        <input disabled type="button" value="Set zone" id="setZone"
+                               class="vis-button"/>
+                        <input type="button" value="Continue" id="send3" class="sendQuery"
+                               data-search-mode="search-graphmatch"/>
                     </div>
-                    <div id="zonesLegend"></div>
-                    <div id="zonesOverlay" class="hide">
-                      <div id="zonesViewSelection">
+                </div>
+                <div id="zonesLegend"></div>
+                <div id="zonesOverlay" class="hide">
+                    <div id="zonesViewSelection">
                         <div class="selectType">
                             <h2>Select New Zone</h2>
                             <span id="closeZonesOverlay" class="close-types">&times;</span>
                             <div class="types" id="availableZones"></div>
                             <div class="additional">
-                              <div id="zoneLabel">Zone label<br><textarea disabled id="zoneLabelText"></textarea></div>
+                                <div id="zoneLabel">Zone label<br><textarea disabled
+                                                                            id="zoneLabelText"></textarea>
+                                </div>
                             </div>
                             <div class="save">
-                              <input style="display: block;" type="button" value="Save" class="saveType" id="saveZone"/>
+                                <input style="display: block;" type="button" value="Save"
+                                       class="saveType" id="saveZone"/>
                             </div>
                         </div>
-                      </div>
-                  </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </body>
+    </div>
+</div>
+</body>
 </html>
