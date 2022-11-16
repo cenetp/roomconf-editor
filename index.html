@@ -200,7 +200,7 @@
             <div id="autocompletion">
                 <div class="controls">
                     <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
-                    <div>
+                    <div class="hide">
                         <div>
                             <input disabled type="checkbox" id="skipBlocks"/>
                             <span style="color:#6d6d6d">Skip clustering view</span>
@@ -256,7 +256,11 @@
                 <div id="clusteringConsent">
                     This window shows the potential <span style="color:#ec0000; font-weight:bold">
                           incomplete clusters</span> in the spatial configuration for which an
-                    autocompletion is available
+                    autocompletion is available.
+                    <div id="noClusters" class="hide"><strong>Currently no clusters available to complete.</strong></div>
+                    <div id="clustersAvailable" class="hide">Select clusters to complete:
+                        <div id="clusterSelection"></div>
+                    </div>
                 </div>
                 <div class="overViewControls">
                           <span class="overViewMessage">

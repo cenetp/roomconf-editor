@@ -740,17 +740,25 @@ const updateZonesLegend = function () {
   });
 };
 
-const getNumberOfClusters = function() {
-  // TODO calculate number of clusters depending on room count?
-  return 2;
-}
-
-const getClusterColors = function(numberOfClusters) {
-  let clusterColors = [];
-  for (let i = 0; i < numberOfClusters; i++) {
-    clusterColors.push(allClusterColors[i]);
+let currentClusters = {};
+const updateClustersSelection = function () {
+  if (Object.keys(currentClusters).length === 0) {
+    document.getElementById("noClusters").classList.remove("hide");
+    document.getElementById("clustersAvailable").classList.add("hide");
+  } else {
+    document.getElementById("clustersAvailable").classList.remove("hide");
+    document.getElementById("noClusters").classList.add("hide");
+    jQuery(".clusterSelectionEntry").remove();
+    Object.keys(currentClusters).forEach((clusterId) => {
+      let clId = "cluster" + clusterId;
+      let clInput = '<input type="checkbox" id="' + clId + '" name="' + clId + '" value="' + clusterId + '">';
+      let clRooms = currentClusters[clusterId].join(", ");
+      let clLabel = '<label for="' + clId + '">&nbsp;<span class="zoneColor" style="background:' +
+        allClusterColors[clusterId] + '"></span> ' + clRooms + "</label><br>";
+      let entry = clInput + clLabel;
+      jQuery("#clusterSelection").append(entry);
+    });
   }
-  return clusterColors;
 }
 
 // Apply AGraphML to a network
@@ -763,10 +771,6 @@ const applyAgraphml = function (agraphml,
                                 ignoreClustering) {
   let currentFactor = factor !== undefined ? factor : 1;
   let mapping = mappingColors !== undefined && Object.entries(mappingColors).length > 0;
-  let clusterColors;
-  if (!mapping && agraphml.includes("cluster")) {
-    clusterColors = getClusterColors(getNumberOfClusters());
-  }
   let zonesAvailable = false;
   // first clear existing nodes, edges, and groups
   nodesToUpdate.clear();
@@ -815,6 +819,7 @@ const applyAgraphml = function (agraphml,
     let cluster = "";
     let problematicCluster = "";
     let data = jQuery(this).find("data");
+    // TODO sort data to ensure that roomType is parsed before cluster?
     data.each(function () {
       let key = jQuery(this).attr("key");
       let text = jQuery(this).first().text();
@@ -838,6 +843,11 @@ const applyAgraphml = function (agraphml,
       if (!ignoreClustering) {
         if (key === "cluster") {
           cluster = text;
+          if (currentClusters[parseInt(cluster)] === undefined) {
+            currentClusters[parseInt(cluster)] = [roomType];
+          } else {
+            currentClusters[parseInt(cluster)].push(roomType);
+          }
         }
         if (key === "problematicCluster") {
           problematicCluster = text;
@@ -874,8 +884,9 @@ const applyAgraphml = function (agraphml,
         },
       };
       if (cluster !== "") {
+
         newNode.color = {
-          background: clusterColors[cluster],
+          background: allClusterColors[parseInt(cluster)],
           border: problematicCluster != "" ? "#ec0000" : "#090"
         }
       }
@@ -975,6 +986,10 @@ const showImmutableNetwork = function(network, agraphml, viewTypeTag) {
 const showClustering = function(msg) {
   let clusteringViewContainer = document.querySelector("#clusteringViewContainer");
   showImmutableNetwork(immutableNetwork(clusteringViewContainer), msg, "clustering");
+  updateClustersSelection(currentClusters);
+  for (const id of Object.getOwnPropertyNames(currentClusters)) {
+    delete currentClusters[id];
+  }
 }
 
 const closeClustering = function() {
