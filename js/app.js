@@ -665,9 +665,16 @@ const activateAutocompletionNotifier = function (order) {
 
 const getAutocompletion = function (blocks) {
   if (typeof blocks !== "object" && blocks.indexOf("<clustering>") === 0) {
+    let selectedClusters = [];
+    document.querySelectorAll(".clusterSelect").forEach((el) => {
+      if (el.checked) {
+        selectedClusters.push(el.value);
+      }
+    });
+    let clusters = "<selectedClusters>" + selectedClusters.join(",") + "</selectedClusters>";
     let fingerprints = '<fingerprints><fingerprint name="Room_Graph" weight="1">'
           + '</fingerprint></fingerprints>';
-    req.socket.send("<autocompletion>" + blocks + fingerprints + "</autocompletion>");
+    req.socket.send("<autocompletion>" + blocks + clusters + fingerprints + "</autocompletion>");
   } else if (getNodesAndEdges() != "") {
     let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
     let clusteringOption; // Distance function or number rooms in cluster
@@ -751,10 +758,11 @@ const updateClustersSelection = function () {
     jQuery(".clusterSelectionEntry").remove();
     Object.keys(currentClusters).forEach((clusterId) => {
       let clId = "cluster" + clusterId;
-      let clInput = '<input type="checkbox" id="' + clId + '" name="' + clId + '" value="' + clusterId + '">';
+      let clInput = '<input type="checkbox" checked class="clusterSelect" id="' + clId + '" name="'
+      + clId + '" value="' + clusterId + '">';
       let clRooms = currentClusters[clusterId].join(", ");
-      let clLabel = '<label for="' + clId + '">&nbsp;<span class="zoneColor" style="background:' +
-        allClusterColors[clusterId] + '"></span> ' + clRooms + "</label><br>";
+      let clLabel = '<label for="' + clId + '">&nbsp;<span class="zoneColor redBorder" style="background:' +
+        allClusterColors[clusterId] + '"></span> ' + clusterId + ' (' + clRooms + ")</label><br>";
       let entry = clInput + clLabel;
       jQuery("#clusterSelection").append(entry);
     });

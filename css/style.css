@@ -347,6 +347,10 @@ header {
   border-radius: 5px;
 }
 
+.redBorder {
+  border: 1px solid red;
+}
+
 #availableZones {
   border-right: 1px solid #555;
 }
