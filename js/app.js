@@ -995,9 +995,6 @@ const showClustering = function(msg) {
   let clusteringViewContainer = document.querySelector("#clusteringViewContainer");
   showImmutableNetwork(immutableNetwork(clusteringViewContainer), msg, "clustering");
   updateClustersSelection(currentClusters);
-  for (const id of Object.getOwnPropertyNames(currentClusters)) {
-    delete currentClusters[id];
-  }
 }
 
 const closeClustering = function() {
@@ -1649,5 +1646,8 @@ jQuery(function ($) {
     let mappingId = $(controls).siblings('.mapping.right').prop('id');
     applyRoomconf(mappingId);
     $("#closeMappings, #closeOutput").click();
+    Object.keys(currentClusters).forEach((clusterId) => {
+      delete currentClusters[clusterId];
+    });
   });
 });
