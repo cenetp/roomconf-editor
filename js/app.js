@@ -758,11 +758,11 @@ const updateClustersSelection = function () {
     jQuery(".clusterSelectionEntry").remove();
     Object.keys(currentClusters).forEach((clusterId) => {
       let clId = "cluster" + clusterId;
-      let clInput = '<input type="checkbox" checked class="clusterSelect" id="' + clId + '" name="'
-      + clId + '" value="' + clusterId + '">';
+      let clInput = '<div class="clusterSelectionEntry"><input  class="clusterSelect" type="checkbox" checked id="'
+      + clId + '" name="' + clId + '" value="' + clusterId + '">';
       let clRooms = currentClusters[clusterId].join(", ");
-      let clLabel = '<label for="' + clId + '">&nbsp;<span class="zoneColor redBorder" style="background:' +
-        allClusterColors[clusterId] + '"></span> ' + clusterId + ' (' + clRooms + ")</label><br>";
+      let clLabel = '<label for="' + clId + '">&nbsp;<span class="zoneColor redBorder" style="background:'
+      + allClusterColors[clusterId] + '"></span> ' + clusterId + ' (' + clRooms + ")</label></div>";
       let entry = clInput + clLabel;
       jQuery("#clusterSelection").append(entry);
     });
