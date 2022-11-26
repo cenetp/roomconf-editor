@@ -748,6 +748,7 @@ const updateZonesLegend = function () {
 };
 
 let currentClusters = {};
+let problematicClusters = new Set();
 const updateClustersSelection = function () {
   if (Object.keys(currentClusters).length === 0) {
     document.getElementById("noClusters").classList.remove("hide");
@@ -757,15 +758,28 @@ const updateClustersSelection = function () {
     document.getElementById("noClusters").classList.add("hide");
     jQuery(".clusterSelectionEntry").remove();
     Object.keys(currentClusters).forEach((clusterId) => {
-      let clId = "cluster" + clusterId;
-      let clInput = '<div class="clusterSelectionEntry"><input  class="clusterSelect" type="checkbox" checked id="'
-      + clId + '" name="' + clId + '" value="' + clusterId + '">';
-      let clRooms = currentClusters[clusterId].join(", ");
-      let clLabel = '<label for="' + clId + '">&nbsp;<span class="zoneColor redBorder" style="background:'
-      + allClusterColors[clusterId] + '"></span> ' + clusterId + ' (' + clRooms + ")</label></div>";
-      let entry = clInput + clLabel;
-      jQuery("#clusterSelection").append(entry);
+      if (problematicClusters.has(parseInt(clusterId))) {
+        let clId = "cluster" + clusterId;
+        let clInput = '<div class="clusterSelectionEntry"><input  class="clusterSelect" type="checkbox" checked id="'
+        + clId + '" name="' + clId + '" value="' + clusterId + '">';
+        let clRooms = currentClusters[clusterId].join(", ");
+        let clLabel = '<label for="' + clId + '">&nbsp;<span class="zoneColor redBorder" style="background:'
+        + allClusterColors[clusterId] + '"></span> ' + clusterId + ' (' + clRooms + ")</label></div>";
+        let entry = clInput + clLabel;
+        jQuery("#clusterSelection").append(entry);
+      }
     });
+  }
+}
+
+const clearAllClusters = function () {
+  if (Object.keys(currentClusters).length > 0) {
+    Object.keys(currentClusters).forEach((clusterId) => {
+      delete currentClusters[clusterId];
+    });
+  }
+  if (problematicClusters.size > 0) {
+    problematicClusters.clear();
   }
 }
 
@@ -859,6 +873,7 @@ const applyAgraphml = function (agraphml,
         }
         if (key === "problematicCluster") {
           problematicCluster = text;
+          problematicClusters.add(parseInt(cluster));
         }
       }
     });
@@ -883,7 +898,8 @@ const applyAgraphml = function (agraphml,
         id: roomId,
         label: label,
         roomType: roomType,
-        color: color !== "" ? color : mapping ? (roomId in mappingColors ? mappingColors[roomId] : "#eeeeee") : roomColors[roomType],
+        color: color !== "" ? color : mapping ?
+          (roomId in mappingColors ? mappingColors[roomId] : "#eeeeee") : roomColors[roomType],
         title: replacementText + area + windowsExist + group,
         borderWidth: (replacementText !== "" || problematicCluster !== "") ? 5 : 2,
         group: zone,
@@ -1196,6 +1212,8 @@ closeOutput.onclick = function () {
   for (const id of Object.getOwnPropertyNames(availableMappingNetworks)) {
     delete availableMappingNetworks[id];
   }
+  // clear all clusters
+  clearAllClusters();
 };
 
 const showSuggestion = function (msg) {
@@ -1637,6 +1655,7 @@ jQuery(function ($) {
     rm.find(".active").removeClass("active").addClass("hide");
     rm.addClass("hide");
     $(".resultAgraphml").removeClass("selectedMapping");
+    clearAllClusters();
   });
   $("#showRetrievalSettings").on("click", function () {
     $("#retrievalSettingsWrapper").toggleClass("hide");
@@ -1646,8 +1665,5 @@ jQuery(function ($) {
     let mappingId = $(controls).siblings('.mapping.right').prop('id');
     applyRoomconf(mappingId);
     $("#closeMappings, #closeOutput").click();
-    Object.keys(currentClusters).forEach((clusterId) => {
-      delete currentClusters[clusterId];
-    });
   });
 });
