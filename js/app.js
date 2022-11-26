@@ -840,6 +840,7 @@ const applyAgraphml = function (agraphml,
     let replacementText = "";
     let cluster = "";
     let problematicCluster = "";
+    let partOfCompletion = "";
     let data = jQuery(this).find("data");
     // TODO sort data to ensure that roomType is parsed before cluster?
     data.each(function () {
@@ -875,6 +876,9 @@ const applyAgraphml = function (agraphml,
           problematicCluster = text;
           problematicClusters.add(parseInt(cluster));
         }
+        if (key === "partOfCompletion") {
+          partOfCompletion = text;
+        }
       }
     });
     let replacement = jQuery(this).find("replacement");
@@ -908,10 +912,9 @@ const applyAgraphml = function (agraphml,
         },
       };
       if (cluster !== "") {
-
         newNode.color = {
           background: allClusterColors[parseInt(cluster)],
-          border: problematicCluster != "" ? "#ec0000" : "#090"
+          border: problematicCluster != "" ? (partOfCompletion === "true" ? "#3a1ccc" : "#ec0000") : "#090"
         }
       }
       if (center.x !== undefined && center.y !== undefined) {
