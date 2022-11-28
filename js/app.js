@@ -663,6 +663,17 @@ const activateAutocompletionNotifier = function (order) {
   }
 }
 
+const activateGetAutocompletion = function (activate) {
+  let getAutocompletionButton = document.querySelector('#getAutocompletion');
+  if (activate) {
+    getAutocompletionButton.disabled = false;
+    getAutocompletionButton.classList.remove('disabled');
+  } else {
+    getAutocompletionButton.disabled = true;
+    getAutocompletionButton.classList.add('disabled');
+  }
+}
+
 const getAutocompletion = function (blocks) {
   if (typeof blocks !== "object" && blocks.indexOf("<clustering>") === 0) {
     let selectedClusters = [];
@@ -676,6 +687,7 @@ const getAutocompletion = function (blocks) {
           + '</fingerprint></fingerprints>';
     req.socket.send("<autocompletion>" + blocks + clusters + fingerprints + "</autocompletion>");
   } else if (getNodesAndEdges() != "") {
+    clearAllClusters();
     let clusteringMethod = document.querySelector('#clusterings').selectedOptions[0].value;
     let clusteringOption; // Distance function or number rooms in cluster
     let df = document.querySelector('#distanceFunctions').selectedOptions[0].value;
@@ -692,6 +704,7 @@ const getAutocompletion = function (blocks) {
         .replace("<agraphml>", '<autocompletion>')
         .replace("</agraphml>", clusteringEl + "</autocompletion>");
     req.socket.send(autocompletionMsg);
+    activateGetAutocompletion(false);
   }
 }
 
@@ -1191,6 +1204,7 @@ const showRetrievalResults = function (msg) {
     loading.classList.add("error");
     renderResponse("form", "#retrievalMessages", msg);
     jQuery("#send2").prop("disabled", false).removeClass("disabled");
+    activateGetAutocompletion(true);
   } else if (msg.startsWith("<result>") || msg.startsWith("<?xml")) {
     document.querySelector("#output").classList.remove("hide");
     document.querySelector("#output").classList.add("show");
@@ -1217,6 +1231,7 @@ closeOutput.onclick = function () {
   }
   // clear all clusters
   clearAllClusters();
+  activateGetAutocompletion(true);
 };
 
 const showSuggestion = function (msg) {
@@ -1632,6 +1647,8 @@ jQuery(function ($) {
   });
   $("#closeClustering").on("click", function () {
     closeClustering();
+    clearAllClusters();
+    activateGetAutocompletion(true);
   });
   $("#skipBlocks").on("change", function () {
     skipBlocks = $(this).prop("checked");
