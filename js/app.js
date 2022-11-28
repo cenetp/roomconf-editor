@@ -712,7 +712,7 @@ const showAutocompletions = function () {
   let autocompletions = autocompletionsMsg.substring(index1, index2);
   renderResponse("tbody", "#result", autocompletions);
   jQuery("tr").append('<td class="showExplanation">Info</td>');
-  let applyMessage = 'Apply <span style="color:#96c2fc;font-weight:600">autocompletion</span> '
+  let applyMessage = 'Apply <span style="color:#3a1ccc;font-weight:600">autocompletion</span> '
    + 'on the right side or select another result.';
   agraphmlToRoomConf(applyMessage);
 }
