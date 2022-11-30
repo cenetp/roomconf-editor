@@ -889,7 +889,7 @@ const applyAgraphml = function (agraphml,
           problematicCluster = text;
           problematicClusters.add(parseInt(cluster));
         }
-        if (key === "partOfCompletion") {
+        if (key === "autocompletion") {
           partOfCompletion = text;
         }
       }
