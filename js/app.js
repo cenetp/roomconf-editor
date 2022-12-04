@@ -1658,6 +1658,20 @@ jQuery(function ($) {
       $('#clusterings, #clusterCount').prop('disabled', false);
     }
   });
+  $("body").on("change", ".clusterSelect", function () {
+    let checkedStates = new Set();
+    $(".clusterSelect").each(function() {
+      let c = $(this).prop("checked");
+      checkedStates.add(c);
+    });
+    if (checkedStates.has(true)) {
+      $("#send4").removeClass("disabled");
+      $("#send4").prop("disabled", false);
+    } else if (checkedStates.size === 1 && checkedStates.has(false)) {
+      $("#send4").addClass("disabled");
+      $("#send4").prop("disabled", true);
+    }
+  });
   $('#clusterings').on('change', function () {
     if ($(this).val() === 'distance-based' || $(this).val() === 'force-directed') {
       $('#distanceFunctionsWrapper').removeClass('hide');
