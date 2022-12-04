@@ -763,12 +763,16 @@ const updateZonesLegend = function () {
 let currentClusters = {};
 let problematicClusters = new Set();
 const updateClustersSelection = function () {
-  if (Object.keys(currentClusters).length === 0) {
+  if (problematicClusters.size === 0) {
     document.getElementById("noClusters").classList.remove("hide");
     document.getElementById("clustersAvailable").classList.add("hide");
+    document.getElementById("send4").classList.add("disabled");
+    document.getElementById("send4").disabled = true;
   } else {
     document.getElementById("clustersAvailable").classList.remove("hide");
     document.getElementById("noClusters").classList.add("hide");
+    document.getElementById("send4").classList.remove("disabled");
+    document.getElementById("send4").disabled = false;
     jQuery(".clusterSelectionEntry").remove();
     Object.keys(currentClusters).forEach((clusterId) => {
       if (problematicClusters.has(parseInt(clusterId))) {
