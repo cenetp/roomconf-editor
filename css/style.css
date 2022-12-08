@@ -867,8 +867,8 @@ input[disabled] + label:hover {
   right: 26px;
   top: 53px;
   border: 2px solid #171717;
-  color: #171717;
-  background: #ccc;
+  color: #000;
+  background: #a4a4a4;
   width: 700px;
   height: 500px;
   overflow-y: scroll;

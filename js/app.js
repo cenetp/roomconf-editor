@@ -116,6 +116,8 @@ let options = {
     size: 30,
     font: {
       size: 18,
+      color: "#000000",
+      background: "#ffffffd5",
       strokeWidth: 0,
       face: "Inconsolata, monospace",
     },
@@ -127,7 +129,8 @@ let options = {
     font: {
       size: 18,
       align: "middle",
-      background: "#ffffff",
+      color: "#000000",
+      background: "#ffffffd5",
       strokeWidth: 0,
       face: "Inconsolata, monospace",
     },
