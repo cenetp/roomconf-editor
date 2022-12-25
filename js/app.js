@@ -412,7 +412,7 @@ let req = {
     };
     req.socket.onclose = function () {
       userView.print('<span class="connection red">' + "&#9679;</span> Not connected.");
-      jQuery("#send2, #getAdaptation, #getSuggestion").prop("disabled", true).addClass("disabled");
+      jQuery("#send2, #getAdaptation, #getSuggestion, #getAutocompletion").prop("disabled", true).addClass("disabled");
     };
     req.socket.onmessage = function (msg) {
       userView.print(msg.data);
@@ -652,6 +652,8 @@ const getAdaptation = function () {
 
 const activateAutocompletionNotifier = function (order) {
   if (order === 'show') {
+    document.querySelector("#autocompletion .loading").classList.remove("active");
+    document.querySelector("#autocompletion .loading").classList.remove("error");
     document.querySelector('#autocompletionNotifier').classList.add('show');
     document.querySelector('#notifier').classList.add('highlight');
     setTimeout(function () {
@@ -678,6 +680,8 @@ const activateGetAutocompletion = function (activate) {
 }
 
 const getAutocompletion = function (blocks) {
+  renderResponse("form", "#autocompletionMessages", "");
+  document.querySelector("#autocompletion .loading").classList.remove("error");
   if (typeof blocks !== "object" && blocks.indexOf("<clustering>") === 0) {
     let selectedClusters = [];
     document.querySelectorAll(".clusterSelect").forEach((el) => {
@@ -709,6 +713,7 @@ const getAutocompletion = function (blocks) {
     req.socket.send(autocompletionMsg);
     activateGetAutocompletion(false);
   }
+  document.querySelector("#autocompletion .loading").classList.add("active");
 }
 
 const getAutocompletionForBlocks = function () {
@@ -719,18 +724,25 @@ const getAutocompletionForBlocks = function () {
 }
 
 const showAutocompletions = function () {
-  document.querySelector("#output").classList.remove("hide");
-  document.querySelector("#output").classList.add("show");
-  let autocomnpletionCount = autocompletionsMsg.match(/<\/tr>/g).length;
-  jQuery("#result").css("width", autocomnpletionCount * 250 + "px");
-  let index1 = autocompletionsMsg.indexOf("<autocompletions>") + 17;
-  let index2 = autocompletionsMsg.indexOf("</autocompletions>");
-  let autocompletions = autocompletionsMsg.substring(index1, index2);
-  renderResponse("tbody", "#result", autocompletions);
-  jQuery("tr").append('<td class="showExplanation">Info</td>');
-  let applyMessage = 'Apply <span style="color:#3a1ccc;font-weight:600">autocompletion</span> '
-   + 'on the right side or select another result.';
-  agraphmlToRoomConf(applyMessage);
+  document.querySelector("#autocompletion .loading").classList.remove("active");
+  if (autocompletionsMsg.includes("<autocompletions><error>")) {
+    document.querySelector("#autocompletion .loading").classList.add("error");
+    renderResponse("form", "#autocompletionMessages", autocompletionsMsg);
+    activateGetAutocompletion(true);
+  } else {
+    document.querySelector("#output").classList.remove("hide");
+    document.querySelector("#output").classList.add("show");
+    let autocomnpletionCount = autocompletionsMsg.match(/<\/tr>/g).length;
+    jQuery("#result").css("width", autocomnpletionCount * 250 + "px");
+    let index1 = autocompletionsMsg.indexOf("<autocompletions>") + 17;
+    let index2 = autocompletionsMsg.indexOf("</autocompletions>");
+    let autocompletions = autocompletionsMsg.substring(index1, index2);
+    renderResponse("tbody", "#result", autocompletions);
+    jQuery("tr").append('<td class="showExplanation">Info</td>');
+    let applyMessage = 'Apply <span style="color:#3a1ccc;font-weight:600">autocompletion</span> '
+     + 'on the right side or select another result.';
+    agraphmlToRoomConf(applyMessage);
+  }
 }
 
 let cl = document.querySelector("#showAgraphml").classList;
@@ -1211,7 +1223,6 @@ const showRetrievalResults = function (msg) {
     loading.classList.add("error");
     renderResponse("form", "#retrievalMessages", msg);
     jQuery("#send2").prop("disabled", false).removeClass("disabled");
-    activateGetAutocompletion(true);
   } else if (msg.startsWith("<result>") || msg.startsWith("<?xml")) {
     document.querySelector("#output").classList.remove("hide");
     document.querySelector("#output").classList.add("show");

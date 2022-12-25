@@ -200,6 +200,7 @@
             <div id="autocompletion">
                 <div class="controls">
                     <input type="button" value="Get Autocompletion" id="getAutocompletion"/>
+                    <span class="loading"></span>
                     <div class="hide">
                         <div>
                             <input disabled type="checkbox" id="skipBlocks"/>
@@ -229,9 +230,8 @@
                             <input disabled type="number" min="2" id="clusterCount" value="2">
                         </div>
                     </div>
+                    <div id="autocompletionMessages"></div>
                 </div>
-                <!-- <div id="adaptations"></div>
-                <input type="button" value="Done" id="closeAdaptation" class="hide"> -->
             </div>
         </div>
         <div id="output" class="w3-light-grey hide">
