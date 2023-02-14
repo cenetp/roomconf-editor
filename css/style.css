@@ -114,6 +114,7 @@ header {
 #autocompletionNotifier,
 #getAutocompletion,
 .applyRoomconf,
+#showBusinessRules,
 #downloadAgraphml {
   border-radius: 5px;
   border: 1px solid #333;
@@ -823,6 +824,7 @@ input[disabled] + label:hover {
   text-decoration: none;
 }
 
+#businessRulesWrapper,
 #autocompletionNotifierWrapper,
 #download {
   right: 25px;
@@ -831,9 +833,14 @@ input[disabled] + label:hover {
 }
 
 #autocompletionNotifierWrapper {
+  right: 136px;
+}
+
+#businessRulesWrapper{
   right: 80px;
 }
 
+#showBusinessRules,
 #autocompletionNotifier,
 #downloadAgraphml {
   height: 28px;
@@ -862,6 +869,7 @@ input[disabled] + label:hover {
   color: #fcff79;
 }
 
+#businessRules,
 #showAgraphml {
   position: absolute;
   right: 26px;
@@ -877,6 +885,10 @@ input[disabled] + label:hover {
   z-index: 99999 !important;
   font-size: 12px;
   outline: none;
+}
+
+#businessRules {
+  background: #f1f1f1;
 }
 
 #agraphmlControls {

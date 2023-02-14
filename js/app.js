@@ -763,6 +763,22 @@ document.querySelector("#downloadAgraphml").onclick = function () {
   }
 };
 
+let brcl = document.querySelector("#businessRules").classList;
+
+document.querySelector("#showBusinessRules").onclick = function () {
+  if (brcl.contains("hide")) {
+    brcl.remove("hide");
+    brcl.add("show");
+  } else {
+    brcl.remove("show");
+    brcl.add("hide");
+  }
+};
+
+// brcl should be hidden on load, //hacky solution to anchor vis locations on iframe.
+brcl.remove("show");
+brcl.add("hide");
+
 // Initalize objects for zonesView
 let groups = {};
 const updateZonesLegend = function () {
