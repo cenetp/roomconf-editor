@@ -747,6 +747,7 @@ const showAutocompletions = function () {
 
 let cl = document.querySelector("#showAgraphml").classList;
 let cl_ag = document.querySelector("#agraphmlControls").classList;
+let brcl = document.querySelector("#businessRules").classList;
 
 document.querySelector("#downloadAgraphml").onclick = function () {
   if (cl.contains("hide")) {
@@ -754,6 +755,8 @@ document.querySelector("#downloadAgraphml").onclick = function () {
     cl_ag.remove("hide");
     cl.add("show");
     cl_ag.add("show");
+    brcl.remove("show");
+    brcl.add("hide");
     sendQuery("download");
   } else {
     cl.remove("show");
@@ -763,10 +766,12 @@ document.querySelector("#downloadAgraphml").onclick = function () {
   }
 };
 
-let brcl = document.querySelector("#businessRules").classList;
-
 document.querySelector("#showBusinessRules").onclick = function () {
   if (brcl.contains("hide")) {
+    cl.remove("show");
+    cl_ag.remove("show");
+    cl.add("hide");
+    cl_ag.add("hide");
     brcl.remove("hide");
     brcl.add("show");
   } else {
@@ -774,10 +779,6 @@ document.querySelector("#showBusinessRules").onclick = function () {
     brcl.add("hide");
   }
 };
-
-// brcl should be hidden on load, //hacky solution to anchor vis locations on iframe.
-brcl.remove("show");
-brcl.add("hide");
 
 // Initalize objects for zonesView
 let groups = {};
