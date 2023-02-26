@@ -1735,4 +1735,10 @@ jQuery(function ($) {
     applyRoomconf(mappingId);
     $("#closeMappings, #closeOutput").click();
   });
+  // Dynamic rules
+  if (config.dr.enable) {
+    $("#showBusinessRules").prop("disabled", false).removeClass("disabled");
+  }
+  let dr = "http://" + config.dr.server + config.dr.endpoint;
+  $("#businessRules").prop("src", dr);
 });

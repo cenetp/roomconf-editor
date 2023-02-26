@@ -5,6 +5,11 @@ var config = {
   autocompletion: true,
   server: "localhost",
   port: 3030,
+  dr: {
+    enable: false,
+    server: "localhost:3000",
+    endpoint: "/businessRules"
+  },
   debug: true
 };
 
