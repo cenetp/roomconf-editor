@@ -18,6 +18,13 @@
             <div id="disableDownload"></div>
             <input type="button" value="</>" title="Show source" id="downloadAgraphml"/>
         </div>
+        <div id="businessRulesWrapper">
+            <input type="button" value="DR" title="Show source" id="showBusinessRules"/>
+            <div>
+                <iframe id="businessRules" class="hide" src="http://127.0.0.1:8000/businessRules"></iframe> 
+                <!-- It should be changed to URL of Consistency Checker if it's going to be deployed somewhere -->
+            </div>
+        </div>
         <div id="autocompletionNotifierWrapper">
             <button title="Autocompletion notifier" id="autocompletionNotifier">
                 <span id="notifier">&#10035;</span>

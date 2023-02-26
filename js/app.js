@@ -747,6 +747,7 @@ const showAutocompletions = function () {
 
 let cl = document.querySelector("#showAgraphml").classList;
 let cl_ag = document.querySelector("#agraphmlControls").classList;
+let brcl = document.querySelector("#businessRules").classList;
 
 document.querySelector("#downloadAgraphml").onclick = function () {
   if (cl.contains("hide")) {
@@ -754,12 +755,28 @@ document.querySelector("#downloadAgraphml").onclick = function () {
     cl_ag.remove("hide");
     cl.add("show");
     cl_ag.add("show");
+    brcl.remove("show");
+    brcl.add("hide");
     sendQuery("download");
   } else {
     cl.remove("show");
     cl_ag.remove("show");
     cl.add("hide");
     cl_ag.add("hide");
+  }
+};
+
+document.querySelector("#showBusinessRules").onclick = function () {
+  if (brcl.contains("hide")) {
+    cl.remove("show");
+    cl_ag.remove("show");
+    cl.add("hide");
+    cl_ag.add("hide");
+    brcl.remove("hide");
+    brcl.add("show");
+  } else {
+    brcl.remove("show");
+    brcl.add("hide");
   }
 };
 
