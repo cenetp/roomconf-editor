@@ -1,0 +1,48 @@
+{
+  "name": "roomconf-editor",
+  "version": "1.0.1",
+  "description": "Editor for graph-based architectural room configurations in AGraphML format, user interface of the MetisCBR framework.",
+  "scripts": {
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production",
+    "start": "webpack-dev-server --mode development --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cenetp/roomconf-editor.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cenetp/roomconf-editor/issues"
+  },
+  "homepage": "http://veisen.de/metiscbr",
+  "devDependencies": {
+    "@webpack-cli/serve": "^1.7.0",
+    "ansi-regex": ">=4.1.1",
+    "copy-webpack-plugin": "^6.0.3",
+    "css-loader": "^4.1.0",
+    "file-loader": "^6.0.0",
+    "follow-redirects": ">=1.14.8",
+    "glob-parent": ">=5.1.2",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-forge": ">=1.3.0",
+    "nth-check": ">=2.0.1",
+    "postcss": ">=8.2.13",
+    "style-loader": "^1.2.1",
+    "tar": ">=6.1.9",
+    "ts-loader": "^8.0.2",
+    "ttf-loader": "^1.0.2",
+    "typescript": "^3.9.7",
+    "url-parse": ">=1.5.6",
+    "webpack": "^5.71.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4"
+  },
+  "dependencies": {
+    "jquery": "^3.5.1",
+    "vis-data": "^6.6.1",
+    "vis-network": "^7.10.2"
+  }
+}
