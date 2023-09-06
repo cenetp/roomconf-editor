@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Eisenstadt
+    given-names: Viktor
+    orcid: https://orcid.org/0000-0001-6567-0943
+  - family-names: Karaali
+    given-names: Ozan
+    orcid:
+  - family-names: Ould Mahieddine
+    given-names: Karim
+    orcid:
+title: "roomconf-editor"
+URL: https://github.com/cenetp/roomconf-editor
+date-released: 2023-09-06
