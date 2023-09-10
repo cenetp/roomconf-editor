@@ -1,15 +1,22 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+title: RoomConf Editor
+message: >-
+  If you use this software, please cite it as below.
+type: software
 authors:
-  - family-names: Eisenstadt
-    given-names: Viktor
-    orcid: https://orcid.org/0000-0001-6567-0943
+  - given-names: Viktor
+    family-names: Eisenstadt
+    orcid: 'https://orcid.org/0000-0001-6567-0943'
   - family-names: Karaali
     given-names: Ozan
-    orcid:
-  - family-names: Ould Mahieddine
-    given-names: Karim
-    orcid:
-title: "roomconf-editor"
-URL: https://github.com/cenetp/roomconf-editor
-date-released: 2023-09-06
+  - given-names: Karim
+    family-names: Ould Mahieddine
+identifiers:
+  - type: url
+    value: >-
+      https://github.com/cenetp/roomconf-editor/releases/tag/v1.0.0-alpha
+repository-code: 'https://github.com/cenetp/roomconf-editor'
+url: 'http://veisen.de/metiscbr'
+abstract: >-
+  Architectural room configuration editor and the UI of the MetisCBR framework
+license: MIT
